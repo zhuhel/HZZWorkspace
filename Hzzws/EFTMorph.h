@@ -1,0 +1,50 @@
+/* Based on RooLagrangianMorphFunc
+ * */
+#ifndef __HZZWS_EFTMORPH_H__
+#define __HZZWS_EFTMORPH_H__
+
+#include <string>
+#include <vector>
+
+#include "Hzzws/SampleBase.h"
+#include "Hzzws/Coefficient.h"
+
+#include "RooAbsPdf.h"
+#include "RooArgList.h"
+#include "RooLagrangianMorphFunc.h"
+
+using namespace std;
+class EFTMorph : public SampleBase {
+
+    public:
+
+        EFTMorph(const char* name, // used to construct PDF
+                const char* configfile);
+        virtual ~EFTMorph();
+
+        virtual bool setChannel(const RooArgSet&, const char* channelName, bool with_sys);
+	
+        virtual RooAbsPdf* getPDF();
+
+        virtual RooAbsReal* getCoefficient(const char* customname="");
+        virtual bool addShapeSys(const TString& npName);
+
+    private:
+
+        RooArgSet createHCMorphParaSet(std::string parlist); 
+        RooArgSet couplingsDatabase;
+        RooArgSet formulaDatabase;
+        RooAbsReal* getOverallNormalization();
+
+    
+    protected:
+      
+        std::map<std::string, std::map<std::string, std::string> > morph_dic;
+        std::map<std::string, Coefficient*> m_sampleCoefMap;
+        RooLagrangianMorphFunc* m_eftfunc;
+
+        RooArgList *m_morphcoefs, *m_morphfuncs;
+
+
+};
+#endif

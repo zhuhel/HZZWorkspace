@@ -1,0 +1,5 @@
+ggF 1.23 
+VBF 1.28
+qqZZ 0.84
+ggZZ 0.84
+zjet 0.99

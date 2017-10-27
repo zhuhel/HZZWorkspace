@@ -1,0 +1,9 @@
+addLep 
+nggFbbHttH & 0.001362 \\
+ZZpol_a2_b0_c0 & 1 \\
+ZZpol_a1_b1_c0 & -0.442804 \\
+ZZpol_a1_b0_c1 & 60.848  \\
+ZZpol_a0_b2_c0 & 524.702  \\
+ZZpol_a0_b1_c1 & 24.0574 \\
+ZZpol_a0_b0_c2 & 1279.8 \\
+PRODpol_a2 & 1\\
