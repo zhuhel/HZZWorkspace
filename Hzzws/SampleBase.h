@@ -50,6 +50,7 @@ class SampleBase{
         const string& get_pdf_name() { return pdf_name_; }
         const string& get_channel() { return category_name_; }
 
+        // get the associated obs/nps
         const RooArgList& getGlobal() { return global_obs_list_; }
         const RooArgList& getNuisance() { return nuisance_obs_list_; } 
 
@@ -67,8 +68,8 @@ class SampleBase{
         bool use_adpt_bin_; // use adaptive binning if true
         double mass_;
 
-        RooArgList global_obs_list_;
-        RooArgList nuisance_obs_list_;
+        RooArgList global_obs_list_;    // associated global obs
+        RooArgList nuisance_obs_list_;  // associated nps
 
         ////////////////////////////////////////
         // Following variables depend on category

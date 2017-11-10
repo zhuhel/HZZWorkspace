@@ -26,8 +26,8 @@ public:
     bool AddConfig(const char* text_file); //adds to existing
     RooAbsReal* GetSys(const char* name);
     RooAbsReal* GetSys();
-    RooArgList GetNPs() { return np_;};
-    RooArgList GetGammas() {return gamma_;};
+    const RooArgList& GetNPs() { return np_;};
+    const RooArgList& GetGammas() {return gamma_;};
     void AddGlobalSys(const char* npName, float low, float up);
     void Print() const;
     void SetCutoff(float in);

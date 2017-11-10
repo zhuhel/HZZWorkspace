@@ -299,7 +299,7 @@ bool Coefficient::BuildCoefficient()
                     )
                 );
         poiFormula->Print();
-        // when .int file appears in 'factors', assuming POI is defined there...
+        // when .ini file appears in 'factors', assuming POI is defined there...
         bool add_poi = true;
         if( m_args.find("factors") != m_args.end() ){
             TString factor_str(m_args["factors"]);

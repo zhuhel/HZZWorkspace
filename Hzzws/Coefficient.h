@@ -30,8 +30,9 @@ class Coefficient {
 
     void SetCutoff (float in);
 
-    RooArgSet GetNPs() { return np_;};
-    RooArgSet GetGammas() {return gamma_;};
+    // get the associated NPs for this coefficient
+    const RooArgSet& GetNPs() { return np_;};
+    const RooArgSet& GetGammas() {return gamma_;};
 
   private:
     RooArgList* m_arglist;
@@ -62,8 +63,8 @@ class Coefficient {
 
     strvec poi_names;
     
-    RooArgSet np_;    
-    RooArgSet gamma_;    
+    RooArgSet np_;    // nuisance parameters associated to the coefficient
+    RooArgSet gamma_; // MC stat NPs associated to the coefficient
 };
 
 #endif

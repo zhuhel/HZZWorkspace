@@ -76,8 +76,7 @@ bool SysText::SetChannel(const char* ch_name){
             for(const auto& npName : sec.second) {
                 istringstream iss(npName.second);
                 float low_value, high_value;
-                //iss >> low_value >> high_value ;
-                iss >> high_value >> low_value ; //!!! TODO tmp fix for off-shell inputs
+                iss >> low_value >> high_value ;
 
                 if (std::isnan(low_value) || std::isnan(high_value)) continue;
 
