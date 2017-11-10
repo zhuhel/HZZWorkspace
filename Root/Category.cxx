@@ -32,6 +32,7 @@ Category::~Category()
 }
 
 void Category::addSample(SampleBase* sample, SystematicsManager* sysMan){
+    log_info("trying to add sample: %s", sample->get_pdf_name().c_str());
     sample_container_.push_back(sample);
     bool with_sys = sysMan->totalNP() > 0;
     if (!sample->setChannel(this->obs, this ->m_label.c_str(), with_sys)){
@@ -84,7 +85,7 @@ void Category::addSample(SampleBase* sample, SystematicsManager* sysMan){
             return;
         }
     }
-   log_info("adding coefficient:");
+    log_info("adding coefficient:");
     coefficient->Print();
     coefList.add(*coefficient);
 
@@ -93,8 +94,9 @@ void Category::addSample(SampleBase* sample, SystematicsManager* sysMan){
 
     RooMCHistConstraint* mc_constrt =
         dynamic_cast<RooMCHistConstraint*>(sample->get_mc_constraint());
-    // add MC constraint terms
+    // add MC constraint terms for SampleHist
     if (mc_constrt != nullptr){
+        log_info("adding RooMCHistConstraint:");
         constraintList.add(*mc_constrt);
         TIter next_global(mc_constrt->getGlobalObservables().createIterator());
         TIter next_nuis(mc_constrt->getNuisanceParameters().createIterator());
@@ -110,6 +112,28 @@ void Category::addSample(SampleBase* sample, SystematicsManager* sysMan){
             nuisance_obs_list_.add(*nuisance);
         }
     }
+
+    RooAbsPdf* mc_constrt2 = sample->get_mc_constraint();
+    // add MC constraint terms for SampleCount
+    if (mc_constrt2 != nullptr){
+        log_info("adding MC Constraint for SampleCount:");
+        mc_constrt2->Print();
+        constraintList.add(*mc_constrt2);
+        TIter next_global(sample->getGlobal().createIterator());
+        TIter next_nuis(sample->getNuisance().createIterator());
+        RooAbsReal* global;
+        RooAbsReal* nuisance;
+        while ((
+                    global = (RooAbsReal*) next_global(),
+                    nuisance = (RooAbsReal*) next_nuis()
+               ))
+        {
+            if (nuisance->isConstant()) continue; // not include the ones below threshold.
+            global_obs_list_.add(*global);
+            nuisance_obs_list_.add(*nuisance);
+        }
+    }
+
 }
 
 void Category::setObservables(const RooArgSet& _obs)
@@ -132,10 +156,13 @@ RooAbsPdf* Category::getPDF(){
     uncon_pdf->Print();
     if (nps_set.empty()) return uncon_pdf;
 
-    //add gaussian constraints
+    //add constraints
     for(auto& np : nps_set){
-        auto* gauss = Helper::createConstraint(np.Data());
-        constraintList.add(*gauss);
+        //add gaussian constraints
+        if(!np.Contains("MCSTAT")) {
+          auto* gauss = Helper::createConstraint(np.Data());
+          constraintList.add(*gauss);
+        }
     }
     constraintList.add(*uncon_pdf);
 

@@ -7,7 +7,10 @@
 
 #include <stdio.h>
 #include <RooRealVar.h>
+#include <RooProduct.h>
+#include <RooConstVar.h>
 #include <RooGaussian.h>
+#include <RooPoisson.h>
 
 #include <TChain.h>
 #include <TH1.h>
@@ -45,6 +48,7 @@ namespace Helper{
     RooRealVar* createNuisanceVar(const char* npName);
     RooRealVar* createGlobalVar(const char* npName);
     RooAbsPdf* createConstraint(const char* npName);
+    RooAbsPdf* createMCStatConstraint(const char* npName, RooRealVar* np, RooArgList* globalSet=NULL);
 
     TChain* loader(const string& inFile_name, const string& chain_name);
     TChain* loader(const vector<string>& inFile_name, const string& chain_name);
@@ -68,7 +72,7 @@ namespace Helper{
     bool isMathSyntax(const string& str);
     // -1, not a boolean type, 0: false, 1: true
     int isBoolean(const string& str);
-
+   
     // sort string vector by length
     bool sort_str_len(const std::string A, const std::string B);
 }

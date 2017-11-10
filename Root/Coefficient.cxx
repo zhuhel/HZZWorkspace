@@ -251,7 +251,7 @@ bool Coefficient::BuildCoefficient()
                   vector<double> highValues;
                   TString varname = "alpha_"+(*poi_name);
                   factor = new RooRealVar(varname.Data(),varname.Data(),
-                    (float) atof(vals.at(2).c_str()), 
+                    (float) atof(vals.at(2).c_str()),
                     (float) atof(vals.at(1).c_str()));
                   listA.add(*factor);
                   highValues.push_back(atof(1 + vals.at(1).c_str()));
@@ -299,7 +299,7 @@ bool Coefficient::BuildCoefficient()
                     )
                 );
         poiFormula->Print();
-        // when .ini file appears in 'factors', assuming POI is defined there...
+        // when .int file appears in 'factors', assuming POI is defined there...
         bool add_poi = true;
         if( m_args.find("factors") != m_args.end() ){
             TString factor_str(m_args["factors"]);
@@ -368,7 +368,10 @@ bool Coefficient::BuildCoefficient()
     // Systematics (keyword 'sys')
     if (m_args.find("sys")!=m_args.end()){
         auto f = GetSystematicFactor(m_args["sys"]);
-        AddFactor(f);
+        if(f) AddFactor(f);
+        // gamma terms for MC stat (for SampleCount)
+        auto fmc = GetMCStatFactor(m_args["sys"]);
+        if(fmc) AddFactor(fmc);
     }
 
     return true;
@@ -795,6 +798,36 @@ RooAbsReal* Coefficient::GetGenericFactorUsingNormDic(const std::string& p, cons
     return factor;
 }
 
+RooAbsReal* Coefficient::GetMCStatFactor(const std::string& p)
+{
+    TString sysarg(p.c_str());
+
+    RooArgList prodset;
+
+    strvec sysfiles;
+    Helper::tokenizeString(p,',',sysfiles);
+
+    for (int i(0);i<(int)sysfiles.size();++i){
+        log_info("in %s adding sysfile (%i/%lu) %s ",__func__,i,sysfiles.size(),sysfiles[i].c_str());
+
+        //Form a single set of systematics
+        if (!TString(sysfiles[i].c_str()).MaybeWildcard()){ 
+            // MC stat
+            const char* mcstat_name = Form("gamma_stat%d_%s_%s",i,m_nickname.c_str(),m_channel.c_str());
+            auto mcstat = m_sysHandler[i][0]->GetSys(mcstat_name); 
+            if (!mcstat){
+                log_err("unable to get mc stat for this file: %s", sysfiles[i].c_str());
+                continue;
+            }
+            prodset.add(*mcstat);
+            gamma_.add(m_sysHandler[i][0]->GetGammas());
+        }
+     }
+    if (prodset.getSize()==0) return NULL;
+
+    const char* fivname = Form("gamma_stat_%s_%s",m_nickname.c_str(),m_channel.c_str());  
+    return new RooProduct(fivname,fivname,prodset);
+}
 
 RooAbsReal* Coefficient::GetSystematicFactor(const std::string& p)
 {
@@ -818,6 +851,7 @@ RooAbsReal* Coefficient::GetSystematicFactor(const std::string& p)
                 continue;
             }
             prodset.add(*fiv);
+            np_.add(m_sysHandler[i][0]->GetNPs());
         }
 
         else{ //For a wildcard (multiple) set of systematics.. make a bspline out of them
@@ -838,6 +872,7 @@ RooAbsReal* Coefficient::GetSystematicFactor(const std::string& p)
                     continue;
                 }
                 bs_fiv_list.add(*fiv);
+                np_.add(s.second->GetNPs());
             }
             const char* bsname = Form("bs_fiv%d_%s_%s",i,m_nickname.c_str(),m_channel.c_str());
             if (bs_fiv_list.getSize() > 0){ // In case of no systematics added

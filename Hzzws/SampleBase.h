@@ -50,6 +50,8 @@ class SampleBase{
         const string& get_pdf_name() { return pdf_name_; }
         const string& get_channel() { return category_name_; }
 
+        const RooArgList& getGlobal() { return global_obs_list_; }
+        const RooArgList& getNuisance() { return nuisance_obs_list_; } 
 
         // To get the stats that is used to make the histrogram
         virtual int getStats() const {return -1;};
@@ -64,6 +66,9 @@ class SampleBase{
         string nickname_; // used for some variables to keep name short
         bool use_adpt_bin_; // use adaptive binning if true
         double mass_;
+
+        RooArgList global_obs_list_;
+        RooArgList nuisance_obs_list_;
 
         ////////////////////////////////////////
         // Following variables depend on category

@@ -26,9 +26,12 @@ public:
     bool AddConfig(const char* text_file); //adds to existing
     RooAbsReal* GetSys(const char* name);
     RooAbsReal* GetSys();
+    RooArgList GetNPs() { return np_;};
+    RooArgList GetGammas() {return gamma_;};
     void AddGlobalSys(const char* npName, float low, float up);
     void Print() const;
     void SetCutoff(float in);
+    void SetMCStatCutoff(float in);
     const string& GetInputName(){
         return file_name_;
     }
@@ -44,8 +47,10 @@ private:
    string ch_name_;
    vector<double> low_;
    vector<double> high_;
-   RooArgList np_;
+   RooArgList np_;  // nuisance parameters (not including MC stat)
+   RooArgList gamma_; // MC stat np
    float m_cutoff;
+   float m_cutoff_mcstat;
 };
 
 #endif

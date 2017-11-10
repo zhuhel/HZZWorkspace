@@ -190,6 +190,8 @@ RooRealVar* createGlobalVar(const char* npName)
 
 RooAbsPdf* createConstraint(const char* npName)
 {
+    log_info("createConstraint for %s", npName);
+
     // TODO: may add other constraint functions here
     auto* var = createNuisanceVar(npName);
     auto* mean = createGlobalVar(npName);
@@ -198,6 +200,48 @@ RooAbsPdf* createConstraint(const char* npName)
     string _pdfname(Form("alpha_%sConstraint", npName ));
     RooGaussian* gauss = new RooGaussian(_pdfname.c_str(), _pdfname.c_str(), *var, *mean, *sigma);
     return gauss;
+}
+
+RooAbsPdf* createMCStatConstraint(const char* npName, RooRealVar* np, RooArgList* globalSet)
+{
+    // Poisson for MC stat (following Histfactory: /afs/cern.ch/atlas/project/HSG7/root/root_v6-04-02/src/roofit/histfactory/src/HistoToWorkspaceFactoryFast.cxx)
+    // np    is the gamma np for MC stat
+    // TODO: assume that  np range is (0, 1+5*sigma)
+
+    log_info("createMCStatConstraint for %s", npName);
+
+    TString npNameIn(npName);
+
+    // set reasonable ranges for gamma parameters
+    // sigma is the relative uncertainty
+    float npMax= np->getMax();
+    float npMin= np->getMin();
+    Double_t sigma = (npMax - 1)/5.;
+
+    // Poisson ( np | tau*beta )
+    // np is the nominal: np0 = tau
+    // beta is the scaling term
+    // tau = 1/sigma/sigma
+    // sigma is the *relative* stat error
+
+    Double_t tau = 1/sigma/sigma; // this is correct Poisson equivalent to a Gaussian with mean 1 and stdev sigma
+
+    // Make nominal "observed" value
+    RooRealVar*  roo_nominal = new RooRealVar(npNameIn + "_nominal", "", tau);
+    roo_nominal->setMin(0.);
+    // Make the scaling term
+    RooConstVar* roo_poisscale = new RooConstVar(npNameIn + "_scale", "", tau);
+    // Make mean for scaled Poisson
+    RooProduct*  roo_poismean = new RooProduct(npNameIn + "_pmean", "", RooArgSet(*roo_poisscale, *np));
+    // Type 2 : RooPoisson
+    TString constr_id = npNameIn + "_constraint";
+    RooPoisson*  roo_poisson = new RooPoisson(constr_id.Data(), constr_id.Data(), *roo_nominal, *roo_poismean);
+    roo_poisson->setNoRounding(true);
+
+    if(globalSet) 
+      if(! globalSet->contains(*roo_nominal) ) globalSet->addClone(*roo_nominal);
+
+    return roo_poisson;
 }
 
 void readNormTable(const char* file_name, 
