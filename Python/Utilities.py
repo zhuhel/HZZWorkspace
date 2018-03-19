@@ -50,6 +50,22 @@ def config_display(cfg_dict):
     return return_str
 
 
+def check_config(cfg_dict, keys, cfg_section='main'):
+    """
+    Check if the config dictionary contains the given keys.
+    :param cfg_dict: the input config dictionary, as in the config_dict function above
+    :param keys: the keys in cfg_section that need to be present
+    :param cfg_section: the section of the config file to search
+    :return: True if the config is fine, False otherwise
+    """
+    accept = True
+    for k in keys:
+        if k not in cfg_dict[cfg_section]:
+            logging.error("Could not find '%s' option in '%s' section of config file", k, cfg_section)
+            accept = False
+    return accept
+
+
 def check_np(np_dict):
     """
     Checks to see if the NP config file is appropriately designed.

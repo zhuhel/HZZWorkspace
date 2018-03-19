@@ -30,6 +30,10 @@ if 'outdir' in top_config['main']:
     logging.warn("Output directory %s found in config file, replacing the command line argument of %s",
                  top_config['main']['outdir'], args.output_dir)
 
+if not Utilities.check_config(top_config, ['categories', 'samples', 'path', 'treename', 'NPlist']):
+    logging.error("Config file does not contain required information. Exiting...")
+    sys.exit()
+
 if not Utilities.check_np(np_config):
     logging.error("NP list file does not contain even 'up' and 'down' variations. Exiting...")
     sys.exit()
@@ -41,6 +45,6 @@ for sample in top_config['main']['samples']:
         logging.info("Category: %s", category)
         if "smooth" not in top_config[category]:
             smooth = False
-            logging.info("Using binned histograms, since smoothing information not found in config file.")
+            logging.info("Using binned histograms, since smoothing information not found in config file")
         else:
             smooth = top_config[category]["smooth"]
