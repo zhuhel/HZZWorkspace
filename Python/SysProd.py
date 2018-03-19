@@ -1,18 +1,19 @@
 #!/usr/bin/env python
 
-from ConfigParser import SafeConfigParser
 from argparse import ArgumentParser
 import Utilities
-from datetime import datetime
-import pprint
+import logging.config
 
 parser = ArgumentParser()
 parser.add_argument(dest='config_file', help="The input config file", type=str)
-parser.add_argument('--log', help="The output log file name", type=str,
-                    default=datetime.now().strftime("log_%Y-%m-%d_%H:%M:%S.txt"))
 args = parser.parse_args()
 
-top_config = Utilities.configDict(args.config_file, tokenize=['categories', 'observables'])
-np_config = Utilities.configDict(top_config['main']['NPlist'])
+logging.config.fileConfig('logging.ini')
 
+logging.info("Calculating systematics from config file %s", args.config_file)
+
+top_config = Utilities.config_dict(args.config_file, tokenize=['categories', 'observables'])
+logging.debug(Utilities.config_display(top_config))
+np_config = Utilities.config_dict(top_config['main']['NPlist'])
+logging.debug(Utilities.config_display(np_config))
 
