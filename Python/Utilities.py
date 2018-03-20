@@ -1,6 +1,5 @@
 from ConfigParser import SafeConfigParser
 import logging
-import os
 
 
 def config_dict(filename, tokenize=None):
@@ -75,7 +74,7 @@ def check_np(np_dict):
     for s, section in np_dict.iteritems():
         var_sum = 0
         for v, value in section.iteritems():
-            if  "JET_JER_SINGLE_NP" in v:
+            if "JET_JER_SINGLE_NP" in v:
                 continue
             if "1up" in v:
                 var_sum += 1

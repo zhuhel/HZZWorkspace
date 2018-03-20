@@ -3,7 +3,8 @@
 from argparse import ArgumentParser
 import Utilities
 import logging.config
-import sys, os
+import sys
+import os
 
 parser = ArgumentParser()
 parser.add_argument(dest='config_file', help="The input config file", type=str)
@@ -19,9 +20,17 @@ except ImportError:
     logging.error("Could not import ROOT module. Make sure your root is configured to work with Python.")
     sys.exit()
 
+
+def get_hist(h_name, sample, category, file_name, observables, cuts, weight_label, smooth):
+    t_cut = ROOT.TChain()
+
+    return_hist = None
+    return return_hist
+
+
 logging.info("Calculating systematics from config file %s", args.config_file)
 
-top_config = Utilities.config_dict(args.config_file, tokenize=['samples','categories', 'observables'])
+top_config = Utilities.config_dict(args.config_file, tokenize=['samples', 'categories', 'observables'])
 logging.debug(Utilities.config_display(top_config))
 np_config = Utilities.config_dict(top_config['main']['NPlist'])
 logging.debug(Utilities.config_display(np_config))
@@ -48,3 +57,6 @@ for sample in top_config['main']['samples']:
             logging.info("Using binned histograms, since smoothing information not found in config file")
         else:
             smooth = top_config[category]["smooth"]
+
+        hist_name = '-'.join([top_config[category]['observables'][0].split(':')[0], sample, category])
+        logging.debug("Histogram name: %s", hist_name)
