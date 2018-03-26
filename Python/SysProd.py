@@ -17,9 +17,35 @@ logging.config.fileConfig(script_loc + '/logging.ini')
 try:
     logging.info("Loading ROOT module...")
     import ROOT
+    dummy = ROOT.RooRealVar()
+    del dummy  # this is just to print the RooFit text first, to neaten up the output
 except ImportError:
     logging.error("Could not import ROOT module. Make sure your root is configured to work with Python.")
     sys.exit()
+
+
+def get_hist(tree_name, file_name, observables):
+    logging.info("Making chain with name %s", tree_name)
+    chain = ROOT.TChain(tree_name)
+    logging.info("Adding file %s", file_name)  # could make this into a loop over files
+    chain.Add(file_name)
+    if chain.GetEntries() == 0:
+        logging.warn("Chain %s has no events", tree_name)
+    else:
+        logging.info("Chain %s has %i events", tree_name, chain.GetEntries())
+
+    tree_obs = ROOT.RooArgSet()
+    for obs in observables:
+        obs_params = obs.split(",")
+        if len(obs_params) == 4:
+            obs_name = obs_params[0].split(":")[0]
+            variable = ROOT.RooRealVar(obs_name, obs_name, float(obs_params[2]), float(obs_params[3]))
+            variable.setBins(int(obs_params[1]))
+            tree_obs.add(variable)
+        else:
+            logging.warn("Wrong number of parameters in observable %s. Skipping...", obs)
+    
+    return 5
 
 
 logging.info("Calculating systematics from config file %s", args.config_file)
@@ -45,6 +71,7 @@ for sample in top_config['main']['samples']:
     logging.info("Starting calculation for %s sample", sample)
 
     for category in top_config['main']['categories']:
+        observable_fullname = '_'.join([o.split(',')[0].split(':')[0] for o in top_config[category]['observables']])
         logging.info("Category: %s", category)
         if "smooth" not in top_config[category]:
             smooth = False
@@ -52,7 +79,7 @@ for sample in top_config['main']['samples']:
         else:
             smooth = top_config[category]["smooth"]
 
-        hist_name = '-'.join([top_config[category]['observables'][0].split(':')[0], sample, category])
+        hist_name = '-'.join([observable_fullname, sample, category])
         logging.debug("Histogram name: %s", hist_name)
 
         try:
@@ -60,11 +87,5 @@ for sample in top_config['main']['samples']:
         except KeyError:
             logging.error("Could not find %s sample filename in config file. Exiting...", sample)
             sys.exit()
-        logging.info("Making chain with name %s", top_config['main']['treename'])
-        chain = ROOT.TChain(top_config['main']['treename'])
-        logging.info("Adding file %s", file_name)  # could make this into a loop over files
-        chain.Add(file_name)
-        if chain.GetEntries() == 0:
-            logging.warn("Chain %s has no events", top_config['main']['treename'])
-        else:
-            logging.info("Chain %s has %i events", top_config['main']['treename'], chain.GetEntries())
+
+        hist = get_hist(top_config['main']['treename'], file_name, top_config[category]['observables'])
