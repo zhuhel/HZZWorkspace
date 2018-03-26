@@ -28,8 +28,9 @@ def config_dict(filename, tokenize=None):
             if tokenize:
                 assert isinstance(tokenize, list)
                 for v, value in section.iteritems():
-                    if v in tokenize:
-                        section[v] = [i.strip() for i in value.split(',')]
+                    for tok in tokenize:
+                        if v in tok[0]:
+                            section[v] = [i.strip() for i in value.split(tok[1])]
         return return_dict
     else:
         logging.error("Config empty, something has gone wrong.")
