@@ -24,7 +24,7 @@ except ImportError:
     sys.exit()
 
 
-def get_hist(tree_name, file_name, observables):
+def get_hist(tree_name, file_name, observables, hist_name, weight_name, cuts, smooth=False):
     logging.info("Making chain with name %s", tree_name)
     chain = ROOT.TChain(tree_name)
     logging.info("Adding file %s", file_name)  # could make this into a loop over files
@@ -34,18 +34,37 @@ def get_hist(tree_name, file_name, observables):
     else:
         logging.info("Chain %s has %i events", tree_name, chain.GetEntries())
 
-    tree_obs = ROOT.RooArgSet()
+    tree_obs = []
     for obs in observables:
         obs_params = obs.split(",")
-        if len(obs_params) == 4:
-            obs_name = obs_params[0].split(":")[0]
-            variable = ROOT.RooRealVar(obs_name, obs_name, float(obs_params[2]), float(obs_params[3]))
-            variable.setBins(int(obs_params[1]))
-            tree_obs.add(variable)
-        else:
+        if len(obs_params) != 4:
             logging.warn("Wrong number of parameters in observable %s. Skipping...", obs)
+            return None
+        obs_name = obs_params[0].split(":")[0]
+        variable = ROOT.RooRealVar(obs_name, obs_name, float(obs_params[2]), float(obs_params[3]))
+        variable.setBins(int(obs_params[1]))
+        tree_obs.append(variable)
+        
+    if len(tree_obs) < 1:
+        logging.error("Could not find observables. Exiting...")
+        return None
+    elif len(tree_obs) > 2:
+        raise NotImplementedError("No support for more than 2 observables")
+
+    return_hist = None
+
+    if not smooth:
+        x = tree_obs[0]
+        if len(tree_obs) == 1:
+            return_hist = ROOT.TH1F(hist_name, hist_name, x.getBinning().numBins(), x.getMin(), x.getMax())
+            logging.debug("Drawing %s with weight %s*(%s)", x.GetName(), weight_name, cuts)
+            chain.Draw("{0}>>{1}".format(x.GetName, hist_name), "{0}*({1})".format(weight_name, cuts))  # this gives an error
+        elif len(tree_obs) == 2:
+            y = tree_obs[1]
+    else:
+        raise NotImplementedError("Smoothing not implemented yet...")
     
-    return 5
+    return return_hist
 
 
 logging.info("Calculating systematics from config file %s", args.config_file)
@@ -77,7 +96,7 @@ for sample in top_config['main']['samples']:
             smooth = False
             logging.debug("Using binned histograms, since smoothing information not found in config file")
         else:
-            smooth = top_config[category]["smooth"]
+            smooth = top_config[category]['smooth']
 
         hist_name = '-'.join([observable_fullname, sample, category])
         logging.debug("Histogram name: %s", hist_name)
@@ -88,4 +107,5 @@ for sample in top_config['main']['samples']:
             logging.error("Could not find %s sample filename in config file. Exiting...", sample)
             sys.exit()
 
-        hist = get_hist(top_config['main']['treename'], file_name, top_config[category]['observables'])
+        hist = get_hist(top_config['main']['treename'], file_name, top_config[category]['observables'], hist_name,
+                        top_config['main']['weightName'], top_config[category]['cuts'], smooth)
