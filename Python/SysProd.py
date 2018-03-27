@@ -62,6 +62,7 @@ def get_hist(tree_name, file_name, observables, hist_name, weight_name, cuts, sm
             logging.debug("Drawing %s with weight %s*(%s)", x.GetName(), weight_name, cuts)
             chain.Draw("{0}>>{1}".format(x.GetName(), hist_name), "{0}*({1})".format(weight_name, cuts))
             if bins:
+                return_hist.SetName('unbinned_hist')
                 binning = array('f', [float(b) for b in bins.split('/')])
                 return_hist = return_hist.Rebin(len(binning) - 1, hist_name, binning)
 
@@ -117,6 +118,7 @@ for sample in top_config['main']['samples']:
         hist_name = '-'.join([observable_fullname, sample, category])
         logging.debug("Histogram name: %s", hist_name)
 
+        logging.info("Starting with nominal configuration")
         try:
             file_name = top_config['main']['path'] + "/Nominal/" + top_config['samples'][sample]
         except KeyError:
