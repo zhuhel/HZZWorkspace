@@ -5,6 +5,7 @@ import Utilities
 import logging.config
 import sys
 import os
+from array import array
 
 parser = ArgumentParser()
 parser.add_argument(dest='config_file', help="The input config file", type=str)
@@ -19,12 +20,13 @@ try:
     import ROOT
     dummy = ROOT.RooRealVar()
     del dummy  # this is just to print the RooFit text first, to neaten up the output
+    ROOT.gROOT.SetBatch(True)  # to prevent actual canvases showing up
 except ImportError:
     logging.error("Could not import ROOT module. Make sure your root is configured to work with Python.")
     sys.exit()
 
 
-def get_hist(tree_name, file_name, observables, hist_name, weight_name, cuts, smooth=False):
+def get_hist(tree_name, file_name, observables, hist_name, weight_name, cuts, smooth=False, bins=None):
     logging.info("Making chain with name %s", tree_name)
     chain = ROOT.TChain(tree_name)
     logging.info("Adding file %s", file_name)  # could make this into a loop over files
@@ -58,12 +60,21 @@ def get_hist(tree_name, file_name, observables, hist_name, weight_name, cuts, sm
         if len(tree_obs) == 1:
             return_hist = ROOT.TH1F(hist_name, hist_name, x.getBinning().numBins(), x.getMin(), x.getMax())
             logging.debug("Drawing %s with weight %s*(%s)", x.GetName(), weight_name, cuts)
-            chain.Draw("{0}>>{1}".format(x.GetName, hist_name), "{0}*({1})".format(weight_name, cuts))  # this gives an error
+            chain.Draw("{0}>>{1}".format(x.GetName(), hist_name), "{0}*({1})".format(weight_name, cuts))
+            if bins:
+                binning = array('f', [float(b) for b in bins.split('/')])
+                return_hist = return_hist.Rebin(len(binning) - 1, hist_name, binning)
+
         elif len(tree_obs) == 2:
             y = tree_obs[1]
+            return_hist = ROOT.TH2F(hist_name, hist_name, x.getBinning().numBins(), x.getMin(), x.getMax(), 
+                                    y.getBinning().numBins(), y.getMin(), y.getMax())
+            logging.debug("Drawing %s and %s (2D) with weight %s*(%s)", x.GetName(), y.GetName(), weight_name, cuts)
+            chain.Draw("{0}:{1}>>{2}".format(x.GetName(), y.GetName(), hist_name), "{0}*({1})".format(weight_name, cuts))
     else:
         raise NotImplementedError("Smoothing not implemented yet...")
-    
+
+    logging.info("Events after cut: %i; Integral: %s", return_hist.GetEntries(), return_hist.Integral())
     return return_hist
 
 
@@ -87,16 +98,21 @@ if not Utilities.check_np(np_config):
     sys.exit()
 
 for sample in top_config['main']['samples']:
-    logging.info("Starting calculation for %s sample", sample)
+    logging.info("Starting calculation for %s sample\n%s", sample, '-'*(39 + len(sample)))
 
     for category in top_config['main']['categories']:
         observable_fullname = '_'.join([o.split(',')[0].split(':')[0] for o in top_config[category]['observables']])
         logging.info("Category: %s", category)
-        if "smooth" not in top_config[category]:
+        if 'smooth' not in top_config[category]:
             smooth = False
             logging.debug("Using binned histograms, since smoothing information not found in config file")
         else:
             smooth = top_config[category]['smooth']
+
+        if 'bins' in top_config[category]:
+            bins = top_config[category]['bins']
+        else:
+            bins = None
 
         hist_name = '-'.join([observable_fullname, sample, category])
         logging.debug("Histogram name: %s", hist_name)
@@ -108,4 +124,4 @@ for sample in top_config['main']['samples']:
             sys.exit()
 
         hist = get_hist(top_config['main']['treename'], file_name, top_config[category]['observables'], hist_name,
-                        top_config['main']['weightName'], top_config[category]['cuts'], smooth)
+                        top_config['main']['weightName'], top_config[category]['cuts'], smooth, bins)
