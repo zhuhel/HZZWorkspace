@@ -20,17 +20,18 @@ try:
     import ROOT
     dummy = ROOT.RooRealVar()
     del dummy  # this is just to print the RooFit text first, to neaten up the output
-    ROOT.gROOT.SetBatch(True)  # to prevent actual canvases showing up
+    ROOT.gROOT.SetBatch(True)  # to prevent TCanvases showing up
 except ImportError:
     logging.error("Could not import ROOT module. Make sure your root is configured to work with Python.")
     sys.exit()
 
 
-def get_hist(tree_name, file_name, observables, hist_name, weight_name, cuts, smooth=False, bins=None):
+def get_hist(tree_name, file_names, observables, hist_name, weight_name, cuts, smooth=False, bins=None):
     logging.info("Making chain with name %s", tree_name)
     chain = ROOT.TChain(tree_name)
-    logging.info("Adding file %s", file_name)  # could make this into a loop over files
-    chain.Add(file_name)
+    for f in file_names:
+        logging.info("Adding file %s", f)
+        chain.Add(f)
     if chain.GetEntries() == 0:
         logging.warn("Chain %s has no events", tree_name)
     else:
@@ -115,15 +116,16 @@ for sample in top_config['main']['samples']:
         else:
             bins = None
 
+        # Start with the Nominal configuration
         hist_name = '-'.join([observable_fullname, sample, category])
         logging.debug("Histogram name: %s", hist_name)
 
         logging.info("Starting with nominal configuration")
         try:
-            file_name = top_config['main']['path'] + "/Nominal/" + top_config['samples'][sample]
+            file_names = [top_config['main']['path'] + "/Nominal/" + s for s in top_config['samples'][sample].split(",")]
         except KeyError:
-            logging.error("Could not find %s sample filename in config file. Exiting...", sample)
+            logging.error("Could not find %s sample filename(s) in config file. Exiting...", sample)
             sys.exit()
 
-        hist = get_hist(top_config['main']['treename'], file_name, top_config[category]['observables'], hist_name,
+        hist = get_hist(top_config['main']['treename'], file_names, top_config[category]['observables'], hist_name,
                         top_config['main']['weightName'], top_config[category]['cuts'], smooth, bins)
