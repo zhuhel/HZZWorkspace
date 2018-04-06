@@ -44,7 +44,6 @@ void SampleCount::setMCCThreshold(float thresh){
 
 RooAbsPdf* SampleCount::get_mc_constraint(){
     log_info("in %s ",__func__);
-    RooArgList constraintList; 
 
     RooArgSet gammas=coef_->GetGammas();
 
@@ -57,16 +56,10 @@ RooAbsPdf* SampleCount::get_mc_constraint(){
         gamma = var;
         TString np(var->GetName());
         //add poisson constraints
-        if(np.Contains("MCSTAT")) {
+        if(np.Contains("MCSTAT") && np.Contains(category_name_)) {
           auto* pois = Helper::createMCStatConstraint(np.Data(), var, &global_obs_list_);
-          constraintList.add(*pois);
+          return pois;
         }
-    }
-
-    if(constraintList.getSize()>0) {
-      TString modelname=Form("constraint_%s", gamma->GetName());
-      RooProdPdf* rpd = new RooProdPdf(modelname.Data(), modelname.Data(), constraintList);
-      return rpd;
     }
 
     return NULL;
