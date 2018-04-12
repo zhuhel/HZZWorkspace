@@ -6,6 +6,7 @@ import logging.config
 import sys
 import os
 from array import array
+import json
 
 parser = ArgumentParser()
 parser.add_argument(dest='config_file', help="The input config file", type=str)
@@ -91,8 +92,9 @@ np_config = Utilities.config_dict(top_config['main']['NPlist'])
 logging.debug(Utilities.config_display(np_config))
 
 if 'outdir' in top_config['main']:
-    logging.warn("Output directory %s found in config file, replacing the command line argument of %s",
+    logging.warn("Output directory %s found in config file, replacing the command line argument of '%s'",
                  top_config['main']['outdir'], args.output_dir)
+    args.output_dir = top_config['main']['outdir']
 
 if not Utilities.check_config(top_config, ['categories', 'samples', 'path', 'treename', 'NPlist', 'weightName']):
     logging.error("Config file does not contain required information. Exiting...")
@@ -109,7 +111,7 @@ for sample in top_config['main']['samples']:
     data[sample] = {}
 
     try:
-        output_text_file = open("norm_%s.txt" % sample, 'w')
+        output_text_file = open("%s/norm_%s.txt" % (args.output_dir, sample), 'w')
     except:
         logging.error("Failed to open file norm_%s.txt for writing results", sample)
 
@@ -147,7 +149,7 @@ for sample in top_config['main']['samples']:
 
         # Shape-like systematics
         for syst_name in np_config['shapeLike']:
-            logging.info("Calculating for shape-like systematic: %s", syst_name)
+            logging.info("Calculating shape-like systematic: %s", syst_name)
             syst_title = np_config['shapeLike'][syst_name]
             file_names = [top_config['main']['path'] + "/{0}/{1}/".format(top_config['main']['sysDir'], syst_name) + s for s in top_config['samples'][sample].split(",")]
             if syst_title not in data[sample][category]:
@@ -182,7 +184,7 @@ for sample in top_config['main']['samples']:
         
         # Norm-like systematics
         for syst_name in np_config['normLike']:
-            logging.info("Calculating for norm-like systematic: %s", syst_name)
+            logging.info("Calculating norm-like systematic: %s", syst_name)
             syst_title = np_config['normLike'][syst_name]
             file_names = [top_config['main']['path'] + "/{0}/NormSystematic/".format(top_config['main']['sysDir']) + s for s in top_config['samples'][sample].split(",")]
             if syst_title not in data[sample][category]:
@@ -205,5 +207,17 @@ for sample in top_config['main']['samples']:
                 continue
             output_text_file.write("%s = %s %s\n" % (syst_title, data[sample][category][syst_title]['down']['norm'], data[sample][category][syst_title]['up']['norm']))
 
+    logging.info("Finished writing file %s", output_text_file.name)
     output_text_file.close()
-    
+
+def jdefault(obj):
+    # To make TH1F return something useful
+    if isinstance(obj, ROOT.TH1F):
+        return "{0}; Integral = {1}; Entries = {2}".format(obj.GetName(), obj.Integral(), obj.GetEntries())
+    else:
+        return None
+
+logging.debug("Dumping data to JSON")
+logging.debug(json.dumps(data, sort_keys=True, indent=2, default=jdefault))
+
+logging.info("Finished processing systematic uncertainties")
