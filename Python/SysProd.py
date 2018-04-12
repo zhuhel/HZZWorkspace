@@ -27,15 +27,15 @@ except ImportError:
 
 
 def get_hist(tree_name, file_names, observables, hist_name, weight_name, cuts, smooth=False, bins=None):
-    logging.info("Making chain with name %s", tree_name)
+    logging.debug("Making chain with name %s", tree_name)
     chain = ROOT.TChain(tree_name)
     for f in file_names:
-        logging.info("Adding file %s", f)
+        logging.debug("Adding file %s", f)
         chain.Add(f)
     if chain.GetEntries() == 0:
         logging.warn("Chain %s has no events", tree_name)
     else:
-        logging.info("Chain %s has %i events", tree_name, chain.GetEntries())
+        logging.debug("Chain %s has %i events", tree_name, chain.GetEntries())
 
     tree_obs = []
     for obs in observables:
@@ -76,7 +76,10 @@ def get_hist(tree_name, file_names, observables, hist_name, weight_name, cuts, s
     else:
         raise NotImplementedError("Smoothing not implemented yet...")
 
-    logging.info("Events after cut: %i; Integral: %s", return_hist.GetEntries(), return_hist.Integral())
+    if return_hist.GetEntries() == 0:
+        logging.warn("Histogram %s has no events after cuts", hist_name)
+    else:
+        logging.debug("Events after cut: %i; Integral: %s", return_hist.GetEntries(), return_hist.Integral())
     return return_hist
 
 
@@ -144,6 +147,7 @@ for sample in top_config['main']['samples']:
 
         # Shape-like systematics
         for syst_name in np_config['shapeLike']:
+            logging.info("Calculating for shape-like systematic: %s", syst_name)
             syst_title = np_config['shapeLike'][syst_name]
             file_names = [top_config['main']['path'] + "/{0}/{1}/".format(top_config['main']['sysDir'], syst_name) + s for s in top_config['samples'][sample].split(",")]
             if syst_title not in data[sample][category]:
@@ -178,6 +182,7 @@ for sample in top_config['main']['samples']:
         
         # Norm-like systematics
         for syst_name in np_config['normLike']:
+            logging.info("Calculating for norm-like systematic: %s", syst_name)
             syst_title = np_config['normLike'][syst_name]
             file_names = [top_config['main']['path'] + "/{0}/NormSystematic/".format(top_config['main']['sysDir']) + s for s in top_config['samples'][sample].split(",")]
             if syst_title not in data[sample][category]:
