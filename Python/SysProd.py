@@ -160,7 +160,7 @@ for sample in top_config['main']['samples']:
                     continue
                 else:
                     data[sample][category][syst_title][variation]['hist'] = get_hist(top_config['main']['treename'], file_names, top_config[category]['observables'],
-                                                                                 hist_name, top_config['main']['weightName'], top_config[category]['cuts'], smooth, bins)
+                                                                                     hist_name, top_config['main']['weightName'], top_config[category]['cuts'], smooth, bins)
                     data[sample][category][syst_title][variation]['norm'] = data[sample][category][syst_title][variation]['hist'].Integral()/data[sample][category]['Nominal']['hist'].Integral()
                     data[sample][category][syst_title][variation]['mean'] = data[sample][category][syst_title][variation]['hist'].GetMean()/data[sample][category]['Nominal']['hist'].GetMean()
                     data[sample][category][syst_title][variation]['sigma'] = data[sample][category][syst_title][variation]['hist'].GetRMS()/data[sample][category]['Nominal']['hist'].GetRMS()
@@ -176,6 +176,25 @@ for sample in top_config['main']['samples']:
                 data[sample][category][syst_title][variation]['mean'] = data[sample][category][syst_title][variation]['hist'].GetMean()/data[sample][category]['Nominal']['hist'].GetMean()
                 data[sample][category][syst_title][variation]['sigma'] = data[sample][category][syst_title][variation]['hist'].GetRMS()/data[sample][category]['Nominal']['hist'].GetRMS()
         
+        # Norm-like systematics
+        for syst_name in np_config['normLike']:
+            syst_title = np_config['normLike'][syst_name]
+            file_names = [top_config['main']['path'] + "/{0}/NormSystematic/".format(top_config['main']['sysDir']) + s for s in top_config['samples'][sample].split(",")]
+            if syst_title not in data[sample][category]:
+                data[sample][category][syst_title] = {"up": {}, "down": {}}
+
+            variation = "up"
+            if "__1down" in syst_name:
+                variation = "down"
+
+            hist_name = '-'.join([observable_fullname, sample, category, syst_title, variation])
+            data[sample][category][syst_title][variation]['hist'] = get_hist(top_config['main']['treename'], file_names, top_config[category]['observables'],
+                                                                             hist_name, "*".join([top_config['main']['weightName'], syst_name]), top_config[category]['cuts'], "", bins)
+            data[sample][category][syst_title][variation]['norm'] = data[sample][category][syst_title][variation]['hist'].Integral()/data[sample][category]['Nominal']['hist'].Integral()
+            data[sample][category][syst_title][variation]['mean'] = data[sample][category][syst_title][variation]['hist'].GetMean()/data[sample][category]['Nominal']['hist'].GetMean()
+            data[sample][category][syst_title][variation]['sigma'] = data[sample][category][syst_title][variation]['hist'].GetRMS()/data[sample][category]['Nominal']['hist'].GetRMS()
+            
+
         for syst_title in sorted(data[sample][category]):
             if syst_title == "Nominal":
                 continue
