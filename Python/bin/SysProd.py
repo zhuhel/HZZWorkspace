@@ -13,7 +13,7 @@ parser.add_argument('-o', '--output_dir', help="The output results directory", t
 args = parser.parse_args()
 
 script_loc = os.path.dirname(os.path.realpath(__file__))
-logging.config.fileConfig(script_loc + '/logging.ini')
+logging.config.fileConfig(script_loc + '../configuration/logging.ini')
 
 try:
     logging.info("Loading ROOT module...")

@@ -10,7 +10,6 @@ currentDir=$PWD
 PATH="/afs/cern.ch/sw/lcg/contrib/gcc/4.9.3/x86_64-slc6/bin:$PATH"
 LD_LIBRARY_PATH="/afs/cern.ch/sw/lcg/contrib/gcc/4.9.3/x86_64-slc6/lib64:$LD_LIBRARY_PATH"
 
-
 # Python 2.7.4
 PYTHONDIR="/afs/cern.ch/sw/lcg/external/Python/2.7.4/x86_64-slc6-gcc48-opt"
 PATH="$PYTHONDIR/bin:$PATH"
@@ -42,3 +41,7 @@ if [ ! -f ./Hzzws_Dict_rdict.pcm ]; then
 fi
 
 D1=$PWD
+
+# set up environment for running Python code
+export PATH=$HZZWSCODEDIR/Python/bin:$PATH
+export PYTHONPATH=$HZZWSCODEDIR/Python/modules:$PYTHONPATH
