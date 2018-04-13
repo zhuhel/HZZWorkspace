@@ -3,7 +3,7 @@ import logging
 from array import array
 
 
-def plot_NPs(data, str_id="test"):
+def plot_NPs(data, str_id="test", save_file=None):
     """
     Takes a dictionary with [NP][variation]["norm"] and makes a TCanvas with a nice plot.
     """
@@ -55,13 +55,18 @@ def plot_NPs(data, str_id="test"):
 
     legend = ROOT.TLatex()
     legend.SetTextSize(0.035)
-    legend.SetTextAlign(33)
     legend.SetTextFont(42)
-    legend.DrawLatexNDC(0.88, 0.9, "#bf{#it{ATLAS}} Simulation Internal")
-    legend.DrawLatexNDC(0.88, 0.86, str_id)
+    legend.SetTextAlign(11)
+    legend.DrawLatexNDC(0.1, 0.91, "#bf{#it{ATLAS}} Simulation Internal")
+    legend.SetTextAlign(31)
+    legend.DrawLatexNDC(0.9, 0.91, str_id)
 
     canvas.SetGridy()
     canvas.SetBottomMargin(0.35)
-    canvas.SetTopMargin(0.05)
+    canvas.SetTopMargin(0.1)
+
+    canvas.Print(str_id + ".pdf")
     
-    return canvas
+    if save_file:
+        save_file.cd()
+        canvas.Write()
