@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from argparse import ArgumentParser
-import Utilities
+import Utilities, Plotter
 import logging.config
 import sys
 import os
@@ -11,6 +11,7 @@ import json
 parser = ArgumentParser()
 parser.add_argument(dest='config_file', help="The input config file", type=str)
 parser.add_argument('-o', '--output_dir', help="The output results directory", type=str, default='.')
+parser.add_argument('--json', help="Dumps all data as JSON to the log file", action='store_true')
 args = parser.parse_args()
 
 script_loc = os.path.dirname(os.path.realpath(__file__))
@@ -206,18 +207,20 @@ for sample in top_config['main']['samples']:
             if syst_title == "Nominal":
                 continue
             output_text_file.write("%s = %s %s\n" % (syst_title, data[sample][category][syst_title]['down']['norm'], data[sample][category][syst_title]['up']['norm']))
+        Plotter.plot_NPs(data[sample][category])
 
     logging.info("Finished writing file %s", output_text_file.name)
     output_text_file.close()
 
-def jdefault(obj):
-    # To make TH1F return something useful
-    if isinstance(obj, ROOT.TH1F):
-        return "{0}; Integral = {1}; Entries = {2}".format(obj.GetName(), obj.Integral(), obj.GetEntries())
-    else:
-        return None
+if args.json:
+    def jdefault(obj):
+        # To make TH1F return something useful
+        if isinstance(obj, ROOT.TH1F):
+            return "{0}; Integral = {1}; Entries = {2}".format(obj.GetName(), obj.Integral(), obj.GetEntries())
+        else:
+            return None
 
-logging.debug("Dumping data to JSON")
-logging.debug(json.dumps(data, sort_keys=True, indent=2, default=jdefault))
+    logging.debug("Dumping data to JSON")
+    logging.debug(json.dumps(data, sort_keys=True, indent=2, default=jdefault))
 
 logging.info("Finished processing systematic uncertainties")
