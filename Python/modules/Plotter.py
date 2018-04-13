@@ -3,9 +3,9 @@ import logging
 from array import array
 
 
-def plot_NPs(data, str_id="test", save_file=None):
+def plot_NPs(data, str_id, save_file=None):
     """
-    Takes a dictionary with [NP][variation]["norm"] and makes a TCanvas with a nice plot.
+    Takes a dictionary with [NP][variation]["norm"], makes a pretty plot to print, and saves them to file optionally.
     """
     logging.debug("Plotting up/down variation of %s NPs", len(data))
     plot_points = []
