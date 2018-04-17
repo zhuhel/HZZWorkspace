@@ -3,7 +3,7 @@ import logging
 from array import array
 
 
-def plot_NPs(data, str_id, save_file=None, prune=0.01, publicity="Simulation Internal"):
+def plot_NPs(data, str_id, output_dir='.', save_file=None, prune=0.01, publicity="Simulation Internal"):
     """
     Takes a dictionary with [NP][variation]["norm"], makes a pretty plot to print, and saves them to file optionally.
     """
@@ -69,7 +69,7 @@ def plot_NPs(data, str_id, save_file=None, prune=0.01, publicity="Simulation Int
     canvas.SetTopMargin(0.1)
     canvas.SetRightMargin(0.05)
 
-    canvas.Print(str_id + ".pdf")
+    canvas.Print(output_dir + "/" + str_id + ".pdf")
     
     if save_file:
         save_file.cd()

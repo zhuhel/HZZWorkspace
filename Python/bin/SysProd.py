@@ -106,7 +106,7 @@ if not Utilities.check_np(np_config):
     sys.exit()
 
 data = {}
-root_output = ROOT.TFile("systematics_results.root", "RECREATE")
+root_output = ROOT.TFile(args.output_dir + "/systematics_results.root", "RECREATE")
 
 for sample in top_config['main']['samples']:
     logging.info("Starting calculation for %s sample\n%s", sample, '-'*(39 + len(sample)))    
@@ -208,7 +208,7 @@ for sample in top_config['main']['samples']:
             if syst_title == "Nominal":
                 continue
             output_text_file.write("%s = %s %s\n" % (syst_title, data[sample][category][syst_title]['down']['norm'], data[sample][category][syst_title]['up']['norm']))
-        Plotter.plot_NPs(data[sample][category], "{0}_{1}".format(sample, category), root_output)
+        Plotter.plot_NPs(data[sample][category], "{0}_{1}".format(sample, category), args.output_dir, root_output)
 
     logging.info("Finished writing file %s", output_text_file.name)
     output_text_file.close()
