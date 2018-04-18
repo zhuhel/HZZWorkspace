@@ -149,6 +149,10 @@ for sample in top_config['main']['samples']:
         data[sample][category]["Nominal"]["hist"] = get_hist(top_config['main']['treename'], file_names, top_config[category]['observables'], 
                                                              hist_name, top_config['main']['weightName'], top_config[category]['cuts'], smooth, bins)
 
+        if data[sample][category]["Nominal"]["hist"].GetEntries() == 0:
+            logging.error("Nominal histogram has no events, skipping category...")
+            continue
+
         # Shape-like systematics
         for syst_name in np_config['shapeLike']:
             logging.info("Calculating shape-like systematic: %s", syst_name)
@@ -163,26 +167,25 @@ for sample in top_config['main']['samples']:
 
             hist_name = '-'.join([observable_fullname, sample, category, syst_title, variation])
             
-            if "JER" in syst_name:
-                if variation == "down":
+            if "JER" in syst_name and variation == "down":
                     continue
-                else:
-                    data[sample][category][syst_title][variation]['hist'] = get_hist(top_config['main']['treename'], file_names, top_config[category]['observables'],
+            
+            data[sample][category][syst_title][variation]['hist'] = get_hist(top_config['main']['treename'], file_names, top_config[category]['observables'],
                                                                                      hist_name, top_config['main']['weightName'], top_config[category]['cuts'], smooth, bins)
-                    data[sample][category][syst_title][variation]['norm'] = data[sample][category][syst_title][variation]['hist'].Integral()/data[sample][category]['Nominal']['hist'].Integral()
-                    data[sample][category][syst_title][variation]['mean'] = data[sample][category][syst_title][variation]['hist'].GetMean()/data[sample][category]['Nominal']['hist'].GetMean()
-                    data[sample][category][syst_title][variation]['sigma'] = data[sample][category][syst_title][variation]['hist'].GetRMS()/data[sample][category]['Nominal']['hist'].GetRMS()
-                    # Symmetrise the JER
-                    data[sample][category][syst_title]['down']['norm'] = 2 - data[sample][category][syst_title]['up']['norm']
-                    data[sample][category][syst_title]['down']['mean'] = 2 - data[sample][category][syst_title]['up']['mean']
-                    data[sample][category][syst_title]['down']['sigma'] = 2 - data[sample][category][syst_title]['up']['sigma']
+            norm = data[sample][category][syst_title][variation]['hist'].Integral()/data[sample][category]['Nominal']['hist'].Integral()
+            if norm == 0.0:
+                logging.warn("0 integral computed. Setting the variation to 0.0")
+                norm = 1.0
 
-            else:        
-                data[sample][category][syst_title][variation]['hist'] = get_hist(top_config['main']['treename'], file_names, top_config[category]['observables'],
-                                                                                 hist_name, top_config['main']['weightName'], top_config[category]['cuts'], smooth, bins)
-                data[sample][category][syst_title][variation]['norm'] = data[sample][category][syst_title][variation]['hist'].Integral()/data[sample][category]['Nominal']['hist'].Integral()
-                data[sample][category][syst_title][variation]['mean'] = data[sample][category][syst_title][variation]['hist'].GetMean()/data[sample][category]['Nominal']['hist'].GetMean()
-                data[sample][category][syst_title][variation]['sigma'] = data[sample][category][syst_title][variation]['hist'].GetRMS()/data[sample][category]['Nominal']['hist'].GetRMS()
+            data[sample][category][syst_title][variation]['norm'] = norm
+            data[sample][category][syst_title][variation]['mean'] = data[sample][category][syst_title][variation]['hist'].GetMean()/data[sample][category]['Nominal']['hist'].GetMean()
+            data[sample][category][syst_title][variation]['sigma'] = data[sample][category][syst_title][variation]['hist'].GetRMS()/data[sample][category]['Nominal']['hist'].GetRMS()
+
+            # Symmetrise the JER
+            if "JER" in syst_name:
+                data[sample][category][syst_title]['down']['norm'] = 2 - norm
+                data[sample][category][syst_title]['down']['mean'] = 2 - data[sample][category][syst_title]['up']['mean']
+                data[sample][category][syst_title]['down']['sigma'] = 2 - data[sample][category][syst_title]['up']['sigma']
         
         # Norm-like systematics
         for syst_name in np_config['normLike']:
@@ -207,7 +210,9 @@ for sample in top_config['main']['samples']:
         for syst_title in sorted(data[sample][category]):
             if syst_title == "Nominal":
                 continue
-            output_text_file.write("%s = %s %s\n" % (syst_title, data[sample][category][syst_title]['down']['norm'], data[sample][category][syst_title]['up']['norm']))
+            up_var = data[sample][category][syst_title]['up']['norm']
+            down_var = data[sample][category][syst_title]['down']['norm']
+            output_text_file.write("%s = %s %s\n" % (syst_title, down_var, up_var))
         Plotter.plot_NPs(data[sample][category], "{0}_{1}".format(sample, category), args.output_dir, root_output)
 
     logging.info("Finished writing file %s", output_text_file.name)
