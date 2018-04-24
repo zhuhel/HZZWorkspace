@@ -97,6 +97,8 @@ if 'outdir' in top_config['main']:
                  top_config['main']['outdir'], args.output_dir)
     args.output_dir = top_config['main']['outdir']
 
+Utilities.check_and_mkdir(args.output_dir)
+
 if not Utilities.check_config(top_config, ['categories', 'samples', 'path', 'treename', 'NPlist', 'weightName']):
     logging.error("Config file does not contain required information. Exiting...")
     sys.exit()

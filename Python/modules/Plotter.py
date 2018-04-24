@@ -1,7 +1,7 @@
 import ROOT
 import logging
 from array import array
-import sys, re
+import sys, re, Utilities
 
 
 def plot_NPs(data, str_id, output_dir='.', save_file=None, prune=0.01, publicity="Simulation Internal"):
@@ -9,6 +9,7 @@ def plot_NPs(data, str_id, output_dir='.', save_file=None, prune=0.01, publicity
     Takes a dictionary with [NP][variation]["norm"], makes a pretty plot to print, and saves them to a root file optionally.
     """
     logging.debug("Plotting up/down variation of %s NPs", len(data))
+    Utilities.check_and_mkdir(output_dir)
     plot_points = []
     for np, var in data.iteritems():
         if np == 'Nominal':
@@ -81,6 +82,7 @@ def plot_compare_NPs(filenames, titles, str_id, output_dir='.', save_file=None, 
     Takes a list of two norm_... filenames, their titles, and an ID to make a pretty plot comparing them, and saves them to a root file optionally.
     """
     logging.debug("Plotting NP comparisons for files %s", filenames)
+    Utilities.check_and_mkdir(output_dir)
     if len(filenames) != 2 or len(titles) != 2:
         logging.error("Please ensure you have specified only 2 input files and titles")
         sys.exit(0)

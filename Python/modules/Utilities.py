@@ -1,5 +1,6 @@
 from ConfigParser import SafeConfigParser
 import logging
+import os
 
 
 def config_dict(filename, tokenize=None):
@@ -86,3 +87,13 @@ def check_np(np_dict):
             return True
         else:
             return False
+
+
+def check_and_mkdir(directory):
+    """
+    Asserts whether a given directory exists. If not, it is created.
+    :directory: the directory to check.
+    """
+    if not os.path.exists(directory):
+        logging.info("Creating directory '%s'", directory)
+        os.makedirs(directory)
