@@ -202,7 +202,12 @@ for sample in top_config['main']['samples']:
             hist_name = '-'.join([observable_fullname, sample, category, syst_title, variation])
             data[sample][category][syst_title][variation]['hist'] = get_hist(top_config['main']['treename'], file_names, top_config[category]['observables'],
                                                                              hist_name, "*".join([top_config['main']['weightName'], syst_name]), top_config[category]['cuts'], "", bins)
-            data[sample][category][syst_title][variation]['norm'] = data[sample][category][syst_title][variation]['hist'].Integral()/data[sample][category]['Nominal']['hist'].Integral()
+            norm = data[sample][category][syst_title][variation]['hist'].Integral()/data[sample][category]['Nominal']['hist'].Integral()
+            if norm == 0.0:
+                logging.warn("0 integral computed. Setting the variation to 0.0")
+                norm = 1.0
+
+            data[sample][category][syst_title][variation]['norm'] = norm
             data[sample][category][syst_title][variation]['mean'] = data[sample][category][syst_title][variation]['hist'].GetMean()/data[sample][category]['Nominal']['hist'].GetMean()
             data[sample][category][syst_title][variation]['sigma'] = data[sample][category][syst_title][variation]['hist'].GetRMS()/data[sample][category]['Nominal']['hist'].GetRMS()
             
