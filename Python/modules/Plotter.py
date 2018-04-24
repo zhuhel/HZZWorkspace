@@ -10,17 +10,8 @@ def plot_NPs(data, str_id, output_dir='.', save_file=None, prune=0.01, publicity
     """
     logging.debug("Plotting up/down variation of %s NPs", len(data))
     Utilities.check_and_mkdir(output_dir)
-    plot_points = []
-    for np, var in data.iteritems():
-        if np == 'Nominal':
-            continue
-        # Store the percentage deviation
-        up_variation = 100*(max([var['up']['norm'] - 1.0, var['down']['norm'] - 1.0, 0.0]))
-        down_variation = 100*(min([var['up']['norm'] - 1.0, var['down']['norm'] - 1.0, 0.0]))
-        if up_variation - down_variation < prune:
-            continue
-        plot_points.append((np.replace("ATLAS_", ""), down_variation, up_variation))
-    
+    plot_points = Utilities.data_to_plotpoints(data, prune)
+
     # Sort by largest overall deviation
     plot_points.sort(key=lambda x: x[2] - x[1], reverse=True)
     n_points = len(plot_points)

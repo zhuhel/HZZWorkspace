@@ -97,3 +97,26 @@ def check_and_mkdir(directory):
     if not os.path.exists(directory):
         logging.info("Creating directory '%s'", directory)
         os.makedirs(directory)
+
+
+def data_to_plotpoints(NP_data, prune=0.01, skip="Nominal", replace_str="ATLAS_"):
+    """
+    Converts an NP dictionary to a list of tuples in the form 
+    (name, percentage down variation, percentage up variation)
+    :NP_data: the dictionary that has the NP data
+    :prune: reject variations less than this value
+    :skip_nominal: skips a nuisance parameter called this value
+    :replace_str: replaces this text with blanks, to neaten the output
+    :return: a list of tuples with the percentage variations.
+    """
+    plot_points = []
+    for np, var in NP_data.iteritems():
+        if np == skip:
+            continue
+        # Store the percentage deviation
+        up_variation = 100*(max([var['up']['norm'] - 1.0, var['down']['norm'] - 1.0, 0.0]))
+        down_variation = 100*(min([var['up']['norm'] - 1.0, var['down']['norm'] - 1.0, 0.0]))
+        if up_variation - down_variation < prune:
+            continue
+        plot_points.append((np.replace("ATLAS_", ""), down_variation, up_variation))
+    return plot_points
