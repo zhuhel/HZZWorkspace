@@ -29,6 +29,8 @@ def plot_NPs(data, str_id, output_dir='.', save_file=None, prune=0.01, publicity
     graph.Draw("A5")
     graph.SetFillColorAlpha(9, 0.8)
 
+    graph.GetXaxis().SetLimits(-2.0, float(n_points) + 0.5)
+
     y_min, y_max = graph.GetYaxis().GetXmin(), graph.GetYaxis().GetXmax()
     line = ROOT.TLine(0.0, y_min, 0.0, y_max)    
     line.SetLineColor(16)
