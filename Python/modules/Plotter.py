@@ -52,7 +52,7 @@ def plot_NPs(data, str_id, output_dir='.', save_file=None, prune=0.01, publicity
         text.SetTextSize(0.015)
     text.SetTextFont(42)
     for x, n in enumerate(plot_points):
-        np = n[0] + " "
+        np = n[0]
         text.DrawLatex(x, y_min*1.05, np)
     
 
@@ -159,7 +159,7 @@ def plot_compare_NPs(filenames, titles, str_id, output_dir='.', save_file=None, 
             text.SetTextSize(0.015)
         text.SetTextFont(42)
         for x, n in enumerate(plot_points_primary):
-            np = n[0] + " "
+            np = n[0]
             text.DrawLatex(x, y_min*1.05, np)
     
         legend = ROOT.TLatex()
