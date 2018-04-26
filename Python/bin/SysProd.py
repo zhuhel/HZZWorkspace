@@ -20,8 +20,7 @@ logging.config.fileConfig(script_loc + '/../configuration/logging.ini')
 try:
     logging.info("Loading ROOT module...")
     import ROOT
-    dummy = ROOT.RooRealVar()
-    del dummy  # this is just to print the RooFit text first, to neaten up the output
+    ROOT.gSystem.Load('libRooFit')  # not necessary, but neatens up the output
     ROOT.gROOT.SetBatch(True)  # to prevent TCanvases showing up
 except ImportError:
     logging.error("Could not import ROOT module. Make sure your root is configured to work with Python.")
