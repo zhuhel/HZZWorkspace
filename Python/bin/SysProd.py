@@ -15,7 +15,7 @@ parser.add_argument('--json', help="Dumps all data as JSON to the log file", act
 args = parser.parse_args()
 
 script_loc = os.path.dirname(os.path.realpath(__file__))
-logging.config.fileConfig(script_loc + '/../configuration/logging.ini')
+logging.config.fileConfig(script_loc + '/../configuration/logging_screen_file.ini')
 
 try:
     logging.info("Loading ROOT module...")
