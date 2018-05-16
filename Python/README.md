@@ -3,12 +3,12 @@
 *Developed by Stefan von Buddenbrock (stef.von.b@cern.ch)*
 
 Contents:
-1. Motivation
-2. Setting up the code
-3. Structure of the code
-4. Modules
-5. Programs
-6. Examples
+1. [Motivation](#motivation)
+2. [Setting up the code](#setting-up-the-code)
+3. [Structure of the code](#structure-of-the-code)
+4. [Modules](#modules)
+5. [Programs](#programs)
+6. [Examples](#examples)
 
 ## Motivation
 
