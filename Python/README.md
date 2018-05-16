@@ -87,8 +87,7 @@ import ROOT
 ROOT.gROOT.SetBatch(True) # This is just to prevent canvases from popping up
 
 plot_compare_NPs(["versionA/norm_sample.txt", "versionB/norm_sample.txt"],
-                 ["Version_A", "Version_B"], "Sample")
-```
+                 ["Version_A", "Version_B"], "Sample")```
 
 Congratulations! This will make a plot (for each category) comparing version A to version B.
 The first argument of `plot_compare_NPs()` contains a list of the different text files to input for the plotting.
