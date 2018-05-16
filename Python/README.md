@@ -81,8 +81,7 @@ This is how I would do it.
 3. For each config file in each directory, run the SysProd.py code as shown above. You should get output text files called `norm_[sample_name].txt` for each sample included in the config file.
 4. Now that you have two separate output files, you can use the Plotter.py module to make a comparison plot. This can be done interactively using a Python prompt, or in a Python script. Try the following:
 
-```
-python
+```python
 from Plotter import plot_compare_NPs
 import ROOT
 
