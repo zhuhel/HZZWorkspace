@@ -55,13 +55,13 @@ else:
     logging.info("Using sample %s to find weight names", chosen_sample)
 
 logging.info("Using output filename: %s", np_list_filename)
-if os.path.isfile(np_list_filename) and not args.overwrite:
-    check = raw_input("File %s already exists... Continue? (y/n) " % np_list_filename).lower()
-    if check != 'y':
-        logging.info("Exiting")
-        sys.exit()
-    else:
-        logging.info("Overwriting existing file")
+if os.path.isfile(np_list_filename):
+    if not args.overwrite:
+        check = raw_input("File %s already exists... Continue? (y/n) " % np_list_filename).lower()
+        if check != 'y':
+            logging.info("Exiting")
+            sys.exit()
+    logging.info("Overwriting existing file")
 
 output_file = open(np_list_filename, 'w')
 output_file.write("[shapeLike]\n")
@@ -84,3 +84,5 @@ for np in sorted(normlike_list):
 
 sample_root_file.Close()
 output_file.close()
+
+logging.info("Done. NP list written to %s", np_list_filename)
