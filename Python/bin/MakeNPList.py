@@ -5,6 +5,7 @@ from argparse import ArgumentParser
 
 parser = ArgumentParser()
 parser.add_argument(dest='config_file', help="The input config file", type=str)
+parser.add_argument("--overwrite", help="Activate to overwrite existing file without prompt", action='store_true')
 args = parser.parse_args()
 
 script_loc = os.path.dirname(os.path.realpath(__file__))
@@ -54,7 +55,7 @@ else:
     logging.info("Using sample %s to find weight names", chosen_sample)
 
 logging.info("Using output filename: %s", np_list_filename)
-if os.path.isfile(np_list_filename):
+if os.path.isfile(np_list_filename) and not args.overwrite:
     check = raw_input("File %s already exists... Continue? (y/n) " % np_list_filename).lower()
     if check != 'y':
         logging.info("Exiting")

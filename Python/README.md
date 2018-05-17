@@ -69,6 +69,17 @@ Optionally, all of the numbers can be written to the log file in JSON format.
 
 **Usage**: `SysProd.py config_file [-o output_dir] [--json]`
 
+#### MakeNPList.py
+
+Suppose you want to evaluate the systematics for all of the available nuisance parameters, given a config file.
+However, you don't have a list of the nuisance parameters.
+You can use MakeNPList.py to compile one for you.
+All you need is a valid config file, with at least one working sample and: `NPlist`, `path` and `sysDir`.
+Run the program with the config file as the first argument and the NPlist file will be made.
+If the file already exists, you will be prompted as to whether you want to overwrite it.
+
+**Usage**: `MakeNPList.py config_file [--overwrite]`
+
 ## Examples
 
 #### Comparing nuisance parameters for two different versions of MiniTree production
