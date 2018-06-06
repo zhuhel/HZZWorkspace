@@ -1,5 +1,8 @@
 #!/bin/bash
-script_name=$BASH_SOURCE
+script_name=${BASH_SOURCE[0]}
+if [[ $SHELL == *"zsh"* ]]; then
+    script_name=${(%):-%N}
+fi
 currentDir=$PWD
 
 ##setup gcc and python
@@ -30,7 +33,7 @@ ulimit -S -s unlimited
 
 cd $currentDir
 #set ws code env
-export HZZWSCODEDIR=$(cd $(dirname "${script_name}") && pwd -P)
+export HZZWSCODEDIR="$( cd "$( dirname "$script_name" )" && pwd )"
 # export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${HZZWSCODEDIR}/lib:/afs/cern.ch/work/k/kecker/public/HZZTensorWS/RooLagrangianMorphFunc/lib
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${HZZWSCODEDIR}/lib
 export PATH=$PATH:${HZZWSCODEDIR}/bin:${HZZWSCODEDIR}/test-bin
