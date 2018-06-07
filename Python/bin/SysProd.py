@@ -92,7 +92,7 @@ def write_to_file(data_dict, sample_name, key):
     except:
         logging.error("Could not open file %s", filename)
 
-    for category in data[sample]:
+    for category in sorted(data[sample]):
         output_text_file.write("[%s]\n" % category)
         for syst_title in sorted(data[sample][category]):
             if syst_title == "Nominal":
@@ -100,7 +100,6 @@ def write_to_file(data_dict, sample_name, key):
             up_var = data[sample][category][syst_title]['up'][key]
             down_var = data[sample][category][syst_title]['down'][key]
             output_text_file.write("%s = %s %s\n" % (syst_title, down_var, up_var))
-    logging.info("Finished writing file %s", output_text_file.name)
     output_text_file.close()
 
 
@@ -228,7 +227,7 @@ for sample in top_config['main']['samples']:
             
         Plotter.plot_NPs(data[sample][category], "{0}_{1}".format(sample, category), args.output_dir, root_output)
     write_to_file(data, sample, "norm")
-    if config_dict['main']['doMeanSigma']:
+    if top_config['main']['doMeanSigma']:
         write_to_file(data, sample, "mean")
         write_to_file(data, sample, "sigma")
 root_output.Close()
