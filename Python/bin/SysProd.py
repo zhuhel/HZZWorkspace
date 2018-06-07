@@ -84,6 +84,26 @@ def get_hist(tree_name, file_names, observables, hist_name, weight_name, cuts, s
     return return_hist
 
 
+def write_to_file(data_dict, sample_name, key):
+    filename = args.output_dir + "/%s_%s.txt" % (key, sample_name)
+    logging.info("Writing '%s' information to file %s", key, filename)
+    try:
+        output_text_file = open(filename, 'w')
+    except:
+        logging.error("Could not open file %s", filename)
+
+    for category in data[sample]:
+        output_text_file.write("[%s]\n" % category)
+        for syst_title in sorted(data[sample][category]):
+            if syst_title == "Nominal":
+                continue
+            up_var = data[sample][category][syst_title]['up'][key]
+            down_var = data[sample][category][syst_title]['down'][key]
+            output_text_file.write("%s = %s %s\n" % (syst_title, down_var, up_var))
+    logging.info("Finished writing file %s", output_text_file.name)
+    output_text_file.close()
+
+
 logging.info("Calculating systematics from config file %s", args.config_file)
 
 top_config = Utilities.config_dict(args.config_file, tokenize=[('samples', ','), ('categories', ','), ('observables', ';')])
@@ -113,14 +133,8 @@ for sample in top_config['main']['samples']:
     logging.info("Starting calculation for %s sample\n%s", sample, '-'*(39 + len(sample)))    
     data[sample] = {}
 
-    try:
-        output_text_file = open("%s/norm_%s.txt" % (args.output_dir, sample), 'w')
-    except:
-        logging.error("Failed to open file norm_%s.txt for writing results", sample)
-
     for category in top_config['main']['categories']:
         data[sample][category] = {}
-        output_text_file.write("[%s]\n" % category)
 
         observable_fullname = '_'.join([o.split(',')[0].split(':')[0] for o in top_config[category]['observables']])
         logging.info("Category: %s", category)
@@ -213,16 +227,7 @@ for sample in top_config['main']['samples']:
             data[sample][category][syst_title][variation]['sigma'] = data[sample][category][syst_title][variation]['hist'].GetRMS()/data[sample][category]['Nominal']['hist'].GetRMS()
             
 
-        for syst_title in sorted(data[sample][category]):
-            if syst_title == "Nominal":
-                continue
-            up_var = data[sample][category][syst_title]['up']['norm']
-            down_var = data[sample][category][syst_title]['down']['norm']
-            output_text_file.write("%s = %s %s\n" % (syst_title, down_var, up_var))
         Plotter.plot_NPs(data[sample][category], "{0}_{1}".format(sample, category), args.output_dir, root_output)
-
-    logging.info("Finished writing file %s", output_text_file.name)
-    output_text_file.close()
 
 root_output.Close()
 
@@ -234,7 +239,9 @@ if args.json:
         else:
             return None
 
-    logging.debug("Dumping data to JSON")
-    logging.debug(json.dumps(data, sort_keys=True, indent=2, default=jdefault))
+    logging.info("Dumping JSON data to %s/systematics_results.json", args.output_dir)
+    json_file = open(args.output_dir + "/systematics_results.json", 'w')
+    json_file.write(json.dumps(data, sort_keys=True, indent=2, default=jdefault))
+    json_file.close()
 
 logging.info("Finished processing systematic uncertainties")
