@@ -92,9 +92,9 @@ def write_to_file(data_dict, sample_name, key):
     except:
         logging.error("Could not open file %s", filename)
 
-    for category in sorted(data[sample]):
+    for category in sorted(data[sample], key=lambda k: k.upper()):
         output_text_file.write("[%s]\n" % category)
-        for syst_title in sorted(data[sample][category]):
+        for syst_title in sorted(data[sample][category], key=lambda k: k.upper()):
             if syst_title == "Nominal":
                 continue
             up_var = data[sample][category][syst_title]['up'][key]
