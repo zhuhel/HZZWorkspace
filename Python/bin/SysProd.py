@@ -226,9 +226,11 @@ for sample in top_config['main']['samples']:
             data[sample][category][syst_title][variation]['mean'] = data[sample][category][syst_title][variation]['hist'].GetMean()/data[sample][category]['Nominal']['hist'].GetMean()
             data[sample][category][syst_title][variation]['sigma'] = data[sample][category][syst_title][variation]['hist'].GetRMS()/data[sample][category]['Nominal']['hist'].GetRMS()
             
-
         Plotter.plot_NPs(data[sample][category], "{0}_{1}".format(sample, category), args.output_dir, root_output)
-
+    write_to_file(data, sample, "norm")
+    if config_dict['main']['doMeanSigma']:
+        write_to_file(data, sample, "mean")
+        write_to_file(data, sample, "sigma")
 root_output.Close()
 
 if args.json:
