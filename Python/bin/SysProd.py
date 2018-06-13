@@ -162,10 +162,11 @@ for sample in top_config['main']['samples']:
 
         data[sample][category]["Nominal"]["hist"] = get_hist(top_config['main']['treename'], file_names, top_config[category]['observables'], 
                                                              hist_name, top_config['main']['weightName'], top_config[category]['cuts'], smooth, bins)
-
+        
         if data[sample][category]["Nominal"]["hist"].GetEntries() == 0:
             logging.error("Nominal histogram has no events, skipping category...")
             continue
+        data[sample][category]["Nominal"]["hist"].Write()
 
         # Shape-like systematics
         for syst_name in np_config['shapeLike']:
@@ -187,6 +188,7 @@ for sample in top_config['main']['samples']:
             data[sample][category][syst_title][variation]['hist'] = get_hist(top_config['main']['treename'], file_names, top_config[category]['observables'],
                                                                                      hist_name, top_config['main']['weightName'], top_config[category]['cuts'], smooth, bins)
             norm = data[sample][category][syst_title][variation]['hist'].Integral()/data[sample][category]['Nominal']['hist'].Integral()
+            data[sample][category][syst_title][variation]['hist'].Write()
             if norm == 0.0:
                 logging.warn("0 integral computed. Setting the variation to 0.0")
                 norm = 1.0
