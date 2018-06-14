@@ -59,6 +59,9 @@ def get_hist(tree_name, file_names, observables, hist_name, weight_name, cuts, s
 
     if not smooth:
         x = tree_obs[0]
+        hist_before_cuts = ROOT.TH1F(hist_name + "_before_cuts", "", x.getBinning().numBins(), x.getMin(), x.getMax())
+        chain.Draw("{0}>>{1}_before_cuts".format(x.GetName(), hist_name), weight_name)
+        integral_before_cuts = hist_before_cuts.Integral()
         if len(tree_obs) == 1:
             return_hist = ROOT.TH1F(hist_name, hist_name, x.getBinning().numBins(), x.getMin(), x.getMax())
             logging.debug("Drawing %s with weight %s*(%s)", x.GetName(), weight_name, cuts)
@@ -80,8 +83,16 @@ def get_hist(tree_name, file_names, observables, hist_name, weight_name, cuts, s
     if return_hist.GetEntries() == 0:
         logging.warn("Histogram %s has no events after cuts", hist_name)
     else:
-        logging.debug("Events after cut: %i; Integral: %s", return_hist.GetEntries(), return_hist.Integral())
-    return return_hist
+        logging.debug("Events after cut: %i", return_hist.GetEntries())
+    
+    try:
+        acceptance = return_hist.Integral()/integral_before_cuts
+        logging.debug("Acceptance: %s / %s = %s", return_hist.Integral(), integral_before_cuts, acceptance)
+    except ZeroDivisionError:
+        logging.error("Acceptance results in division by 0. Setting overall acceptance to 0.")
+        acceptance = 0.0
+
+    return return_hist, acceptance
 
 
 def write_to_file(data_dict, sample_name, key):
@@ -160,8 +171,8 @@ for sample in top_config['main']['samples']:
             logging.error("Could not find %s sample filename(s) in config file. Exiting...", sample)
             sys.exit()
 
-        data[sample][category]["Nominal"]["hist"] = get_hist(top_config['main']['treename'], file_names, top_config[category]['observables'], 
-                                                             hist_name, top_config['main']['weightName'], top_config[category]['cuts'], smooth, bins)
+        data[sample][category]["Nominal"]["hist"], data[sample][category]["Nominal"]["acc"] = get_hist(top_config['main']['treename'], file_names, top_config[category]['observables'], 
+                                                                                                       hist_name, top_config['main']['weightName'], top_config[category]['cuts'], smooth, bins)
         
         if data[sample][category]["Nominal"]["hist"].GetEntries() == 0:
             logging.error("Nominal histogram has no events, skipping category...")
@@ -185,9 +196,9 @@ for sample in top_config['main']['samples']:
             if "JER" in syst_name and variation == "down":
                     continue
             
-            data[sample][category][syst_title][variation]['hist'] = get_hist(top_config['main']['treename'], file_names, top_config[category]['observables'],
-                                                                                     hist_name, top_config['main']['weightName'], top_config[category]['cuts'], smooth, bins)
-            norm = data[sample][category][syst_title][variation]['hist'].Integral()/data[sample][category]['Nominal']['hist'].Integral()
+            data[sample][category][syst_title][variation]['hist'], data[sample][category][syst_title][variation]['acc'] = get_hist(top_config['main']['treename'], file_names, top_config[category]['observables'],
+                                                                                                                                   hist_name, top_config['main']['weightName'], top_config[category]['cuts'], smooth, bins)
+            norm = data[sample][category][syst_title][variation]['acc']/data[sample][category]['Nominal']['acc']
             data[sample][category][syst_title][variation]['hist'].Write()
             if norm == 0.0:
                 logging.warn("0 integral computed. Setting the variation to 0.0")
@@ -216,9 +227,9 @@ for sample in top_config['main']['samples']:
                 variation = "down"
 
             hist_name = '-'.join([observable_fullname, sample, category, syst_title, variation])
-            data[sample][category][syst_title][variation]['hist'] = get_hist(top_config['main']['treename'], file_names, top_config[category]['observables'],
-                                                                             hist_name, "*".join([top_config['main']['weightName'], syst_name]), top_config[category]['cuts'], "", bins)
-            norm = data[sample][category][syst_title][variation]['hist'].Integral()/data[sample][category]['Nominal']['hist'].Integral()
+            data[sample][category][syst_title][variation]['hist'], data[sample][category][syst_title][variation]['acc'] = get_hist(top_config['main']['treename'], file_names, top_config[category]['observables'],
+                                                                                                                                   hist_name, "*".join([top_config['main']['weightName'], syst_name]), top_config[category]['cuts'], "", bins)
+            norm = data[sample][category][syst_title][variation]['acc']/data[sample][category]['Nominal']['acc']
             if norm == 0.0:
                 logging.warn("0 integral computed. Setting the variation to 0.0")
                 norm = 1.0
@@ -229,7 +240,7 @@ for sample in top_config['main']['samples']:
             
         Plotter.plot_NPs(data[sample][category], "{0}_{1}".format(sample, category), args.output_dir, root_output)
     write_to_file(data, sample, "norm")
-    if top_config['main']['doMeanSigma']:
+    if top_config['main']['doMeanSigma'].lower() != "false":
         write_to_file(data, sample, "mean")
         write_to_file(data, sample, "sigma")
 root_output.Close()
