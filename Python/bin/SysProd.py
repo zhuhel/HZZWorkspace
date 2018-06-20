@@ -229,7 +229,7 @@ for sample in top_config['main']['samples']:
             
         Plotter.plot_NPs(data[sample][category], "{0}_{1}".format(sample, category), args.output_dir, root_output)
     write_to_file(data, sample, "norm")
-    if top_config['main']['doMeanSigma']:
+    if top_config['main']['doMeanSigma'].lower() != 'false':
         write_to_file(data, sample, "mean")
         write_to_file(data, sample, "sigma")
 root_output.Close()
