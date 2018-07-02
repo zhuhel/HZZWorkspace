@@ -232,7 +232,8 @@ for sample in top_config['main']['samples']:
             
         Plotter.plot_NPs(data[sample][category], "{0}_{1}".format(sample, category), args.output_dir, root_output)
     
-    logging.warn("The following variations could not be found or returned a 0 integral:\n%s", "\n".join(missing_variations))
+    if len(missing_variations) > 0:
+        logging.warn("The following variation(s) could not be found or returned a 0 integral:\n%s", "\n".join(missing_variations))
     write_to_file(data, sample, "norm")
     if top_config['main']['doMeanSigma'].lower() != 'false':
         write_to_file(data, sample, "mean")
