@@ -280,7 +280,8 @@ void run_limit(RooWorkspace* ws_, ModelConfig* mc_,
   w->saveSnapshot("nominalNuis",*mc->GetNuisanceParameters());
 
   global_status=0;
-  RooDataSet* asimovData_0 = (RooDataSet*)w->data(asimovDataName);
+  // RooDataSet* asimovData_0 = (RooDataSet*)w->data(asimovDataName);
+  RooDataSet* asimovData_0 = NULL;
   if (!asimovData_0)
   {
       asimovData_0 = makeAsimovData(conditionalExpected, obs_nll, 0, firstPOI_->GetName());

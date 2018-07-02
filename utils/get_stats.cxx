@@ -97,7 +97,7 @@ int main(int argc, char** argv)
     // const RooArgSet* observables = mc->GetObservables();
     // auto nuisances = mc->GetNuisanceParameters();
     // string asimov_data_name = "asimovNull";
-    string asimov_data_name = "asimovData_0";
+    string asimov_data_name = "asimovData";
     ws->Print("v");
 
     // setup other POIs before set constant
@@ -171,7 +171,6 @@ int main(int argc, char** argv)
                 RooStatsHelper::setOtherPOIs(pois, muName+fix_variables, other_poi_value, true);
                 asimov_data = RooStatsHelper::makeAsimovData(ws, 1.0, 0.0,
                         poi->GetName(), mcName.c_str(), dataName.c_str(), do_profile);
-                // asimov_data_name = string(asimov_data->GetName());
                 RooStatsHelper::setOtherPOIs(pois, muName+fix_variables, other_poi_value, is_other_poi_const);
             }
             if(asimov_data) 
