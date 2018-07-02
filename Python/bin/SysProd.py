@@ -131,6 +131,7 @@ root_output = ROOT.TFile(args.output_dir + "/systematics_results.root", "RECREAT
 for sample in top_config['main']['samples']:
     logging.info("Starting calculation for %s sample\n%s", sample, '-'*(39 + len(sample)))    
     data[sample] = {}
+    missing_variations = set()
 
     for category in top_config['main']['categories']:
         data[sample][category] = {}
@@ -191,6 +192,7 @@ for sample in top_config['main']['samples']:
             data[sample][category][syst_title][variation]['hist'].Write()
             if norm == 0.0:
                 logging.warn("0 integral computed. Setting the variation to 0.0")
+                missing_variations.add(syst_name)
                 norm = 1.0
 
             data[sample][category][syst_title][variation]['norm'] = norm
@@ -221,6 +223,7 @@ for sample in top_config['main']['samples']:
             norm = data[sample][category][syst_title][variation]['hist'].Integral()/data[sample][category]['Nominal']['hist'].Integral()
             if norm == 0.0:
                 logging.warn("0 integral computed. Setting the variation to 0.0")
+                missing_variations.add(syst_name)
                 norm = 1.0
 
             data[sample][category][syst_title][variation]['norm'] = norm
@@ -228,6 +231,8 @@ for sample in top_config['main']['samples']:
             data[sample][category][syst_title][variation]['sigma'] = data[sample][category][syst_title][variation]['hist'].GetRMS()/data[sample][category]['Nominal']['hist'].GetRMS()
             
         Plotter.plot_NPs(data[sample][category], "{0}_{1}".format(sample, category), args.output_dir, root_output)
+    
+    logging.warn("The following variations could not be found or returned a 0 integral:\n%s", "\n".join(missing_variations))
     write_to_file(data, sample, "norm")
     if top_config['main']['doMeanSigma'].lower() != 'false':
         write_to_file(data, sample, "mean")
