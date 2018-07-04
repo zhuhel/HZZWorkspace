@@ -28,10 +28,11 @@
 
 
 EFTMorph::EFTMorph(const char* name,
-        const char* configfile) : SampleBase(name),
+        const char* configfile,bool _shape_BSM_only) : SampleBase(name),
     m_eftfunc(NULL),
     m_morphcoefs(NULL),
-    m_morphfuncs(NULL)
+    m_morphfuncs(NULL),
+    onlyShapeBSMsensitive(_shape_BSM_only)
 {
 
   //Read inputs from config file
@@ -249,7 +250,7 @@ RooAbsReal* EFTMorph::getCoefficient(const char* customname){
 
   RooAbsReal* expectedEv = getOverallNormalization();
   if (!expectedEv) log_err("could not construct expected events term!");
-  coef_->AddFactor(expectedEv);
+  if (!onlyShapeBSMsensitive)coef_->AddFactor(expectedEv);
 
   return SampleBase::getCoefficient(customname);
 }

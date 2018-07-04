@@ -486,10 +486,11 @@ bool SampleFactory::AddKeysSample(SampleBase* samplebase, strvec& args){
 SampleBase* SampleFactory::FactoryEFTMorph(strvec& args){
   
 
-  if (args.size()!=2){
-    log_err("Error: EFTMorph requires 2 arguments, user provided %lu instead! \
+  if (args.size()!=2 and args.size()!=3){
+    log_err("Error: EFTMorph requires 2 or 3 arguments, user provided %lu instead! \
       \n\t name (/s used to construct PDF) \
       \n\t input (/s input ini file \
+      \n\t onlyShapeBSMsensitive (/b use only BSM shape info, not BSM norm info as is default \
           ",args.size());
 
     return NULL;
@@ -505,6 +506,14 @@ SampleBase* SampleFactory::FactoryEFTMorph(strvec& args){
     if (input.empty()){
         log_err("EFTMorph missing mandatory argument 'input'");
         return NULL;
+    }
+    
+    if (args.size() == 3){
+        int onlyShapeBSMsensitive = Helper::isBoolean(args.at(2));
+        if(onlyShapeBSMsensitive > 0){
+            log_info("Using only BSM information from shape and NOT from rate!");
+            return new EFTMorph(name.c_str(),input.c_str(),onlyShapeBSMsensitive);
+        }
     }
 
     return  new EFTMorph(name.c_str(),input.c_str());
