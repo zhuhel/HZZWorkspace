@@ -19,7 +19,7 @@ class EFTMorph : public SampleBase {
     public:
 
         EFTMorph(const char* name, // used to construct PDF
-                const char* configfile);
+                const char* configfile, bool _shape_BSM_only=false);
         virtual ~EFTMorph();
 
         virtual bool setChannel(const RooArgSet&, const char* channelName, bool with_sys);
@@ -45,6 +45,8 @@ class EFTMorph : public SampleBase {
 
         RooArgList *m_morphcoefs, *m_morphfuncs;
 
+// default is false: norm is BSM sensitive. with this bool to true remove norm dependence on BSM couplings -> only shape is BSM sensitive
+        bool onlyShapeBSMsensitive;
 
 };
 #endif
