@@ -99,10 +99,11 @@ bool EFTMorph::setChannel(const RooArgSet& _obs, const char* _ch_name, bool with
         *samples);
   // fix obsname automatically created by RooLagrangianMorphFunc to name provided in top level config file
   m_eftfunc->getVariables()->find(m_eftfunc->getObservable()->GetName())->SetName(obs_list_.first()->GetName());
-  m_eftfunc->writeCoefficients("coeffsZZ.txt");
-  m_eftfunc->writeMatrixToFile(m_eftfunc->getMatrix(),"coeffsMatrixZZ.txt");
-  m_eftfunc->writeMatrixToFile(m_eftfunc->getInvertedMatrix(),"coeffsInvMatrixZZ.txt");
 
+//   information for cross section morphing
+  m_eftfunc->writeMatrixToFile(m_eftfunc->getInvertedMatrix(),Form("coeffsInvMatrix_%s.txt",m_eftfunc->GetName()));
+  m_eftfunc->writeFormulas(Form("formulas_%s.txt",m_eftfunc->GetName()));
+  m_eftfunc->writePhysics(Form("phys_%s.txt",m_eftfunc->GetName()));
   return true;
 }
 
