@@ -2136,6 +2136,44 @@ bool RooLagrangianMorphFunc::writeCoefficients(const char* filename){
 
 //_____________________________________________________________________________
 
+bool RooLagrangianMorphFunc::writeFormulas(const char* filename){
+    // write a matrix to a text file
+  std::ofstream stream(filename);
+  if(!stream.good()){
+    ERROR("unable to read file '"<<filename<<"'!");
+    return false;
+  }
+  
+  RooLagrangianMorphFunc::CacheElem* cache = this->getCache(_curNormSet);
+  for(auto const & formula : cache->_formulas){
+    stream << (formula.second)->GetTitle() << std::endl;
+  }
+  stream.close();  
+  return true;
+}
+
+//_____________________________________________________________________________
+
+bool RooLagrangianMorphFunc::writePhysics(const char* filename){
+      // write a matrix to a text file
+  std::ofstream stream(filename);
+  if(!stream.good()){
+    ERROR("unable to read file '"<<filename<<"'!");
+    return false;
+  }
+  RooLagrangianMorphFunc::CacheElem* cache = this->getCache(_curNormSet);
+  for(int i=0; i<cache->_phys.getSize(); ++i){
+    RooProduct* phys = (RooProduct*) cache->_phys.at(i);
+    if(!phys) continue;
+    stream << "# " << phys->GetName() << std::endl;
+    RooAbsReal* integral = phys->createIntegral(*this->getObservable());
+    if(integral) stream << integral->getVal() << std::endl;
+  }
+  stream.close();  
+  return true;
+}
+//_____________________________________________________________________________
+
 RooLagrangianMorphFunc::CacheElem* RooLagrangianMorphFunc::getCache(const RooArgSet* /*nset*/) const {
   // retrieve the cache object
   RooLagrangianMorphFunc::CacheElem* cache = (RooLagrangianMorphFunc::CacheElem*) _cacheMgr.getObj(0,(RooArgSet*)0);
@@ -2459,6 +2497,17 @@ void RooLagrangianMorphFunc::printSamples() const {
   for(auto folder : this->_folders){
     std::cout << folder << std::endl;
     if(folder ==  this->_baseFolder) std::cout << "*" << std::endl;
+  }
+}
+
+//_____________________________________________________________________________
+void RooLagrangianMorphFunc::printFormulas() const {
+  // print the morphing formulas
+  RooLagrangianMorphFunc::CacheElem* cache = this->getCache(_curNormSet);
+  for(auto const & formula : cache->_formulas){
+    std::cout << formula.first << " ";
+    (formula.second)->Print();
+    std::cout << std::endl;
   }
 }
 
