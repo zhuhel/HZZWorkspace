@@ -99,6 +99,7 @@ class RooLagrangianMorphFunc : public RooAbsPdf {
   void printParameters() const;
   void printParameters(const char* samplename) const;
   void printSamples() const;
+  void printFormulas() const;
   void printPhysics() const;
 
   RooProduct* getSumElement(const char* name) const;
@@ -132,6 +133,8 @@ class RooLagrangianMorphFunc : public RooAbsPdf {
   bool useCoefficients(const TMatrixD& inverse);
   bool useCoefficients(const char* filename);
   bool writeCoefficients(const char* filename);
+  bool writeFormulas(const char* filename);
+  bool writePhysics(const char* filename);
   
   int countContributingFormulas() const;
   RooParamHistFunc* getBaseTemplate();
