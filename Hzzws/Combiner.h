@@ -45,6 +45,9 @@ class Combiner{
         TChain* mc_chain;
         map<string, Coefficient*> allCoefficients; // map for co-efficients
         SystematicsManager* sysMan;
+	
+	std::string weight_var_name;//name of weight variable in minitree, default is 'weight'
+	
 
         // operations
         string findCategoryConfig(const string& cat_name, const string& name);
