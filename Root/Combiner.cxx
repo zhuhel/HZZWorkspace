@@ -152,21 +152,29 @@ void Combiner::readConfig(const char* configName)
         string input_mc = main_dic.at("mc");
 	strvec mc_weight_config;
 	Helper::tokenizeString(input_mc,',',mc_weight_config);
-	// in case the user wants to use a different variable as weight than the default (='weight')
-	if(mc_weight_config.size() == 2 ){
+	// loop over additional arguments 
+	if(mc_weight_config.size() > 1 ){
+	  // first argument must be input mc file	  
 	  input_mc = mc_weight_config[0];
-	  strvec weightvar;
-	  Helper::tokenizeString(mc_weight_config[1],':',weightvar);
-	  if(weightvar.size()==2 && weightvar[0].compare("weight") == 0){
-	    weight_var_name = weightvar[1];
+	  for(unsigned int iarg = 1; iarg < mc_weight_config.size() ; ++iarg){
+	    string full_arg (mc_weight_config[iarg]);
+	    strvec arg;
+	    Helper::tokenizeString(full_arg,':',arg);
+	    // in case the user wants to use a different variable as weight than the default (='weight')
+	    if(arg.size()==2 && arg[0].compare("weight") == 0){
+	      weight_var_name = arg[1];
+	    }
+	    else if(!full_arg.empty()){
+	      log_warn(" did not recognize argument given to 'mc' configuration: '%s' . Allowed arguments are: 'weight : <weightvar>' ",full_arg.c_str());
+	    }
 	  }
 	}
-        cout<<" you are adding weighted MC!! As weight the minitree variable with name '" << weight_var_name.c_str() << "' is used" << endl;
+        log_info("you are adding weighted MC!! As weight the minitree variable with name '%s' is used", weight_var_name.c_str());
         mc_chain = Helper::loader(input_mc.c_str(), "tree_incl_all");
         rename_map_[weight_var_name] = "weightVar"; //add the weight variable to the workspace
         workspace->factory("weightVar[-1000,1000]");
     } catch (const out_of_range& oor){
-        cout<< "no MC was added"<<endl;
+        log_info("no MC was added");
     }
 
     ///////////////////////////////////
