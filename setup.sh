@@ -1,5 +1,8 @@
 #!/bin/bash
-script_name=$BASH_SOURCE
+script_name=${BASH_SOURCE[0]}
+if [[ $SHELL == *"zsh"* ]]; then
+    script_name=${(%):-%N}
+fi
 currentDir=$PWD
 
 ##setup gcc and python
@@ -9,7 +12,6 @@ currentDir=$PWD
 # GCC 4.9.3
 PATH="/afs/cern.ch/sw/lcg/contrib/gcc/4.9.3/x86_64-slc6/bin:$PATH"
 LD_LIBRARY_PATH="/afs/cern.ch/sw/lcg/contrib/gcc/4.9.3/x86_64-slc6/lib64:$LD_LIBRARY_PATH"
-
 
 # Python 2.7.4
 PYTHONDIR="/afs/cern.ch/sw/lcg/external/Python/2.7.4/x86_64-slc6-gcc48-opt"
@@ -31,7 +33,7 @@ ulimit -S -s unlimited
 
 cd $currentDir
 #set ws code env
-export HZZWSCODEDIR=$(cd $(dirname "${script_name}") && pwd -P)
+export HZZWSCODEDIR="$( cd "$( dirname "$script_name" )" && pwd )"
 # export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${HZZWSCODEDIR}/lib:/afs/cern.ch/work/k/kecker/public/HZZTensorWS/RooLagrangianMorphFunc/lib
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${HZZWSCODEDIR}/lib
 export PATH=$PATH:${HZZWSCODEDIR}/bin:${HZZWSCODEDIR}/test-bin
@@ -42,3 +44,7 @@ if [ ! -f ./Hzzws_Dict_rdict.pcm ]; then
 fi
 
 D1=$PWD
+
+# set up environment for running Python code
+export PATH=$HZZWSCODEDIR/Python/bin:$PATH
+export PYTHONPATH=$HZZWSCODEDIR/Python/modules:$PYTHONPATH
