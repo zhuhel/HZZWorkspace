@@ -31,6 +31,7 @@ Combiner::Combiner(const char* _name, const char* _configName):
     data_chain = nullptr;
     mc_chain = nullptr;
     workspace = nullptr;
+    weight_var_name = ("weight");
 }
 
 Combiner::~Combiner(){
@@ -149,12 +150,38 @@ void Combiner::readConfig(const char* configName)
     ///////////////////////////////////
     try {
         string input_mc = main_dic.at("mc");
-        cout<<" you are adding weighted MC!!" << endl;
+	strvec mc_weight_config;
+	Helper::tokenizeString(input_mc,',',mc_weight_config);  
+	// first argument must be input mc file	  
+	input_mc = mc_weight_config.size() > 0 ? mc_weight_config[0] : "";
+	// loop over additional arguments   
+	for(unsigned int iarg = 1; iarg < mc_weight_config.size() ; ++iarg){
+	  string full_arg (mc_weight_config[iarg]);
+	  strvec arg;
+	  Helper::tokenizeString(full_arg,':',arg);
+	  // in case the user wants to use a different variable as weight than the default (='weight')
+	  if(arg.size()==2 && arg[0].compare("weight") == 0){
+	    weight_var_name = arg[1];
+	  }
+	  else if(!full_arg.empty()){
+	    log_warn(" did not recognize argument given to 'mc' configuration: '%s' . Allowed arguments are: 'weight : <weightvar>' ",full_arg.c_str());
+	  }
+	}
         mc_chain = Helper::loader(input_mc.c_str(), "tree_incl_all");
-        rename_map_["weight"] = "weightVar"; //add the weight variable to the workspace
-        workspace->factory("weightVar[-1000,1000]");
+	if(mc_chain){
+	  // check if input tree contains weight variable	
+	  if(!mc_chain->GetListOfBranches()->FindObject(weight_var_name.c_str())){
+	    log_err("MC weight var %s not contained in input tree -> no MC will be added",weight_var_name.c_str());
+	    mc_chain = 0;
+	  }
+	  else{
+	    rename_map_[weight_var_name] = "weightVar"; //add the weight variable to the workspace
+	    workspace->factory("weightVar[-1000,1000]");
+	    log_info("you are adding weighted MC!! As weight the minitree variable with name '%s' is used", weight_var_name.c_str());
+	  }
+	}
     } catch (const out_of_range& oor){
-        cout<< "no MC was added"<<endl;
+        log_info("no MC was added");
     }
 
     ///////////////////////////////////
@@ -305,9 +332,9 @@ void Combiner::readConfig(const char* configName)
     if (mc_chain){
         std::cout<<"adding mc in ALL categories"<<std::endl;
         obs_.add(channelCat,true); //silence because it might already be there if you added data!
-        static RooRealVar* wgt = new RooRealVar("weight","weight",-1000,1000);
+        static RooRealVar* wgt = new RooRealVar(weight_var_name.c_str(),weight_var_name.c_str(),-1000,1000);
         obs_.add(*wgt);
-        RooDataSet* MC = new RooDataSet("MC","Weighted MC",obs_,RooFit::Index(channelCat),RooFit::Import(mcMap), RooFit::WeightVar("weight"));
+        RooDataSet* MC = new RooDataSet("MC","Weighted MC",obs_,RooFit::Index(channelCat),RooFit::Import(mcMap), RooFit::WeightVar(weight_var_name.c_str()));
         workspace->import(*MC, RooFit::RenameVariable(orignames.Data(),newnames.Data()));
         //for (auto& d : mcMap) workspace->import(*d.second, RooFit::RenameVariable(orignames.Data(),newnames.Data()));
         MC->Print();
@@ -362,7 +389,11 @@ void Combiner::readConfig(const char* configName)
         }
     }
 
-
+    if (workspace->obj("ModelConfig")){
+      std::cout<<"\n PRINTING POI"<<std::endl;
+      ((RooStats::ModelConfig*)workspace->obj("ModelConfig"))->GetParametersOfInterest()->Print("v");
+      std::cout<<std::endl;
+    }
 
     //////////////////////////////////////////////
     // Add Asimov
@@ -463,10 +494,6 @@ void Combiner::configWorkspace(RooWorkspace* ws)
 
     if (poiSet->getSize()==0)
         log_err("I cannot find POI!");
-
-    std::cout<<"\n PRINTING POI"<<std::endl;
-    poiSet->Print("v");
-    std::cout<<std::endl;
 
     //////////////////////////////
     // define nusiance parameters and global observables
@@ -637,10 +664,14 @@ void Combiner::addDataChan( map<string, RooDataSet*>& map, TChain* chain, RooArg
   TTree* cutChain = chain->CopyTree(cut.c_str());
   cout << "Observables in minitree: " << obs.getSize() << endl;
   string data_name(Form("%s_%s",(weighted?"mc":"data"),catname.c_str()));
-  RooCmdArg wgt_arg = weighted ? RooFit::WeightVar("weight") : RooCmdArg::none() ;
+  RooCmdArg wgt_arg = weighted ? RooFit::WeightVar(weight_var_name.c_str()) : RooCmdArg::none() ;
   RooArgSet thisObs(obs);
   if (weighted){
-    static RooRealVar* wgt = new RooRealVar("weight","weight",-1000,1000);
+    if(!chain->GetListOfBranches()->FindObject(weight_var_name.c_str())){
+      log_err("MC weight var %s not contained in input tree -> no MC added",weight_var_name.c_str());
+      return;
+    }
+    static RooRealVar* wgt = new RooRealVar(weight_var_name.c_str(),weight_var_name.c_str(),-1000,1000);
     thisObs.add(*wgt);
   }
   std::cout<<"reading data type "<<(weighted?"MC":"data")<<std::endl;
