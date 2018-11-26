@@ -20,10 +20,13 @@ SysText::SysText(const char* text_path):
 
     // please comment it out after debugging!
     // Helper::printDic<string>(sys_all_);
-
+    
     ch_name_ = "";
     SetCutoff(Helper::getSysCutoff("all"));
+    SetMCStatCutoff(Helper::getSysCutoff("mcstat"));
     Clear();
+    m_cutoff = 0.;
+    m_cutoff_mcstat = 0.;
 }
 
 SysText::SysText(const map<string, map<string, string> >& sys_all) 
@@ -35,6 +38,7 @@ SysText::SysText(const map<string, map<string, string> >& sys_all)
     }
     ch_name_ = "";
     SetCutoff(Helper::getSysCutoff("all"));
+    SetMCStatCutoff(Helper::getSysCutoff("mcstat"));
     Clear();
 }
 
@@ -42,6 +46,7 @@ SysText::SysText(){
     sys_all_.clear();
     ch_name_ = "";
     SetCutoff(Helper::getSysCutoff("all"));
+    SetMCStatCutoff(Helper::getSysCutoff("mcstat"));
     Clear();
 }
 
@@ -75,13 +80,26 @@ bool SysText::SetChannel(const char* ch_name){
 
                 if (std::isnan(low_value) || std::isnan(high_value)) continue;
 
-                // systematic cutoff
-                if (!(fabs(low_value-1.0)>m_cutoff || fabs(high_value-1.0)>m_cutoff || 0.5*fabs(high_value-low_value)>m_cutoff)) {
-                    log_info("sys below cutoff (%.5f)! dropping %s in chan %s with effect %.5f %.5f %.5f",m_cutoff,(npName.first).c_str(),ch_name,fabs(low_value-1.0),fabs(high_value-1.0),fabs(high_value-low_value));
-                    continue;
-                }
-                log_info("sys above cutoff (%.5f)! keeping %s in chan %s with effect %.5f %.5f %.5f",m_cutoff,(npName.first).c_str(),ch_name,fabs(low_value-1.0),fabs(high_value-1.0),fabs(high_value-low_value));
+                float abs_low, abs_high, abs_var;
+                abs_low = fabs(low_value-1.0);
+                abs_high = fabs(high_value-1.0);
+                abs_var = fabs(high_value-low_value);
 
+                // mc stat cutoff
+                if( (npName.first).find("MCSTAT") != string::npos ) {
+                  if (!(abs_low>m_cutoff_mcstat || abs_high>m_cutoff_mcstat || 0.5*abs_var>m_cutoff_mcstat)) {
+                      log_info("mc_stat below cutoff (%.5f)! dropping %s in chan %s with effect %.5f %.5f %.5f",m_cutoff_mcstat,(npName.first).c_str(),ch_name,abs_low,abs_high,abs_var);
+                      continue;
+                  }
+                  log_info("mc_stat above cutoff (%.5f)! keeping %s in chan %s with effect %.5f %.5f %.5f",m_cutoff_mcstat,(npName.first).c_str(),ch_name,abs_low,abs_high,abs_var);
+                } else {
+                // systematic cutoff
+                  if (!(abs_low>m_cutoff || abs_high>m_cutoff || 0.5*abs_var>m_cutoff)) {
+                      log_info("sys below cutoff (%.5f)! dropping %s in chan %s with effect %.5f %.5f %.5f",m_cutoff,(npName.first).c_str(),ch_name,abs_low,abs_high,abs_var);
+                      continue;
+                  }
+                  log_info("sys above cutoff (%.5f)! keeping %s in chan %s with effect %.5f %.5f %.5f",m_cutoff,(npName.first).c_str(),ch_name,abs_low,abs_high,abs_var);
+                }
 
                 vector<float>  sys;
                 sys.push_back(low_value);
@@ -120,22 +138,48 @@ bool SysText::AddSys(const TString& ch_name, const TString& npName)
 
 void SysText::addSys(const TString& npName, double low, double up)
 {
-    RooRealVar* npVar = Helper::createNuisanceVar(npName.Data());
-    np_.add(*npVar);
-    low_.push_back(low);
-    high_.push_back(up);
-    log_info("added systematic: %s", npName.Data());
+    RooRealVar* npVar;
+    string npNameIn=Form("%s", npName.Data());
+    TString npVarName;
+    if(!npName.Contains("MCSTAT")) { 
+      npVar = Helper::createNuisanceVar(npName.Data());
+      np_.add(*npVar);
+      low_.push_back(low);
+      high_.push_back(up);
+      log_info("added systematic: %s", npName.Data());
+    } else { // MC stat
+      // scale factor to be applied to the yield: 1 + stat_errr
+      // nominal:1   
+      // stat_err: poisson constraint
+      if(npNameIn.find("gamma_stat") == string::npos)
+        npVarName="gamma_stat_"+npName;
+      Double_t sigma = fabs(up-low)/2.;
+      npVar = new RooRealVar(npVarName.Data(), npVarName.Data(), 1.0, 0, 1+5*sigma); // use 5*sigam by default
+      gamma_.add(*npVar);
+      log_info("added MC stat: %s", npName.Data());
+    }
 }
 
 RooAbsReal* SysText::GetSys(const char* name) {
+    string nameIn=Form("%s", name);
+
     if (low_.size() < 1){ 
         log_info("%s: Tried GetSys but I don't have any systematics... returning NULL", file_name_.c_str());
         return NULL;
     }
-    auto* fiv = new RooStats::HistFactory::FlexibleInterpVar(name, name, np_, 1., low_, high_);
-    // 4: piece-wise log outside boundaries, polynomial interpolation inside
-    fiv->setAllInterpCodes(4); 
-    return fiv;
+    if(nameIn.find("gamma_stat") == string::npos) { 
+      auto* fiv = new RooStats::HistFactory::FlexibleInterpVar(name, name, np_, 1., low_, high_);
+      // 4: piece-wise log outside boundaries, polynomial interpolation inside
+      fiv->setAllInterpCodes(4); 
+      return fiv;
+    } else { // MC stat
+      if(gamma_.getSize() < 1) {
+        log_info("%s: Tried GetSys for MC stat but I don't have any ... returning NULL", file_name_.c_str());
+        return NULL;
+      }
+      RooProduct*  McStat = new RooProduct(name, name, RooArgSet(gamma_));
+      return McStat;
+    }
 }
 
 RooAbsReal* SysText::GetSys(){
@@ -179,3 +223,7 @@ void SysText::SetCutoff(float in){
     m_cutoff=in;
 }
 
+void SysText::SetMCStatCutoff(float in){ 
+    log_info("received call to SysText::SetMCStatCutoff... overriding %.6f to %.6f",m_cutoff_mcstat,in);
+    m_cutoff_mcstat=in;
+}

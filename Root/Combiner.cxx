@@ -511,8 +511,8 @@ void Combiner::configWorkspace(RooWorkspace* ws)
             log_err("no global observable: %s in workspace", globalName.c_str());
             continue;
         }
-        nuisanceSet_.add( *ws->var(nuisanceName.c_str()) );
-        globalobsSet_.add( *ws->var(globalName.c_str()) );
+        nuisanceSet_.addClone( *ws->var(nuisanceName.c_str()) );
+        globalobsSet_.addClone( *ws->var(globalName.c_str()) );
     }
     ws->defineSet("obs", obs_ws_);
     ws->defineSet("nuisance", nuisanceSet_);

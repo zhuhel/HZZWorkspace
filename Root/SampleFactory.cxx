@@ -41,7 +41,7 @@ SampleBase* SampleFactory::FactorySampleCount(strvec& args){
         log_err("SampleCount missing mandatory argument 'name'");
         return NULL;
     }
-    return new SampleBase(name.c_str());
+    return new SampleCount(name.c_str());
 }
 
 // ===========================================================

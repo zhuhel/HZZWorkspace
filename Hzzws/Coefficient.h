@@ -30,6 +30,10 @@ class Coefficient {
 
     void SetCutoff (float in);
 
+    // get the associated NPs for this coefficient
+    const RooArgSet& GetNPs() { return np_;};
+    const RooArgSet& GetGammas() {return gamma_;};
+
   private:
     RooArgList* m_arglist;
     strmap m_args;
@@ -44,6 +48,7 @@ class Coefficient {
     RooAbsReal* GetGenericFactorUsingNormDic(const std::string& p, const std::string& a);
     RooAbsReal* GetGenericFactorUsingConfigDic(const std::string& p, const std::string& a);
     RooAbsReal* GetSystematicFactor(const std::string& p);
+    RooAbsReal* GetMCStatFactor(const std::string& p);
     RooAbsReal* GetPOI(const std::string& p);
     RooAbsReal* GetGlobalFactor(const std::string& p);
 
@@ -57,7 +62,9 @@ class Coefficient {
     std::pair<bool, float> m_customCutoff;
 
     strvec poi_names;
-        
+    
+    RooArgSet np_;    // nuisance parameters associated to the coefficient
+    RooArgSet gamma_; // MC stat NPs associated to the coefficient
 };
 
 #endif

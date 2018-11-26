@@ -3,6 +3,7 @@
 
 
 #include "Hzzws/SampleBase.h"
+#include "Hzzws/SampleCount.h"
 #include "Hzzws/SampleHist.h"
 #include "Hzzws/SampleHistParam.h"
 #include "Hzzws/SampleKeys.h"
