@@ -14,19 +14,21 @@ PATH="/afs/cern.ch/sw/lcg/contrib/gcc/4.9.3/x86_64-slc6/bin:$PATH"
 LD_LIBRARY_PATH="/afs/cern.ch/sw/lcg/contrib/gcc/4.9.3/x86_64-slc6/lib64:$LD_LIBRARY_PATH"
 
 # Python 2.7.4
-PYTHONDIR="/afs/cern.ch/sw/lcg/external/Python/2.7.4/x86_64-slc6-gcc48-opt"
-PATH="$PYTHONDIR/bin:$PATH"
-LD_LIBRARY_PATH="$PYTHONDIR/lib:$LD_LIBRARY_PATH"
-PYTHONPATH=$PYTHONPATH:"$PYTHONDIR/lib/python2.7"
-export PATH LD_LIBRARY_PATH PYTHONDIR PYTHONPATH
+#PYTHONDIR="/afs/cern.ch/sw/lcg/external/Python/2.7.4/x86_64-slc6-gcc48-opt"
+#PATH="$PYTHONDIR/bin:$PATH"
+#LD_LIBRARY_PATH="$PYTHONDIR/lib:$LD_LIBRARY_PATH"
+#PYTHONPATH=$PYTHONPATH:"$PYTHONDIR/lib/python2.7"
+#export PATH LD_LIBRARY_PATH PYTHONDIR PYTHONPATH
 # additional lib.
 export PYTHONPATH=$PYTHONPATH:/afs/cern.ch/user/s/shsun/public/python/numpy/1.10.4/install/lib/python2.7/site-packages/:/afs/cern.ch/user/s/shsun/public/python/scipy/install/lib/python2.7/site-packages/:/afs/cern.ch/user/x/xju/public/python/lib/python2.7/site-packages/
 
 #ROOT
 #RootDir=/afs/cern.ch/atlas/project/HSG7/root/current/x86_64-slc6-gcc48/
-RootDir=/afs/cern.ch/atlas/project/HSG7/root/root_v6-04-02/x86_64-slc6-gcc49/
-cd $RootDir
-source bin/thisroot.sh
+#RootDir=/afs/cern.ch/atlas/project/HSG7/root/root_v6-04-02/x86_64-slc6-gcc49/
+#cd $RootDir
+#source bin/thisroot.sh
+source $ATLAS_LOCAL_ROOT_BASE/user/atlasLocalSetup.sh
+lsetup "root 6.08.06-HiggsComb-x86_64-slc6-gcc49-opt"
 
 # increase stack size - needed for large workspaces
 ulimit -S -s unlimited
