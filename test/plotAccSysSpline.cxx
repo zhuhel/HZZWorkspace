@@ -68,7 +68,7 @@ int main(){
   // LOOP OVER PRODUCTION MODES
   //
 
-  for (int p(0);p<prod.size();++p){
+  for (unsigned int p(0);p<prod.size();++p){
     std::cout<<prod[p]<<std::endl;
 
     //wsp->var(Form("XS_%s",prod[p].c_str()))->setVal(1./wsp->var("ATLAS_LUMI")->getVal());
@@ -78,7 +78,7 @@ int main(){
     //
     TCanvas can("can","",600,600);
 
-    for (int c(0);c<categories.size();++c){
+    for (unsigned int c(0);c<categories.size();++c){
         std::cout<<categories[c]<<std::endl;
 
         wsp->var(Form("BRRatio_%s",categories[c].c_str()))->setVal(1.);
@@ -104,7 +104,7 @@ int main(){
         acwsys->plotOn(frame, LineColor(color[c]),Precision(0.0001));
 
 
-        for (int s(0);s<sys.size();++s){ //begin loop over systematics
+        for (unsigned int s(0);s<sys.size();++s){ //begin loop over systematics
             if (!wsp->var(sys[s].c_str())) {
                 std::cout<<"failed to find systematic: "<<sys[s]<<std::endl;
                 continue;
@@ -142,7 +142,7 @@ int main(){
         float y = 0.85;
 
         //Decorate the plot
-        for (int s(0),o(0);s<sys.size();++s){ //begin loop over systematics
+        for (unsigned int s(0),o(0);s<sys.size();++s){ //begin loop over systematics
             if (!wsp->var(sys[s].c_str())) {
                 std::cout<<"failed to find systematic: "<<sys[s]<<std::endl;
                 continue;

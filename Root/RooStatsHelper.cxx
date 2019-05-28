@@ -517,7 +517,7 @@ void RooStatsHelper::fitData(RooWorkspace* w, const char* mcName,
 
   RooStats::ModelConfig *mc=(RooStats::ModelConfig*)w->obj(mcName);
   RooArgSet* nuisanceParameters = (RooArgSet*) mc->GetNuisanceParameters();
-  auto pois = const_cast<RooArgSet*>(mc->GetParametersOfInterest());
+  // auto pois = const_cast<RooArgSet*>(mc->GetParametersOfInterest());
 
   //perform S+B fit (with mu=poival fixed)
   cout<<"S+B fixed"<<endl;

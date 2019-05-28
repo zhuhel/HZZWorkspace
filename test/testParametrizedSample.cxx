@@ -34,8 +34,8 @@ void generate_para_ws()
     const char* norm_sys = "norm_ggF_125_Low.txt";
     const char* shape_sys = "ggF_125_Low_Shape.root";
     ***/
-    const char* path = "/afs/cern.ch/user/x/xju/work/h4l/workspace/mc15_13TeV_v2/himass/";
-    const char* norm_sys = "norm_ggF_125_Low.txt";
+    // const char* path = "/afs/cern.ch/user/x/xju/work/h4l/workspace/mc15_13TeV_v2/himass/";
+    // const char* norm_sys = "norm_ggF_125_Low.txt";
     const char* shape_sys = "ggF_125_Low_Shape.root";
     auto* sample_h124 = new SampleHist("ATLAS_Signal_ggH124",  "test_ggH_200.root", shape_sys);
     auto* sample_h125 = new SampleHist("ATLAS_Signal_ggH125",  "test_ggH_300.root", shape_sys);
@@ -87,7 +87,7 @@ void generate_keys_ws()
     const char* f2 = Form("%s/mc15_13TeV.341947.Pythia8EvtGen_A14NNPDF23LO_ZH125_ZZ4l.root", path);
     const char* f3 = Form("%s/mc15_13TeV.341948.Pythia8EvtGen_A14NNPDF23LO_ZH126_ZZ4l.root", path);
 
-    const char* norm_sys = "norm_ggF_125_Low.txt";
+    // const char* norm_sys = "norm_ggF_125_Low.txt";
 
     auto* sample_h124 = new SampleKeys("ATLAS_Signal_ggH124", 124, 110, 140,
             f1,"");

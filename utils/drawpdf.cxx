@@ -93,7 +93,7 @@ int main(int argc, char** argv)
         lg->SetFillColor(10);
         lg->AddEntry(xframe->findObject("Data"),"Input Data","PE");
         lg->AddEntry(xframe->findObject("nominal"),"sigal+bkg nominal pdf", "L");
-        for(int icomp=0; icomp<nComp.size(); icomp++)
+        for(unsigned int icomp=0; icomp<nComp.size(); icomp++)
           lg->AddEntry(xframe->findObject(nComp.at(icomp).data()),nComp.at(icomp).data(), "L");
         xframe->Draw();
         lg->Draw();

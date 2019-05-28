@@ -215,7 +215,7 @@ RooAbsPdf* createMCStatConstraint(const char* npName, RooRealVar* np, RooArgList
     // set reasonable ranges for gamma parameters
     // sigma is the relative uncertainty
     float npMax= np->getMax();
-    float npMin= np->getMin();
+    // float npMin= np->getMin();
     Double_t sigma = (npMax - 1)/5.;
 
     // Poisson ( np | tau*beta )
@@ -461,7 +461,7 @@ void getListOfNames(const string& cut, strvec& name_list, strmap& name_map) {
     // find non-poi names, i.e., the ones like kgg[1.0/0.9/1.1], or mu10[10]
     for(auto& x: new_list){
       if(cutStr_org.Contains(x)) {
-        auto indx = cutStr_org.Index(x) + x.length();
+        int indx = cutStr_org.Index(x) + x.length();
         // check if a '[' follows
         bool found_range=false;
         while(indx!=kNPOS) {

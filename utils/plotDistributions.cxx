@@ -115,10 +115,10 @@ int main(){
   std::map<std::string, std::map<std::string, TH1F*> > hists;
 
   //Loop to populate all histograms
-  for (int i(0);i<types.size();++i){
+  for (unsigned int i(0);i<types.size();++i){
     std::string sample = types[i];
 
-    for (int c(0);c<cats.size();++c){
+    for (unsigned int c(0);c<cats.size();++c){
 
       const char* hname = Form("hist_%s_%s",sample.c_str(),cats[c].c_str());
       TH1F* hist = new TH1F(hname,"",hbins,hmin,hmax);
@@ -149,7 +149,7 @@ int main(){
           normname.push_back(Form("nTotATLAS_Bkg_qqZZ_%s",cats[c].c_str()));
         }
 
-        for (int i(0);i<pdfname.size();++i){
+        for (unsigned int i(0);i<pdfname.size();++i){
           if (!w->pdf(pdfname[i].c_str())){
               cout <<pdfname[i] << " does not exits" << endl;
               continue;
@@ -177,7 +177,9 @@ int main(){
                 added*=2.0; //multiply effect to be conservative
                 if (added!=0 && added==added) hi->SetBinError(b , sqrt(old*old + added*added));
               }
-              delete up,down,nom;
+              delete up;
+              delete down;
+              delete nom;
             }
           }
           delete hifull;
@@ -196,7 +198,7 @@ int main(){
   //Combine things and plot
   TCanvas* can = new TCanvas("c","c",800,800);
   can->SetMargin(0.09,0.04,0.09,0.03);
-  for (int c(0);c<=cats.size()+1;++c){
+  for (unsigned int c(0);c<=cats.size()+1;++c){
     can->Clear();
 
     int rebin = (c<cats.size()&&cats[c]=="VBF_incl_13TeV" ? hbins/hbinsVBF : 1);
@@ -205,9 +207,9 @@ int main(){
     std::map<std::string, TH1F*> inclusivehists;
     TH1F summed("summed","summed",hbins/rebin,hmin,hmax);
     if (c>=cats.size()){
-      for (int p2(0);p2<types.size();++p2) { 
+      for (unsigned int p2(0);p2<types.size();++p2) { 
         inclusivehists[types[p2]] = new TH1F(Form("incl_%s",types[p2].c_str()), "",hbins,hmin,hmax); 
-        for (int c2(0);c2<cats.size();++c2) { if (c==cats.size()+1 && cats[c2]=="VBF_incl_13TeV") continue; inclusivehists[types[p2]]->Add(hists[types[p2]][cats[c2]]); }
+        for (unsigned int c2(0);c2<cats.size();++c2) { if (c==cats.size()+1 && cats[c2]=="VBF_incl_13TeV") continue; inclusivehists[types[p2]]->Add(hists[types[p2]][cats[c2]]); }
         inclusivehists[types[p2]]->SetLineColor(kBlack);
         if (types[p2]=="data") {
           inclusivehists[types[p2]]->SetMarkerStyle(20); 
@@ -221,7 +223,7 @@ int main(){
       }
     }
     else {
-      for (int p2(0);p2<types.size();++p2) { 
+      for (unsigned int p2(0);p2<types.size();++p2) { 
         if (types[p2]=="data") continue;
         TH1F* hnew = (TH1F*)hists[types[p2]][cats[c]]->Rebin(rebin,Form("%s_rebinned",hists[types[p2]][cats[c]]->GetName()));
         ths.Add(hnew); summed.Add(hnew);
@@ -293,7 +295,7 @@ TGraphErrors* HistToGraph(TH1F* hist){
     ye.push_back(hist->GetBinError(i));
   }
   std::cout<<"making a tgraph out of "<<std::endl;
-  for (int i(0);i<x.size();++i){
+  for (unsigned int i(0);i<x.size();++i){
     std::cout<<x[i]<<"\t"<<y[i]<<"\t"<<ye[i]<<std::endl;
   }
   return new TGraphErrors(x.size(), &(x[0]), &(y[0]), &(xe[0]), &(ye[0]));
