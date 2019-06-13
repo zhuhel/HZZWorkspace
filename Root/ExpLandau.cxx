@@ -214,7 +214,7 @@ FlexibleInterpVar* ExpLandau::flexibleInterpVar(const string& fivName, vector<st
 {
     RooArgList variables;
 
-    for (int inp=0; inp<(int)names.size(); inp++) {
+    for (size_t inp=0; inp<names.size(); inp++) {
         RooRealVar* np = Helper::createNuisanceVar(names[inp].c_str());
         variables.add(*np);
     }

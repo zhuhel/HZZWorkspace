@@ -76,7 +76,7 @@ bool Coefficient::setChannel(const char* channelName, bool with_sys)
         strvec sysfiles;
         Helper::tokenizeString(m_args["sys"],',',sysfiles);
 
-        for (int i(0);i<(int)sysfiles.size();++i){
+        for (size_t i=0; i<sysfiles.size(); ++i){
             log_info("in %s adding sysfile %s",__func__,sysfiles[i].c_str());
 
             //no wildcard, just one sys handler
@@ -135,7 +135,7 @@ bool Coefficient::setChannel(const char* channelName, bool with_sys)
                 Helper::addPoiName(dep.Data());
 
                 //Create the bpsline bases
-                const char * bsname = Form("bs_bases%d_%s_%s",i,m_nickname.c_str(),channelName);
+                const char * bsname = Form("bs_bases%u_%s_%s",i,m_nickname.c_str(),channelName);
                 m_bspline_bases[i] = new RooStats::HistFactory::RooBSplineBases(bsname, bsname, 3, basevals, *m_base_var[i]);
 
             }
@@ -807,13 +807,13 @@ RooAbsReal* Coefficient::GetMCStatFactor(const std::string& p)
     strvec sysfiles;
     Helper::tokenizeString(p,',',sysfiles);
 
-    for (int i(0);i<(int)sysfiles.size();++i){
-        log_info("in %s adding sysfile (%i/%lu) %s ",__func__,i,sysfiles.size(),sysfiles[i].c_str());
+    for (size_t i=0; i<sysfiles.size(); ++i){
+        log_info("in %s adding sysfile (%u/%lu) %s ",__func__,i,sysfiles.size(),sysfiles[i].c_str());
 
         //Form a single set of systematics
         if (!TString(sysfiles[i].c_str()).MaybeWildcard()){ 
             // MC stat
-            const char* mcstat_name = Form("gamma_stat%d_%s_%s",i,m_nickname.c_str(),m_channel.c_str());
+            const char* mcstat_name = Form("gamma_stat%u_%s_%s",i,m_nickname.c_str(),m_channel.c_str());
             auto mcstat = m_sysHandler[i][0]->GetSys(mcstat_name); 
             if (!mcstat){
                 log_err("unable to get mc stat for this file: %s", sysfiles[i].c_str());
@@ -838,8 +838,8 @@ RooAbsReal* Coefficient::GetSystematicFactor(const std::string& p)
     strvec sysfiles;
     Helper::tokenizeString(p,',',sysfiles);
 
-    for (int i(0);i<(int)sysfiles.size();++i){
-        log_info("in %s adding sysfile (%i/%lu) %s ",__func__,i,sysfiles.size(),sysfiles[i].c_str());
+    for (size_t i=0; i<sysfiles.size(); ++i){
+        log_info("in %s adding sysfile (%u/%lu) %s ",__func__,i,sysfiles.size(),sysfiles[i].c_str());
 
         //Form a single set of systematics
         if (!TString(sysfiles[i].c_str()).MaybeWildcard()){ 

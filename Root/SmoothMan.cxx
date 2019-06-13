@@ -76,7 +76,7 @@ void SmoothMan::process() {
     std::string mirror="";
 
     //interpret args
-    for (int i(1);i<sampleArgs.size();++i){
+    for (size_t i=1; i<sampleArgs.size(); ++i) {
       TString s2 = sampleArgs[i].c_str();
       if (s2.IsFloat()) rho.push_back(s2.Atof());
       else if (s2.Contains("Mirror")) mirror = s2.Data();
@@ -152,7 +152,7 @@ void SmoothMan::getObs(string cat, string &oname, string &treename, RooArgSet &t
     vector<string> branch;  
     Helper::tokenizeString(m_dic[cat]["observables"], ';', branch);
 
-    for (int i=0; i<(int)branch.size(); ++i){
+    for (size_t i=0; i<branch.size(); ++i){
         vector<string> tmp_obs;
         string tmp_branch;
         readObservable(branch[i], tmp_obs, tmp_branch);

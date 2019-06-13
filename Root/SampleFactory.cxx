@@ -25,7 +25,7 @@ SampleBase* SampleFactory::CreateSample(const std::string& type, strvec& args){
 
     log_err("SampleFactory doesn't understand sampletype %s!",type.c_str());
     return NULL;
-};
+}
 
 // ===========================================================
 // SampleCount

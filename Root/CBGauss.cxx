@@ -69,10 +69,10 @@ CBGauss::~CBGauss()
     delete masses_;
     
     if(doSys) {
-        for (int i(0); i < (int)shape_mean_sys_.size(); ++i)
+        for (size_t i=0; i<shape_mean_sys_.size(); ++i)
             delete shape_mean_sys_[i];
 
-        for (int i(0); i < (int)shape_sigma_sys_.size(); ++i)
+        for (size_t i=0; i<shape_sigma_sys_.size(); ++i)
             delete shape_sigma_sys_[i];
     }
 
@@ -486,7 +486,7 @@ FlexibleInterpVar* CBGauss::flexibleInterpVar(const string& fivName, vector<stri
 {
     RooArgList variables;
 
-    for (int inp=0; inp<(int)names.size(); inp++) {
+    for (size_t inp=0; inp<names.size(); inp++) {
         RooRealVar* np = Helper::createNuisanceVar(names[inp].c_str());
         variables.add(*np);
     }

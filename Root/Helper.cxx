@@ -168,7 +168,7 @@ void readAcceptancePoly(std::vector<double>& params, const char* prod, const cha
 
   vector<string> tokens;
   tokenizeString(paramString.c_str(),' ',tokens);
-  for (int i(1);i<(int)tokens.size();++i)
+  for (size_t i=1; i<tokens.size(); ++i)
     params.push_back(stod(tokens[i]));
 }
 
@@ -274,9 +274,9 @@ void readNormTable(const char* file_name,
             string cat_name;
             iss >> cat_name;
             if (cat_name == "") continue;
-            int total = (int) category_names.size();
+            size_t total = category_names.size();
             double yield;
-            int index = 0;
+            size_t index = 0;
             while ( index < total ){
                 char ch;
                 iss >> ch >> yield;
