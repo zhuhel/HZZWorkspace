@@ -172,7 +172,7 @@ int main(int argc, const char** argv){
     //create summary histogram for non-1 functions
 
     TH1F* histfunc = new TH1F("_functions_summary","",vals.size(),0,1);
-    for (int i(0);i<vals.size();++i){
+    for (size_t i=0; i<vals.size(); ++i){
       histfunc->SetBinContent(i+1,vals[i]);
       histfunc->GetXaxis()->SetBinLabel(i+1,names[i]);
     }
@@ -203,7 +203,7 @@ int main(int argc, const char** argv){
 
     TH1F* histvars = new TH1F("_vars_summary","",vals.size(),0,1);
     std::cout<<"size = "<<vals.size()<<std::endl;
-    for (int i(0);i<vals.size();++i){
+    for (size_t i=0; i<vals.size(); ++i){
       std::cout<<i<<" "<<names[i]<<" "<<vals[i]<<std::endl;
       histvars->SetBinContent(i+1,vals[i]);
       histvars->GetXaxis()->SetBinLabel(i+1,names[i]);

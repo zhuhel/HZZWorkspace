@@ -60,7 +60,7 @@ Coefficient* CoefficientFactory::CreateCoefficient(const std::string& coefline){
     else if (m.first=="factors") expS=2;
     else expS=-1;
 
-    if (expS>=0 && coef_splitbycomma.size()!=expS){
+    if (expS>=0 && (int)coef_splitbycomma.size()!=expS){
       log_err("coefficient argument type %s expect exactly %d argument (comma-seperated), received: %s",m.first.c_str(), expS, m.second.c_str());
       return NULL;
     }

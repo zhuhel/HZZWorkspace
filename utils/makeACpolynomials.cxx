@@ -38,8 +38,8 @@ int main(){
   float minPlotY=0.05; //set to -1 to use auto
   float maxPlotY=0.2; //set to -1 to use auto
 
-  float lumi=1;
-  bool storedLumi=false;
+  // float lumi=1;
+  // bool storedLumi=false;
 
   std::vector<std::string> widths;
   //widths.push_back("NW");
@@ -157,9 +157,9 @@ int main(){
   can.SetGrid(2,2);
   can.SetLeftMargin(0.15);
 
-  for (int p(0);p<prod.size();++p){
+  for (unsigned int p(0);p<prod.size();++p){
 
-    for (int w(0);w<widths.size();++w){
+    for (unsigned int w(0);w<widths.size();++w){
       std::cout<<"\nprod: "<<prod[p]<<" width: "<<widths[w]<<std::endl;
 
       bool hasTau=true;
@@ -217,7 +217,7 @@ int main(){
         masses.push_back((*it).first);
         zero.push_back(0.);
 
-        for (int c(0);c<categories.size();++c){
+        for (unsigned int c(0);c<categories.size();++c){
           std::string cat = categories[c];
           TH1F* h = new TH1F("h","h",1,-9999,9999);
           tree->Draw("m4l_constrained_HM>>h",Form("%s*(9./4.)*(weight/(w_lumi*w_xs*w_br))",cuts[c].c_str()));
@@ -231,9 +231,9 @@ int main(){
       std::cout<<"built a map of acceptance vs mass. size="<<masses.size()<<std::endl;
 
       std::cout<<"MC acceptances for "<<prod[p]<<":"<<std::endl;
-      for (int c(0);c<categories.size();++c){
+      for (unsigned int c(0);c<categories.size();++c){
         std::cout<<"\t"<<categories[c]<<std::endl;
-        for (int m(0);m<masses.size();++m){
+        for (unsigned int m(0);m<masses.size();++m){
           std::cout<<"\t\t"<<masses[m]<<":\t"<<norm[categories[c]][m]<<"\t+-\t"<<norm_error[categories[c]][m]<<std::endl;
         }
       }
@@ -249,7 +249,7 @@ int main(){
       //BUILD A GRAPH OF MASS POINT VS NORMS
       TMultiGraph* mg = new TMultiGraph();
       can.cd();
-      for (int c(0);c<categories.size();++c){
+      for (unsigned int c(0);c<categories.size();++c){
         std::string cat = categories[c];
 
         TGraphErrors* graph = new TGraphErrors(masses.size(), &(masses[0]), &(norm[cat][0]), &(zero[0]), &(norm_error[cat][0]));
@@ -264,13 +264,13 @@ int main(){
         //ESTIMATE SYSTEMATIC
         TF1* polfit = graph->GetFunction(pol);
         std::vector<float> dev;
-        for (int m(0);m<masses.size();++m){
+        for (unsigned int m(0);m<masses.size();++m){
           dev.push_back(polfit->Eval(masses[m]) - norm[cat][m]);
           //std::cout<<"actual dev "<<masses[m]<<"\t = "<<norm[cat][m] / polfit->Eval(masses[m])<<std::endl;
         }
         float rms = TMath::RMS(dev.size(),&(dev[0]))/sqrt(masses.size()-1);
         dev.clear();
-        for (int m(0);m<masses.size();++m){
+        for (unsigned int m(0);m<masses.size();++m){
           float nom = polfit->Eval(masses[m]);
           outfileSys<<prod[p]<<"  "<<cat<<"  "<<masses[m]<<"  "<<Form("%.8f",(nom-rms)/nom)<<"   "<<Form("%.8f",(nom+rms)/nom)<<std::endl;
         }
@@ -321,7 +321,7 @@ int main(){
         outfileSI << Form("[%s %s %s]\n",prod[p].c_str(),widths[w].c_str(),cat.c_str());
         std::string outline = "";
         std::string outlineSI = "& ";
-        for (int r(0);r<polyParameters.size();++r) {
+        for (unsigned int r(0);r<polyParameters.size();++r) {
           outline=outline+" "+Form("%.20f",polyParameters[r]);
           outlineSI=outlineSI+Form("%.3e",polyParameters[r])+" & ";
         }
@@ -349,7 +349,7 @@ int main(){
 
       float x(0.25),y(0.85);
       ATLASLabel(x,y,"Internal",kBlack);
-      for (int c(0);c<categories.size();++c)
+      for (unsigned int c(0);c<categories.size();++c)
           myLineText(x,y-0.05-0.04*c,color[c],kSolid,2,catlabels[c].c_str(),0.035);
 
       can.Update();

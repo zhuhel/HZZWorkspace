@@ -87,5 +87,5 @@ namespace RooStatsHelper{
     double calculateSignificance(double obs_nll_min, double obs_nll_bkg);
 
     bool compare_TObject_byName(TObject* a, TObject* b);
-};
+}
 #endif

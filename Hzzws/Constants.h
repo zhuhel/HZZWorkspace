@@ -6,6 +6,6 @@
 namespace constant{
     const strvec OPERATION_LIST {"=", ">", "<", "&", "|", "!", "(", ")"," ", "*","/"," ","+","-", "[", "]"};
     const strvec MATH_SYNTAX_LIST {"sqrt", "cos", "sin", "tan", "log", "exp"};
-};
+}
 
 #endif

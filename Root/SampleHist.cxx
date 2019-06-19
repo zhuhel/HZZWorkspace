@@ -314,8 +314,7 @@ RooStarMomentMorph* SampleHist::createRooStarMomentMorph(const string& outputNam
     vector<int> nnuispoints;
     vector<double> nrefpoints;
 
-    for (int isys = 0; isys < (int)sysPdfs.size(); isys++)
-    {
+    for (size_t isys = 0; isys < sysPdfs.size(); isys++) {
         if (sysPdfs[isys].first==0 || sysPdfs[isys].second==0) {
             cout << "pdf for " << paramNames[isys] << " missing!" << endl;
         }

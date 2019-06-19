@@ -38,10 +38,10 @@ int main(int argc, char** argv)
 
     string input_name(argv[1]);
     int opt_id = 2;
-    if(argc > opt_id) out_name = string(argv[opt_id]); opt_id ++;
-    if(argc > opt_id) wsName = string(argv[opt_id]); opt_id ++;
-    if(argc > opt_id) muName = string(argv[opt_id]); opt_id ++;
-    if(argc > opt_id) dataName = string(argv[opt_id]); opt_id ++;
+    if (argc > opt_id) out_name = string(argv[opt_id++]);
+    if (argc > opt_id) wsName = string(argv[opt_id++]);
+    if (argc > opt_id) muName = string(argv[opt_id++]);
+    if (argc > opt_id) dataName = string(argv[opt_id++]);
     
     // set binning and range for POI
     int nbins = 100;

@@ -197,7 +197,7 @@ int main( int argc, char *argv[] ) {
   
   // sys WS - (4) Retrieve the PDF components 
   const RooArgSet *poi = model->GetParametersOfInterest();
-  const RooArgSet *nps = model->GetNuisanceParameters();
+  // const RooArgSet *nps = model->GetNuisanceParameters();
   //const RooRealVar *m4l = ( RooRealVar* ) model->GetObservables()->first(); 
   // RooCategory *cat = w->cat( "channelCat" );
   //cout<<"********** Categroy" <<endl;

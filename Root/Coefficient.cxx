@@ -76,7 +76,7 @@ bool Coefficient::setChannel(const char* channelName, bool with_sys)
         strvec sysfiles;
         Helper::tokenizeString(m_args["sys"],',',sysfiles);
 
-        for (int i(0);i<(int)sysfiles.size();++i){
+        for (size_t i=0; i<sysfiles.size(); ++i){
             log_info("in %s adding sysfile %s",__func__,sysfiles[i].c_str());
 
             //no wildcard, just one sys handler
@@ -135,7 +135,7 @@ bool Coefficient::setChannel(const char* channelName, bool with_sys)
                 Helper::addPoiName(dep.Data());
 
                 //Create the bpsline bases
-                const char * bsname = Form("bs_bases%d_%s_%s",i,m_nickname.c_str(),channelName);
+                const char * bsname = Form("bs_bases%lu_%s_%s",i,m_nickname.c_str(),channelName);
                 m_bspline_bases[i] = new RooStats::HistFactory::RooBSplineBases(bsname, bsname, 3, basevals, *m_base_var[i]);
 
             }
@@ -807,13 +807,13 @@ RooAbsReal* Coefficient::GetMCStatFactor(const std::string& p)
     strvec sysfiles;
     Helper::tokenizeString(p,',',sysfiles);
 
-    for (int i(0);i<(int)sysfiles.size();++i){
-        log_info("in %s adding sysfile (%i/%lu) %s ",__func__,i,sysfiles.size(),sysfiles[i].c_str());
+    for (size_t i=0; i<sysfiles.size(); ++i){
+        log_info("in %s adding sysfile (%lu/%lu) %s ",__func__,i,sysfiles.size(),sysfiles[i].c_str());
 
         //Form a single set of systematics
         if (!TString(sysfiles[i].c_str()).MaybeWildcard()){ 
             // MC stat
-            const char* mcstat_name = Form("gamma_stat%d_%s_%s",i,m_nickname.c_str(),m_channel.c_str());
+            const char* mcstat_name = Form("gamma_stat%lu_%s_%s",i,m_nickname.c_str(),m_channel.c_str());
             auto mcstat = m_sysHandler[i][0]->GetSys(mcstat_name); 
             if (!mcstat){
                 log_err("unable to get mc stat for this file: %s", sysfiles[i].c_str());
@@ -838,12 +838,12 @@ RooAbsReal* Coefficient::GetSystematicFactor(const std::string& p)
     strvec sysfiles;
     Helper::tokenizeString(p,',',sysfiles);
 
-    for (int i(0);i<(int)sysfiles.size();++i){
-        log_info("in %s adding sysfile (%i/%lu) %s ",__func__,i,sysfiles.size(),sysfiles[i].c_str());
+    for (size_t i=0; i<sysfiles.size(); ++i){
+        log_info("in %s adding sysfile (%lu/%lu) %s ",__func__,i,sysfiles.size(),sysfiles[i].c_str());
 
         //Form a single set of systematics
         if (!TString(sysfiles[i].c_str()).MaybeWildcard()){ 
-            const char* fivname = Form("fiv%d_%s_%s",i,m_nickname.c_str(),m_channel.c_str());
+            const char* fivname = Form("fiv%lu_%s_%s",i,m_nickname.c_str(),m_channel.c_str());
             m_sysHandler[i][0]->Print();
             auto fiv = m_sysHandler[i][0]->GetSys(fivname); 
             if (!fiv){
@@ -864,7 +864,7 @@ RooAbsReal* Coefficient::GetSystematicFactor(const std::string& p)
 
                 TString numToString = Form("%.2f",s.first);
                 numToString.ReplaceAll(".","p");
-                const char* fivname = Form("fiv%d_%s_%s_%s",i,numToString.Data(),m_nickname.c_str(),m_channel.c_str());
+                const char* fivname = Form("fiv%lu_%s_%s_%s",i,numToString.Data(),m_nickname.c_str(),m_channel.c_str());
 
                 auto fiv = s.second->GetSys(fivname);
                 if (!fiv){
@@ -874,7 +874,7 @@ RooAbsReal* Coefficient::GetSystematicFactor(const std::string& p)
                 bs_fiv_list.add(*fiv);
                 np_.add(s.second->GetNPs());
             }
-            const char* bsname = Form("bs_fiv%d_%s_%s",i,m_nickname.c_str(),m_channel.c_str());
+            const char* bsname = Form("bs_fiv%lu_%s_%s",i,m_nickname.c_str(),m_channel.c_str());
             if (bs_fiv_list.getSize() > 0){ // In case of no systematics added
                 auto bs_fiv = new RooStats::HistFactory::RooBSpline(bsname, bsname, bs_fiv_list, *m_bspline_bases[i], RooArgSet());
                 prodset.add(*bs_fiv);

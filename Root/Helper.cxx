@@ -168,7 +168,7 @@ void readAcceptancePoly(std::vector<double>& params, const char* prod, const cha
 
   vector<string> tokens;
   tokenizeString(paramString.c_str(),' ',tokens);
-  for (int i(1);i<(int)tokens.size();++i)
+  for (size_t i=1; i<tokens.size(); ++i)
     params.push_back(stod(tokens[i]));
 }
 
@@ -215,7 +215,7 @@ RooAbsPdf* createMCStatConstraint(const char* npName, RooRealVar* np, RooArgList
     // set reasonable ranges for gamma parameters
     // sigma is the relative uncertainty
     float npMax= np->getMax();
-    float npMin= np->getMin();
+    // float npMin= np->getMin();
     Double_t sigma = (npMax - 1)/5.;
 
     // Poisson ( np | tau*beta )
@@ -274,9 +274,9 @@ void readNormTable(const char* file_name,
             string cat_name;
             iss >> cat_name;
             if (cat_name == "") continue;
-            int total = (int) category_names.size();
+            size_t total = category_names.size();
             double yield;
-            int index = 0;
+            size_t index = 0;
             while ( index < total ){
                 char ch;
                 iss >> ch >> yield;
@@ -461,7 +461,7 @@ void getListOfNames(const string& cut, strvec& name_list, strmap& name_map) {
     // find non-poi names, i.e., the ones like kgg[1.0/0.9/1.1], or mu10[10]
     for(auto& x: new_list){
       if(cutStr_org.Contains(x)) {
-        auto indx = cutStr_org.Index(x) + x.length();
+        int indx = cutStr_org.Index(x) + x.length();
         // check if a '[' follows
         bool found_range=false;
         while(indx!=kNPOS) {

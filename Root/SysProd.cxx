@@ -48,14 +48,14 @@ bool SysProd::checkConfig() {
    // check samples
    vector<string> samples; 
    Helper::tokenizeString(p_dic["main"]["samples"].c_str(), ',', samples);
-   for(int i=0; i<(int)samples.size(); ++i){
+   for(size_t i=0; i<samples.size(); ++i){
       if(!p_dic["samples"].count(samples[i].c_str()))
       {log_err("ERROR: look at samples!");  check = false;}
    }
    // check categories
    vector<string> categories;
    Helper::tokenizeString(p_dic["main"]["categories"].c_str(), ',', categories);
-   for(int i=0; i<(int)categories.size(); ++i){
+   for(size_t i=0; i<categories.size(); ++i){
       if(!p_dic.count(categories[i].c_str()))
       {log_err("ERROR: look at categories!");  check = false;}
    } 
@@ -115,13 +115,13 @@ void SysProd::process() {
    // get sample list
    vector<string> samplesList, samplesNames; 
    Helper::tokenizeString(p_dic["main"]["samples"].c_str(), ',', samplesList);
-   for(int i=0; i<(int)samplesList.size(); ++i){
+   for(size_t i=0; i<samplesList.size(); ++i){
       samplesNames.push_back(samplesList[i].c_str()); 
       samplesList[i]  = p_dic["samples"][samplesList[i].c_str()].c_str();
-      }
+   }
 
    // loop over samples
-   for(int i=0; i<(int)samplesList.size(); ++i){
+   for(size_t i=0; i<samplesList.size(); ++i){
       log_info("Working on %s",(samplesList[i]).c_str());
 
       // loop over categories
@@ -129,24 +129,24 @@ void SysProd::process() {
       vector<string> catList; 
       Helper::tokenizeString(p_dic["main"]["categories"].c_str(), ',', catList);
 
-      int nSystDirs = (int)systDirs.size();
-      int nNormSyst = (int)outNormSystWeightName.size();
+      size_t nSystDirs = systDirs.size();
+      size_t nNormSyst = outNormSystWeightName.size();
 
-      vector<TH1*> systHistVec(nSystDirs*(int)catList.size());
-      vector<TH1*> systHistVecNorm(nNormSyst*(int)catList.size());
+      vector<TH1*> systHistVec(nSystDirs*catList.size());
+      vector<TH1*> systHistVecNorm(nNormSyst*catList.size());
 
       // vectors to store original shapes for comparison
-      vector<TH1*> systHistVecOut(nSystDirs*(int)catList.size());
+      vector<TH1*> systHistVecOut(nSystDirs*catList.size());
       vector<TH1*> systHistVecNom;
 
-      vector<double> normalizationValues(nSystDirs*(int)catList.size());
-      vector<double> normalizationValuesW(nNormSyst*(int)catList.size());
+      vector<double> normalizationValues(nSystDirs*catList.size());
+      vector<double> normalizationValuesW(nNormSyst*catList.size());
 
       // vectors to store NP effect for mean and sigma (high mass)
-      vector<double> normalizationValues_mean(nSystDirs*(int)catList.size());
-      vector<double> normalizationValuesW_mean(nNormSyst*(int)catList.size());
-      vector<double> normalizationValues_sigma(nSystDirs*(int)catList.size());
-      vector<double> normalizationValuesW_sigma(nNormSyst*(int)catList.size());
+      vector<double> normalizationValues_mean(nSystDirs*catList.size());
+      vector<double> normalizationValuesW_mean(nNormSyst*catList.size());
+      vector<double> normalizationValues_sigma(nSystDirs*catList.size());
+      vector<double> normalizationValuesW_sigma(nNormSyst*catList.size());
 
 
       int nomHistCounter(0);
@@ -154,7 +154,7 @@ void SysProd::process() {
       int systNormHistCounter(0);
 
 
-       for(int j=0; j<(int)catList.size(); ++j){
+       for(size_t j=0; j<catList.size(); ++j){
           cout << "cat.:" << catList[j] <<endl;
 
              // check if smooth
@@ -281,7 +281,7 @@ void SysProd::process() {
       // dump shape systematics histograms
       string sName = m_outDir+"/"+"syst_"+samplesNames[i]+".root";
       TFile* fsyst = new TFile(sName.c_str(), "RECREATE");
-      for(int t=0; t<(int)systHistVec.size(); ++t) { systHistVec[t]->Write(); }
+      for(size_t t=0; t<systHistVec.size(); ++t) { systHistVec[t]->Write(); }
       fsyst->Close();
       delete fsyst;
 
@@ -289,8 +289,8 @@ void SysProd::process() {
       string fName = m_outDir+"/"+"outputs_"+samplesNames[i]+".root";
       TFile* fout = new TFile(fName.c_str(), "RECREATE");
 
-      for(int t=0; t<(int)systHistVecNom.size(); ++t) { systHistVecNom[t]->Write(); }  
-      for(int t=0; t<(int)systHistVecOut.size(); ++t) { systHistVecOut[t]->Write(); }
+      for(size_t t=0; t<systHistVecNom.size(); ++t) { systHistVecNom[t]->Write(); }
+      for(size_t t=0; t<systHistVecOut.size(); ++t) { systHistVecOut[t]->Write(); }
       fout->Close();
       delete fout;
   
@@ -311,10 +311,10 @@ void SysProd::process() {
 
  
       // delete
-      for(int t=0; t<(int)systHistVecNom.size(); ++t)  {delete systHistVecNom[t];}
-      for(int t=0; t<(int)systHistVecOut.size(); ++t)  {delete systHistVecOut[t];}
-      for(int t=0; t<(int)systHistVec.size(); ++t)     {delete systHistVec[t];}
-      for(int t=0; t<(int)systHistVecNorm.size(); ++t) {delete systHistVecNorm[t];}
+      for(size_t t=0; t<systHistVecNom.size(); ++t)  {delete systHistVecNom[t];}
+      for(size_t t=0; t<systHistVecOut.size(); ++t)  {delete systHistVecOut[t];}
+      for(size_t t=0; t<systHistVec.size(); ++t)     {delete systHistVec[t];}
+      for(size_t t=0; t<systHistVecNorm.size(); ++t) {delete systHistVecNorm[t];}
       systHistVecNom.clear();
       systHistVecOut.clear();
       systHistVec.clear();
@@ -420,7 +420,7 @@ TH1* SysProd::getHist(string hName, string sample, string cat, vector<string> fn
         vector<string> tmpBins;
         Helper::tokenizeString(p_dic[cat]["bins"].c_str(), '/', tmpBins);
         double xbins[tmpBins.size()];
-        for(int i=0; i<(int)tmpBins.size(); ++i){ xbins[i] = (double)::atof(tmpBins[i].c_str()); }
+        for(size_t i=0; i<tmpBins.size(); ++i){ xbins[i] = (double)::atof(tmpBins[i].c_str()); }
         return hist->Rebin(tmpBins.size()-1, hName.c_str(), xbins);
     }
     else {
@@ -433,7 +433,7 @@ void SysProd::getRho(string sample, string smooth, double &rho){
    rho = 1.;
    vector<string> rho_vec;  
    Helper::tokenizeString(smooth.c_str(), ';', rho_vec);
-   for(int i=0; i<(int)rho_vec.size(); ++i){
+   for(size_t i=0; i<rho_vec.size(); ++i){
       if(rho_vec[i].find(sample) != string::npos){
       vector<string> rho_val; 
       Helper::tokenizeString(rho_vec[i].c_str(), ':', rho_val);
@@ -447,7 +447,7 @@ void SysProd::getRhoVec(string sample, string  smooth, double &rho_x, double &rh
    rho_y = 1.;
    vector<string> rho_vec; 
    Helper::tokenizeString(smooth.c_str(), ';', rho_vec);
-   for(int i=0; i<(int)rho_vec.size(); ++i){
+   for(size_t i=0; i<rho_vec.size(); ++i){
       if(rho_vec[i].find(sample) != string::npos){
       vector<string> rho_tmp, rho_val; 
       Helper::tokenizeString(rho_vec[i].c_str(), ':', rho_tmp);
@@ -530,16 +530,16 @@ void SysProd::fillNormFile(const string& normFileName, vector<string> catList, v
    int systHistCounter=0;
    int systNormHistCounter=0;
 
-      for(int j=0; j<(int)catList.size(); ++j){
+      for(size_t j=0; j<catList.size(); ++j){
          sysOut << "[" << catList[j] << "]" <<endl;
 
-         for(int s=0; s<(int)outSystHistName.size(); s++){  
+         for(size_t s=0; s<outSystHistName.size(); s++){
             if(s%2==0){sysOut << outSystHistName[s] << " = " << Form("%.6f",normalizationValues[systHistCounter]); }
             else      {sysOut << " " << Form("%.6f",normalizationValues[systHistCounter]) <<endl;}
             systHistCounter++;
          }
        
-         for(int s=0; s<(int)outNormSystHistName.size(); s++){
+         for(size_t s=0; s<outNormSystHistName.size(); s++){
             if(s%2==0){sysOut << outNormSystHistName[s] << " = " << Form("%.6f",normalizationValuesW[systNormHistCounter]); }
             else      {sysOut << " " << Form("%.6f",normalizationValuesW[systNormHistCounter]) <<endl;}
             systNormHistCounter++;
@@ -553,7 +553,7 @@ bool SysProd::checkNP(vector<string> systDirs){
    if(systDirs.size() == 1) { cout << "ERROR: You must have up/down dirs for NP!" <<endl; return false;}
 
    int countUpDown=0; 
-   for(int i=0; i<(int)systDirs.size(); i++){
+   for(size_t i=0; i<systDirs.size(); i++){
 
       if(systDirs[i].compare("JET_JER_SINGLE_NP__1up")==0) continue; // skip JER
 
@@ -570,7 +570,7 @@ bool SysProd::checkNormNP(vector<string> outNormSystWeightName, string fName, st
    TFile *f = new TFile(fName.c_str(), "read");
    TTree *input = (TTree*)f->Get(tName.c_str());
 
-   for(int i=0; i<(int)outNormSystWeightName.size(); i++){
+   for(size_t i=0; i<outNormSystWeightName.size(); i++){
       TBranch* branch = (TBranch*)input->GetListOfBranches()->FindObject(outNormSystWeightName[i].c_str());
       if(!branch) { 
          cout << "ERROR: Branch " << outNormSystWeightName[i] << " does not exist in the tree!" <<endl; 

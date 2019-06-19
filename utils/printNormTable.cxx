@@ -244,11 +244,11 @@ int main(int argc, char** argv){
 
     //Printing table
     std::cout<<"Category ";
-    for (int s(0);s < normResultsSorted.size();++s) std::cout<<" & "<<normResultsSorted[s].first<<" ";
+    for (unsigned int s(0);s < normResultsSorted.size();++s) std::cout<<" & "<<normResultsSorted[s].first<<" ";
     std::cout<<" \\\\ "<<std::endl;
-    for (int c(0);c < normResultsSorted[0].second.size();++c){
+    for (unsigned int c(0);c < normResultsSorted[0].second.size();++c){
         std::cout<<normResultsSorted[0].second[c].first<<" ";
-        for (int s(0);s < normResultsSorted.size();++s) {
+        for (unsigned int s(0);s < normResultsSorted.size();++s) {
             std::cout<<" &  $"<<Form("%.2f\\pm%.2f",normResultsSorted[s].second[c].second.first, normResultsSorted[s].second[c].second.second)<<"$ ";
         }
         std::cout<<" \\\\ "<<std::endl;
