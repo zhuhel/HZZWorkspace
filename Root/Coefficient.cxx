@@ -1,8 +1,8 @@
-#include "Hzzws/Coefficient.h"
-#include "Hzzws/IntegralHelper.h"
+#include "HZZWorkspace/Coefficient.h"
+#include "HZZWorkspace/IntegralHelper.h"
 
 #include "RooStats/HistFactory/FlexibleInterpVar.h"
-#include <RooStats/HistFactory/RooBSpline.h>
+#include <RooFitExtensions/RooBSpline.h>
 #include "RooProduct.h"
 #include "RooAddition.h"
 #include "RooFormulaVar.h"
@@ -55,6 +55,7 @@ void Coefficient::setName(const std::string& name)
 // =============================
 // Set Channel
 // ============================
+// MG: intentionally not using with_sys? 
 bool Coefficient::setChannel(const char* channelName, bool with_sys)
 {
     m_global_sys.clear();
@@ -71,7 +72,7 @@ bool Coefficient::setChannel(const char* channelName, bool with_sys)
     }
     m_sysHandler.clear();
 
-    if (m_args.find("sys")!=m_args.end()){
+    if (with_sys && m_args.find("sys")!=m_args.end()){
 
         strvec sysfiles;
         Helper::tokenizeString(m_args["sys"],',',sysfiles);

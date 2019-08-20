@@ -10,7 +10,7 @@
 /*****************************************************************************
  *  Katharina Ecker (kecker@cern.ch): Copied (3rd May 2017 ) SVN VERSION  645*
  *****************************************************************************/
-#include "Hzzws/RooLagrangianMorphFunc.h"
+#include "HZZWorkspace/RooLagrangianMorphFunc.h"
 
 #include "Riostream.h"
 

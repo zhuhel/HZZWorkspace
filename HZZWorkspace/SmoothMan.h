@@ -4,7 +4,7 @@
 #ifndef _HZZWS_SMOOTHMAN_H_
 #define _HZZWS_SMOOTHMAN_H_
 
-#include "Hzzws/Smoother.h"
+#include "HZZWorkspace/Smoother.h"
 #include <string>
 #include <map>
 #include <vector>

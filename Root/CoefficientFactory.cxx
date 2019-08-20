@@ -1,4 +1,4 @@
-#include "Hzzws/CoefficientFactory.h"
+#include "HZZWorkspace/CoefficientFactory.h"
 
 // ===========================================================
 // CreateCoefficient

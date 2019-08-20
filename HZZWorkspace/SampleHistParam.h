@@ -16,12 +16,12 @@
 #include <RooArgList.h>
 #include <RooProduct.h>
 #include <RooAbsReal.h>
-#include <RooStarMomentMorph.h>
-#include <RooMCHistConstraint.h>
+#include <RooFitExtensions/RooStarMomentMorph.h>
+#include <RooFitExtensions/RooMCHistConstraint.h>
 #include "RooBinning.h"
 
-#include "Hzzws/SampleBase.h"
-#include "Hzzws/RooHistParamPdf.h"
+#include "HZZWorkspace/SampleBase.h"
+#include "HZZWorkspace/RooHistParamPdf.h"
 
 using namespace std;
 class SampleHistParam : public SampleBase {

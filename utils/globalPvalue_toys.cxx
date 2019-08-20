@@ -23,7 +23,7 @@
 
 #include <RooWorkspace.h>
 #include <RooRealVar.h>
-#include "Hzzws/RooStatsHelper.h"
+#include "HZZWorkspace/RooStatsHelper.h"
 #include "RooMinimizer.h"
 
 struct FitResult_t{
@@ -103,7 +103,7 @@ int main(int argc, char** argv)
         poi_var->setVal(0.);
         poi_var->setConstant(true);
         RooNLLVar* nll_ = RooStatsHelper::createNLL(obs_data, mc);
-        RooStatsHelper::minimize(nll_, workspace);
+        RooStatsHelper::minimize(nll_);
         delete nll_;
     }
     workspace->saveSnapshot("condGO",*mc->GetGlobalObservables());
@@ -171,7 +171,7 @@ int main(int argc, char** argv)
         poi_var->setVal(0.);
         poi_var->setConstant(true);
         RooNLLVar* nll_bonly = RooStatsHelper::createNLL(pseduo_data, mc);
-        int status_bonly = (RooStatsHelper::minimize(nll_bonly, workspace) == NULL)?0:1;
+        int status_bonly = (RooStatsHelper::minimize(nll_bonly) == NULL)?0:1;
         res["nll_B_fixed"] = nll_bonly->getVal();
         res["status_B_fixed"] = status_bonly * 1.0;
         res["poi_B_fixed"] = poi_var->getVal();
@@ -185,7 +185,7 @@ int main(int argc, char** argv)
 
             cout <<" mH: before" << mH_var->getVal() << " " << endl;
             RooNLLVar* nll_ = RooStatsHelper::createNLL(pseduo_data, mc);
-            int status_ = (RooStatsHelper::minimize(nll_, workspace) == NULL)?0:1;
+            int status_ = (RooStatsHelper::minimize(nll_) == NULL)?0:1;
             double sigma_ = RooStatsHelper::calculateSignificance(nll_->getVal(), res["nll_B_fixed"]);
             cout <<" mH: " << mH_var->getVal() << " " << sigma_ << endl;
 

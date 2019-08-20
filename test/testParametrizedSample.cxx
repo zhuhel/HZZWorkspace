@@ -8,10 +8,10 @@
 #include <RooWorkspace.h>
 #include <TCanvas.h>
 
-#include "Hzzws/ParametrizedSample.h"
-#include "Hzzws/SampleHist.h"
-#include "Hzzws/SampleKeys.h"
-#include <RooStats/HistFactory/RooBSpline.h>
+#include "HZZWorkspace/ParametrizedSample.h"
+#include "HZZWorkspace/SampleHist.h"
+#include "HZZWorkspace/SampleKeys.h"
+#include <RooFitExtensions/RooBSpline.h>
 
 void generate_para_ws();
 void generate_keys_ws();

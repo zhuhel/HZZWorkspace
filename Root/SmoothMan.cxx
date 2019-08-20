@@ -1,7 +1,7 @@
 // 
 //    Description:  
 // 
-#include "Hzzws/SmoothMan.h"
+#include "HZZWorkspace/SmoothMan.h"
 
 #include <fstream>
 #include <iostream>
@@ -13,7 +13,7 @@
 #include "RooRealVar.h"
 #include "TVectorD.h"
 
-#include "Hzzws/Helper.h"
+#include "HZZWorkspace/Helper.h"
 
 using namespace std;
 SmoothMan::SmoothMan(const char *configFile) {

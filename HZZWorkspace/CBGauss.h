@@ -17,12 +17,12 @@ using namespace std; // don't remove it otherwise RooBSpline crashes
 #include <RooArgList.h>
 #include <RooProduct.h>
 #include <RooAbsReal.h>
-#include <RooStats/HistFactory/RooBSplineBases.h>
+#include <RooFitExtensions/RooBSplineBases.h>
 
 #include "RooRealVar.h"
 
-#include "Hzzws/SampleBase.h"
-#include "Hzzws/Helper.h"
+#include "HZZWorkspace/SampleBase.h"
+#include "HZZWorkspace/Helper.h"
 
 
 class RooWorkspace;

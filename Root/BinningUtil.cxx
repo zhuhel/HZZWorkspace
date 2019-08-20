@@ -1,4 +1,4 @@
-#include "Hzzws/BinningUtil.h"
+#include "HZZWorkspace/BinningUtil.h"
 
 #include <iostream>
 
@@ -199,9 +199,10 @@ BinningUtil::createPdf( RooArgList& parList, RooArgList& pdfList, RooRealVar& x,
 }
 
 
+// MG: To-do - intentional that binning is not used? 
 RooCurve*
 BinningUtil::plotOnWithErrorBand( RooPlot* frame, Double_t Z, RooAbsPdf& pdf, RooArgSet& obs, const int& nCurves, const int& nEvents, 
-			       const char* binning, RooDataHist* dataHist ) 
+			       const char* , RooDataHist* dataHist ) 
 {
   RooCurve* cenCurve = frame->getCurve() ;
   frame->remove(0,kFALSE) ;

@@ -3,9 +3,9 @@
 //    Description:  
 // 
 // ==========================================================================
-#include "Hzzws/SampleFactory.h"
-#include "Hzzws/SimpleMorph.h"
-#include "Hzzws/CoefficientFactory.h"
+#include "HZZWorkspace/SampleFactory.h"
+#include "HZZWorkspace/SimpleMorph.h"
+#include "HZZWorkspace/CoefficientFactory.h"
 
 #include <string>
 #include <vector>
@@ -13,8 +13,8 @@
 #include <map>
 #include <sys/stat.h>
 
-#include <RooStats/HistFactory/RooBSpline.h>
-#include "RooParamKeysPdf.h"
+#include <RooFitExtensions/RooBSpline.h>
+#include <RooFitExtensions/RooParamKeysPdf.h>
 #include "RooMomentMorph.h"
 #include "TVectorD.h"
 #include "RooConstVar.h"

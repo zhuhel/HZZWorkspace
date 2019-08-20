@@ -1,4 +1,4 @@
-#include "Hzzws/CBGauss.h"
+#include "HZZWorkspace/CBGauss.h"
 #include "TCanvas.h"
 #include "RooPlot.h"
 #include "RooAbsPdf.h"

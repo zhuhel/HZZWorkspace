@@ -16,11 +16,11 @@
 #include <RooArgList.h>
 #include <RooProduct.h>
 #include <RooAbsReal.h>
-#include <RooStarMomentMorph.h>
-#include <RooMCHistConstraint.h>
+#include <RooFitExtensions/RooStarMomentMorph.h>
+#include <RooFitExtensions/RooMCHistConstraint.h>
 #include "RooBinning.h"
 
-#include "Hzzws/SampleBase.h"
+#include "HZZWorkspace/SampleBase.h"
 
 using namespace std;
 class SampleCount : public SampleBase {

@@ -18,8 +18,8 @@
 #include <TTree.h>
 #include <RooWorkspace.h>
 #include <RooRealVar.h>
-#include "Hzzws/RooStatsHelper.h"
-#include "Hzzws/Helper.h"
+#include "HZZWorkspace/RooStatsHelper.h"
+#include "HZZWorkspace/Helper.h"
 #include "TMath.h"
 
 using namespace std;
@@ -76,7 +76,7 @@ int main(int argc, char** argv)
           poi_val->setConstant(true);
       }
       unique_ptr<RooNLLVar> nll(RooStatsHelper::createNLL(obs_data, mc));
-      RooStatsHelper::minimize(nll.get(), workspace);
+      RooStatsHelper::minimize(nll.get());
   } else {
       std::cout<<"could not find dataset:"<<dataName<<". Skipping conditional step!"<<std::endl;
   }

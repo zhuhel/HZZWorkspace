@@ -3,10 +3,10 @@
 //
 #ifndef __HZZWS_COMBINER_H__
 #define __HZZWS_COMBINER_H__
-#include "Hzzws/SampleBase.h"
-#include "Hzzws/Coefficient.h"
-#include "Hzzws/Category.h"
-#include "Hzzws/SystematicsManager.h"
+#include "HZZWorkspace/SampleBase.h"
+#include "HZZWorkspace/Coefficient.h"
+#include "HZZWorkspace/Category.h"
+#include "HZZWorkspace/SystematicsManager.h"
 
 #include <TString.h>
 #include <TFile.h>

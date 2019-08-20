@@ -12,7 +12,7 @@
 #include "TH1F.h"
 #include "TString.h"
 
-#include "Hzzws/Helper.h"
+#include "HZZWorkspace/Helper.h"
 using namespace std;
 
 map<string, double> pdf_qqZZ(double m4l){

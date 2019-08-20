@@ -3,11 +3,12 @@
 //    Description:  
 // 
 // ==========================================================================
-#include "Hzzws/CoefficientFactory.h"
-#include "Hzzws/EFTMorph.h"
+#include "HZZWorkspace/CoefficientFactory.h"
+#include "HZZWorkspace/EFTMorph.h"
 
 #include "TMath.h"
 
+#include <algorithm> // std::transform
 #include <string>
 #include <vector>
 #include <iostream>
@@ -76,13 +77,38 @@ bool EFTMorph::setChannel(const RooArgSet& _obs, const char* _ch_name, bool with
   //check morphing inputs are present
   if (morph_dic.find(_ch_name)==morph_dic.end()) { log_err("morphing config file does not contain channel %s",_ch_name); return false; }
   for (const auto s : {"file","folder","productioncouplings","decaycouplings","samples"}) {
+    // basisname is optional, treated later below
     if (morph_dic[_ch_name].find(s)==morph_dic[_ch_name].end()) { log_err("morphing config file for channel %s is missing field %s",_ch_name, s); return false; }
     log_info("for channel %s found %s as %s",_ch_name,s,morph_dic[_ch_name][s].c_str());
   }
 
   //Load information from config as inputs for morphing
-  decMorphPara->add(createHCMorphParaSet(morph_dic[_ch_name]["decaycouplings"]));
-  prodMorphPara->add(createHCMorphParaSet(morph_dic[_ch_name]["productioncouplings"]));
+  if (morph_dic[_ch_name].find("basisname") == morph_dic[_ch_name].end()) {
+      // fallback case: if basisname is not provided, assume it is
+      // HiggsCharacterisation for backward compatibility
+      log_info("for channel %s: 'basisname' property is not specified, assume it is HiggsCharacterisation", _ch_name);
+      decMorphPara->add(createHCMorphParaSet(morph_dic[_ch_name]["decaycouplings"]));
+      prodMorphPara->add(createHCMorphParaSet(morph_dic[_ch_name]["productioncouplings"]));
+  }
+  else { // switch according to chosen basis
+      auto basisName = morph_dic[_ch_name]["basisname"];
+      // Go for case insensitive property.
+      std::transform(basisName.begin(), basisName.end(), basisName.begin(), ::tolower);
+      if (basisName == "hc" or basisName == "higgscharacterisation") {
+          log_info("for channel %s recognized 'basisname' to be HiggsCharacterisation", _ch_name);
+          decMorphPara->add(createHCMorphParaSet(morph_dic[_ch_name]["decaycouplings"]));
+          prodMorphPara->add(createHCMorphParaSet(morph_dic[_ch_name]["productioncouplings"]));
+      }
+      else if (basisName == "smeft" or basisName == "warsaw" or basisName == "higgs") {
+          log_info("for channel %s recognized 'basisname' to be SMEFT or Warsaw or Higgs", _ch_name);
+          decMorphPara->add(createGeneralMorphParaSet(morph_dic[_ch_name]["decaycouplings"]));
+          prodMorphPara->add(createGeneralMorphParaSet(morph_dic[_ch_name]["productioncouplings"]));
+      }
+      else {
+          log_err("Basis name '%s' not recognized for morphing.", morph_dic[_ch_name]["basisname"].c_str());
+          return false;
+      }
+  } // end switch basis name
 
   //Add samples
   std::vector<std::string> samplesvec;
@@ -177,6 +203,30 @@ RooArgSet EFTMorph::createHCMorphParaSet(std::string parlist){
     morphPara->add(*_g);
   }
   return (*morphPara);
+}
+
+
+RooArgSet EFTMorph::createGeneralMorphParaSet(std::string parlist)
+{
+    std::vector<std::string> varlist;
+    Helper::tokenizeString(parlist, ',', varlist);
+    if(varlist.size() == 0){
+        log_err("WARNING createGeneralMorphParaSet() did not find any couplings in input list %s", parlist.c_str());
+        log_err("Example: cHW,cHB,cHWB");
+    }
+
+    RooArgSet* morphPara = new RooArgSet();
+    for (auto var : varlist) {
+        const TString sk = TString(var);
+        RooRealVar* k = dynamic_cast<RooRealVar*>(couplingsDatabase.find(sk.Data()));
+        if (!k) {
+            k = new RooRealVar(sk.Data(), sk.Data(), 1., -100, 100); // FIXME I default the value to 1.0!
+            couplingsDatabase.add(*k);
+        }
+        Helper::addPoiName(k->GetName());
+        morphPara->add(*k);
+    }
+    return *morphPara;
 }
 
 

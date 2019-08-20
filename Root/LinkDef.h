@@ -1,7 +1,7 @@
 #ifndef __HZZWS_LINKDEF_H__
 #define __HZZWS_LINKDEF_H__
 
-#include <Hzzws/RooStatsHelper.h>
+#include <HZZWorkspace/RooStatsHelper.h>
 
 #ifdef __ROOTCLING__
 #pragma link off all globals;

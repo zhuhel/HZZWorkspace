@@ -1,4 +1,4 @@
-#include "Hzzws/Combiner.h"
+#include "HZZWorkspace/Combiner.h"
 
 #include <fstream>
 #include <string>
@@ -14,12 +14,12 @@
 #include <RooCategory.h>
 #include "RooStats/ModelConfig.h"
 
-#include "Hzzws/Helper.h"
-#include "Hzzws/SampleFactory.h"
-#include "Hzzws/CoefficientFactory.h"
-#include "Hzzws/CBGauss.h"
-#include "Hzzws/SampleKeys.h"
-#include "Hzzws/RooStatsHelper.h"
+#include "HZZWorkspace/Helper.h"
+#include "HZZWorkspace/SampleFactory.h"
+#include "HZZWorkspace/CoefficientFactory.h"
+#include "HZZWorkspace/CBGauss.h"
+#include "HZZWorkspace/SampleKeys.h"
+#include "HZZWorkspace/RooStatsHelper.h"
 
 Combiner::Combiner(const char* _name, const char* _configName):
     ws_name_(_name),
@@ -436,8 +436,8 @@ void Combiner::readConfig(const char* configName)
     //////////////////////////////////////////
     // Done
     /////////////////////////////////////////
-    workspace->addClassDeclImportDir(getenv("HZZWSCODEDIR"));
-    workspace->addClassImplImportDir(getenv("HZZWSCODEDIR"));
+    // workspace->addClassDeclImportDir(getenv("HZZWSCODEDIR"));
+    // workspace->addClassImplImportDir(getenv("HZZWSCODEDIR"));
     workspace->importClassCode("*", false); //import code for any custom classes not in standard ROOT build
     workspace ->writeToFile(ws_name_);
     std::cout<<"\n\nfinal workspace:\n\n"<<std::endl;

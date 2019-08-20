@@ -1,4 +1,4 @@
-#include "Hzzws/Combiner.h"
+#include "HZZWorkspace/Combiner.h"
 #include <iostream>
 
 ///////////////////////////////////

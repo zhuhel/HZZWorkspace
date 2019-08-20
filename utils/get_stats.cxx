@@ -21,9 +21,9 @@
 #include "RooStats/AsymptoticCalculator.h"
 #include "RooMinimizer.h"
 
-#include "Hzzws/RooStatsHelper.h"
-#include "Hzzws/Helper.h"
-#include "Hzzws/runAsymptoticsCLsCorrectBands.h"
+#include "HZZWorkspace/RooStatsHelper.h"
+#include "HZZWorkspace/Helper.h"
+#include "HZZWorkspace/runAsymptoticsCLsCorrectBands.h"
 
 
 

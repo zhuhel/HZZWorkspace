@@ -6,7 +6,7 @@
 #include "TTree.h"
 #include "TH1.h"
 #include "TCanvas.h"
-#include "Hzzws/PlotHelp.h"
+#include "HZZWorkspace/PlotHelp.h"
 #include "Rtypes.h"
 #include <map>
 #include "TFitResultPtr.h"

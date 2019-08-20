@@ -25,8 +25,8 @@
 #include <stdlib.h>
 #include <string>
 
-#include "Hzzws/Helper.h"
-#include "Hzzws/RooStatsHelper.h"
+#include "HZZWorkspace/Helper.h"
+#include "HZZWorkspace/RooStatsHelper.h"
 
 using namespace std;
 int main(int argc, char** argv)
@@ -195,7 +195,7 @@ int main(int argc, char** argv)
     /* fix parameters given in option*/
     if(fix_variables.find("gamma") != string::npos) {
         auto nll = RooStatsHelper::createNLL(data, mc);
-        RooStatsHelper::minimize(nll, workspace, true);
+        RooStatsHelper::minimize(nll, true);
         RooStatsHelper::fixTermsWithPattern(mc, "gamma_stat");
         delete nll;
     }
@@ -209,7 +209,7 @@ int main(int argc, char** argv)
     auto nll = RooStatsHelper::createNLL(data, mc);
     RooFitResult* fit_results = NULL;
     if (do_visual_error && fit_mode >= 0) {
-        fit_results = RooStatsHelper::minimize(nll, workspace, true);
+        fit_results = RooStatsHelper::minimize(nll, true);
     }
     // fit_results = NULL;
     auto* canvas = new TCanvas("c1", "c1", 600, 600);

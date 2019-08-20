@@ -20,8 +20,8 @@
 #include "TROOT.h"
 #include "TStopwatch.h"
 
-#include "Hzzws/RooStatsHelper.h"
-#include "Hzzws/Helper.h"
+#include "HZZWorkspace/RooStatsHelper.h"
+#include "HZZWorkspace/Helper.h"
 
 
 void RooStatsHelper::setDefaultMinimize(){
@@ -30,8 +30,14 @@ void RooStatsHelper::setDefaultMinimize(){
   ROOT::Math::MinimizerOptions::SetDefaultPrintLevel(1);
 }
 
+
+RooFitResult* RooStatsHelper::minimize(RooNLLVar* nll, RooWorkspace* ){
+    log_warn("Careful! You called minimize (RooNLLVar*, RooWorkspace* ) - be aware that this signature is deprecated in favour of minimize(RooNLLVar* nll, \
+        bool save, const RooArgSet* minosSet), since the WS is not actually used anywhere. Please update your method call to make this warning go away.");
+    return minimize(nll);
+}
+
 RooFitResult* RooStatsHelper::minimize(RooNLLVar* nll, 
-        RooWorkspace* combWS, 
         bool save, const RooArgSet* minosSet)
 {
     nll->enableOffsetting(true);
@@ -210,7 +216,7 @@ double RooStatsHelper::getPvalue(RooWorkspace* combined,
     PrintExpEvts(combPdf, mu, mc->GetObservables(), data);
     RooNLLVar* nll = createNLL(data, mc);
     
-    minimize(nll, combined);
+    minimize(nll);
     double obs_nll_min = nll ->getVal();
     cout << "mu_hat for " << data->GetName() << " " << mu->getVal() << 
         " " << mu->getError() << " " << obs_nll_min << endl;
@@ -226,7 +232,7 @@ double RooStatsHelper::getPvalue(RooWorkspace* combined,
     mu ->setVal(1.0e-200);
     mu ->setConstant(1);
     RooNLLVar* nllCond = createNLL(data, mc);
-    minimize(nllCond, combined);
+    minimize(nllCond);
     double obs_nll_min_bkg = nllCond ->getVal();
     cout<<"NLL for background only: "<< obs_nll_min_bkg<<endl;
     delete nllCond;
@@ -316,7 +322,7 @@ RooDataSet* RooStatsHelper::makeAsimovData(RooWorkspace* combined,
         mu ->setConstant(kFALSE);
         // mu ->setRange(-40,40); // !!!!Do that outside the function!!!
         RooNLLVar* conditioning_nll = createNLL(combData, mcInWs);
-        minimize(conditioning_nll, combined);//find the \hat_mu
+        minimize(conditioning_nll);//find the \hat_mu
         delete conditioning_nll;
     }
     mu ->setConstant(kTRUE); // Fix mu at the profileMu
@@ -325,7 +331,7 @@ RooDataSet* RooStatsHelper::makeAsimovData(RooWorkspace* combined,
     if (doprofile)
     { // profile nuisance parameters at mu = profileMu
         RooNLLVar* conditioning_nll = createNLL(combData, mcInWs);
-        minimize(conditioning_nll, combined);
+        minimize(conditioning_nll);
     }
 
     // loop over the nui/glob list, grab the corresponding variable from the tmp ws, 
@@ -525,7 +531,7 @@ void RooStatsHelper::fitData(RooWorkspace* w, const char* mcName,
   muVar->setVal(poival);
   muVar->setConstant(true);
   RooNLLVar* nll_SBfixed = createNLL(data, mc);
-  int status = (minimize(nll_SBfixed, w) == NULL)?0:1;
+  int status = (minimize(nll_SBfixed) == NULL)?0:1;
 
   result["nll_SB_fixed"] = nll_SBfixed->getVal();
   result["poi_SB_fixed"] = muVar->getVal(); 
@@ -539,7 +545,7 @@ void RooStatsHelper::fitData(RooWorkspace* w, const char* mcName,
   muVar->setConstant(false);
 
   RooNLLVar* nll_SBfree = createNLL(data, mc);
-  status = (minimize(nll_SBfree, w) == NULL)?0:1;
+  status = (minimize(nll_SBfree) == NULL)?0:1;
   result["nll_SB_free"] = nll_SBfree->getVal();
   result["poi_SB_free"] = muVar->getVal(); 
   result["status_SB_free"] = status*1.0;
@@ -590,7 +596,7 @@ void RooStatsHelper::generateToy(RooWorkspace* w ,
     std::cout<<"S+B free (everything free)"<<std::endl;
     pois->setAttribAll("Constant", false);
     RooNLLVar* nll_SBfree = createNLL(toyData, mc);
-    int status = (minimize(nll_SBfree, w) == NULL)?0:1;
+    int status = (minimize(nll_SBfree) == NULL)?0:1;
     result["nll_SB_free"] = nll_SBfree->getVal();
     result["poi_SB_free"] = muVar->getVal(); 
     result["status_SB_free"] = status*1.0;
@@ -601,7 +607,7 @@ void RooStatsHelper::generateToy(RooWorkspace* w ,
     muVar->setVal(poi_value);
     muVar->setConstant(true);
     RooNLLVar* nll_SBfixed = createNLL(toyData, mc);
-    status = (minimize(nll_SBfixed, w) == NULL)?0:1;
+    status = (minimize(nll_SBfixed) == NULL)?0:1;
     result["nll_SB_fixed"] = nll_SBfixed->getVal();
     result["poi_SB_fixed"] = muVar->getVal(); 
     result["status_SB_fixed"] = status*1.0;
@@ -617,7 +623,7 @@ void RooStatsHelper::generateToy(RooWorkspace* w ,
     }
 
     RooNLLVar* nll_Bonly = createNLL(toyData, mc);
-    status = (minimize(nll_Bonly, w) == NULL)?0:1;
+    status = (minimize(nll_Bonly) == NULL)?0:1;
     result["nll_B_fixed"] = nll_Bonly->getVal();
     result["poi_B_fixed"] = muVar->getVal(); 
     result["status_B_fixed"] = status*1.0;
@@ -684,7 +690,7 @@ bool RooStatsHelper::ScanPOI(RooWorkspace* ws,
     tree->Fill();
 
     double step = (hi-low)/total;
-    for(int i = 0; i < total; i++){
+    for (int i = 0; i < total+1; i++) {
         double poi_value = low + i*step;
         poi->setVal(poi_value);
         poi->setConstant(true);

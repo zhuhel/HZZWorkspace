@@ -1,5 +1,5 @@
-#include "Hzzws/AnalyticHMBkg.h"
-#include "Hzzws/Helper.h"
+#include "HZZWorkspace/AnalyticHMBkg.h"
+#include "HZZWorkspace/Helper.h"
 #include "RooFormulaVar.h"
 #include "RooGenericPdf.h"
 #include "RooRealVar.h"
@@ -104,21 +104,24 @@ RooAbsPdf* AnalyticHMBkg::getPDF(){
     //
     auto x0 = m_var["x0"];
     std::cout<<"var x0:"; x0->Print();
+
     //f1(x)
-    const char * f1form = "(0.5+0.5*TMath::Erf((@0-@1)/@2))*(1./(1.0+TMath::Exp((@0-@1)/@3)))";
-    auto f1 = new RooFormulaVar(Form("%s_%s_f1",pdf_name_.c_str(),category_name_.c_str()),f1form,     RooArgList(*x ,*m_var["a1"],*m_var["a2"],*m_var["a3"]));
-    auto f1x0 = new RooFormulaVar(Form("%s_%s_f1x0",pdf_name_.c_str(),category_name_.c_str()),f1form, RooArgList(*x0,*m_var["a1"],*m_var["a2"],*m_var["a3"]));
+    const char* f1form = "TMath::Exp(@1 + @2*@0 + @3*TMath::Power(@0,2))";
+    auto f1 =new RooFormulaVar(Form("%s_%s_f1",pdf_name_.c_str(),category_name_.c_str()), f1form,     RooArgList(*x ,*m_var["a1"],*m_var["a2"],*m_var["a3"]));
+    auto f1x0 =new RooFormulaVar(Form("%s_%s_f1x0",pdf_name_.c_str(),category_name_.c_str()), f1form, RooArgList(*x0,*m_var["a1"],*m_var["a2"],*m_var["a3"]));
+
     //f2(x)
-    const char* f2form = "TMath::Exp(@1+@2*@0)";
-    auto f2 =new RooFormulaVar(Form("%s_%s_f2",pdf_name_.c_str(),category_name_.c_str()), f2form,     RooArgList(*x ,*m_var["c1"],*m_var["c2"])); 
-    auto f2x0 =new RooFormulaVar(Form("%s_%s_f2x0",pdf_name_.c_str(),category_name_.c_str()), f2form, RooArgList(*x0,*m_var["c1"],*m_var["c2"]));
-    //f3(x) = exp( polynominal(b1, b2, b3, b4), change b4 to b3.7
-    // find how many parameters of b* in the array.
+    const char * f2form = "(0.5 + 0.5*TMath::Erf((@0-@1)/@2)) * (1./(1.0+TMath::Exp((@0-@1)/@3)))";
+    auto f2 = new RooFormulaVar(Form("%s_%s_f2",pdf_name_.c_str(),category_name_.c_str()),f2form,     RooArgList(*x ,*m_var["b1"],*m_var["b2"],*m_var["b3"]));
+    auto f2x0 = new RooFormulaVar(Form("%s_%s_f2x0",pdf_name_.c_str(),category_name_.c_str()),f2form, RooArgList(*x0,*m_var["b1"],*m_var["b2"],*m_var["b3"]));
+
+    //f3(x) = exp( polynominal(c1, c2, c3, c4), 'c4' should be 'c3.7' for ggZZ
+    // find how many parameters of c* in the array.
     vector<string> poly_order_names;
     for (map<string, RooAbsReal*>::iterator it = m_var.begin();
             it != m_var.end(); ++it){
         string para_name(it->first);
-        if (para_name[0] == 'b'){
+        if (para_name[0] == 'c'){
             poly_order_names.push_back(para_name);
             log_info("Found %s", para_name.c_str());
         }
@@ -154,6 +157,7 @@ RooAbsPdf* AnalyticHMBkg::getPDF(){
     const char* f3form = Form("TMath::Exp(%s)", oss.str().c_str());
     auto f3 = new RooFormulaVar(Form("%s_%s_f3",pdf_name_.c_str(),category_name_.c_str()),f3form,     f3_x_list);
     auto f3x0 = new RooFormulaVar(Form("%s_%s_f3x0",pdf_name_.c_str(),category_name_.c_str()), f3form , f3_x0_list);
+
     //Cnorm
     auto cnorm = new RooFormulaVar(Form("%s_%s_cnorm",pdf_name_.c_str(),category_name_.c_str()),"@2/(@0+@1)",RooArgList(*f1x0,*f2x0,*f3x0));
     //step(x<x0)

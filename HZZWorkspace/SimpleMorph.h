@@ -4,9 +4,9 @@
 #include <string>
 #include <vector>
 
-#include "Hzzws/SampleHist.h"
-#include "Hzzws/SampleBase.h"
-#include "Hzzws/Coefficient.h"
+#include "HZZWorkspace/SampleHist.h"
+#include "HZZWorkspace/SampleBase.h"
+#include "HZZWorkspace/Coefficient.h"
 
 #include "RooAbsPdf.h"
 #include "RooArgList.h"

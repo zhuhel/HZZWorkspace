@@ -2,19 +2,19 @@
 #define __HZZWS_SAMPLEFACTORY_H__
 
 
-#include "Hzzws/SampleBase.h"
-#include "Hzzws/SampleCount.h"
-#include "Hzzws/SampleHist.h"
-#include "Hzzws/SampleHistParam.h"
-#include "Hzzws/SampleKeys.h"
-#include "Hzzws/CBGauss.h"
-#include "Hzzws/CBGaussSum.h"
-#include "Hzzws/ParametrizedSample.h"
-#include "Hzzws/ExpLandau.h"
-#include "Hzzws/AnalyticHMBkg.h"
-#include "Hzzws/EFTMorph.h"
-#include "Hzzws/SimpleMorph.h"
-#include "Hzzws/Helper.h"
+#include "HZZWorkspace/SampleBase.h"
+#include "HZZWorkspace/SampleCount.h"
+#include "HZZWorkspace/SampleHist.h"
+#include "HZZWorkspace/SampleHistParam.h"
+#include "HZZWorkspace/SampleKeys.h"
+#include "HZZWorkspace/CBGauss.h"
+#include "HZZWorkspace/CBGaussSum.h"
+#include "HZZWorkspace/ParametrizedSample.h"
+#include "HZZWorkspace/ExpLandau.h"
+#include "HZZWorkspace/AnalyticHMBkg.h"
+#include "HZZWorkspace/EFTMorph.h"
+#include "HZZWorkspace/SimpleMorph.h"
+#include "HZZWorkspace/Helper.h"
 #include <map>
 
 typedef SampleBase* (*SBConstructor)(strvec&);

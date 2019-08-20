@@ -17,9 +17,9 @@
 
 #include <RooWorkspace.h>
 #include <RooRealVar.h>
-#include "Hzzws/RooStatsHelper.h"
+#include "HZZWorkspace/RooStatsHelper.h"
 
-#include "Hzzws/Helper.h"
+#include "HZZWorkspace/Helper.h"
 #include "TMath.h"
 
 void print_help(char* argv)
@@ -157,7 +157,7 @@ int main(int argc, char** argv)
             workspace->var(muName.c_str())->setConstant(true);
         }
         unique_ptr<RooNLLVar> nll(RooStatsHelper::createNLL(obs_data, mc));
-        RooStatsHelper::minimize(nll.get(), workspace);
+        RooStatsHelper::minimize(nll.get());
     } else {
         std::cout<<"Skipping conditional step!"<<std::endl;
     }

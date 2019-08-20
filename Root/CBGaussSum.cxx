@@ -10,11 +10,11 @@
 #include "RooAddition.h"
 #include "RooFormulaVar.h"
 
-#include "Hzzws/Helper.h"
-#include "Hzzws/CBGaussSum.h"
-#include "Hzzws/SampleFactory.h"
-#include "Hzzws/Coefficient.h"
-#include "Hzzws/CoefficientFactory.h"
+#include "HZZWorkspace/Helper.h"
+#include "HZZWorkspace/CBGaussSum.h"
+#include "HZZWorkspace/SampleFactory.h"
+#include "HZZWorkspace/Coefficient.h"
+#include "HZZWorkspace/CoefficientFactory.h"
 
 CBGaussSum::CBGaussSum(
         const char* _name,

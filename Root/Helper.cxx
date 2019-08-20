@@ -1,5 +1,5 @@
-#include "Hzzws/Helper.h"
-#include "Hzzws/Constants.h"
+#include "HZZWorkspace/Helper.h"
+#include "HZZWorkspace/Constants.h"
 
 #include <fstream>
 #include <iostream>
@@ -10,8 +10,8 @@
 #include <TString.h>
 #include <TRegexp.h>
 #include <TMath.h>
-#include "RooStats/HistFactory/RooBSplineBases.h"
-#include "RooStats/HistFactory/RooBSpline.h"
+#include <RooFitExtensions/RooBSplineBases.h>
+#include <RooFitExtensions/RooBSpline.h>
 
 #include <algorithm>
 

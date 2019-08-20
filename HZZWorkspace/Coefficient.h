@@ -1,11 +1,11 @@
 #ifndef __HZZWS_COEFFICIENT_H__
 #define __HZZWS_COEFFICIENT_H__
 
-#include "Hzzws/SysText.h"
-#include "Hzzws/Helper.h"
+#include "HZZWorkspace/SysText.h"
+#include "HZZWorkspace/Helper.h"
 #include "RooArgList.h"
 #include "RooAbsReal.h"
-#include <RooStats/HistFactory/RooBSplineBases.h>
+#include <RooFitExtensions/RooBSplineBases.h>
 
 class Coefficient {
 
