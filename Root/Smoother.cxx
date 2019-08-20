@@ -1,4 +1,4 @@
-#include "Hzzws/Smoother.h"
+#include "HZZWorkspace/Smoother.h"
 
 #include "TCanvas.h"
 #include <RooDataSet.h>
@@ -16,7 +16,7 @@
 
 #include <algorithm>
 
-#include "Hzzws/Helper.h"
+#include "HZZWorkspace/Helper.h"
 
 
 Smoother::Smoother(const string& outname, std::vector<float> rho, std::string mirror){

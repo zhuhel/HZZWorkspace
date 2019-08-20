@@ -25,7 +25,11 @@ namespace RooStatsHelper{
     void setVarfixed(RooWorkspace* ws, const char* varName, double imass);
     void setVarFree(RooWorkspace* combined, const char* varName);
     pair<double,double> getVarVal(const RooWorkspace& w, const char* var);
-    RooFitResult* minimize(RooNLLVar* nll, RooWorkspace* combWS=nullptr, bool save = true, const RooArgSet* minosSet = NULL);
+    // MG: old signature - keeping a wrapper to the new one around with a warning, to avoid
+    // unexpected results due to implicit RooWorkspace*  --> bool conversion in signature below 
+    RooFitResult* minimize(RooNLLVar* nll, RooWorkspace* ws);
+    // MG: This is the version to use
+    RooFitResult* minimize(RooNLLVar* nll, bool save = true, const RooArgSet* minosSet = NULL);
     RooNLLVar* createNLL(RooAbsData* data, RooStats::ModelConfig* mc);
     // Make asimov data
     void unfoldConstraints(RooArgSet& initial, RooArgSet& final, RooArgSet& obs, RooArgSet& nuis, int& counter);

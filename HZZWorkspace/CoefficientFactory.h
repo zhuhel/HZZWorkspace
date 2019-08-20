@@ -2,8 +2,8 @@
 #define __HZZWS_COEFFICIENTFACTORY_H__
 
 
-#include "Hzzws/Coefficient.h"
-#include "Hzzws/Helper.h"
+#include "HZZWorkspace/Coefficient.h"
+#include "HZZWorkspace/Helper.h"
 #include <map>
 
 

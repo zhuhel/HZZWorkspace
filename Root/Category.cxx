@@ -1,4 +1,4 @@
-#include "Hzzws/Category.h"
+#include "HZZWorkspace/Category.h"
 
 #include <iostream>
 #include <cstdlib>
@@ -9,12 +9,12 @@
 //#include <RooRealSumPdf.h>
 #include <RooGaussian.h>
 #include <RooProdPdf.h>
-#include <RooMCHistConstraint.h>
+#include <RooFitExtensions/RooMCHistConstraint.h>
 #include "RooAddition.h"
 #include <RooHistPdf.h>
 #include <RooDataHist.h>
 
-#include "Hzzws/Helper.h"
+#include "HZZWorkspace/Helper.h"
 //________________________________________________________________________
     Category::Category(const string& label)
     : m_label(label)

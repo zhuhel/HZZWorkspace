@@ -1,4 +1,4 @@
-#include "Hzzws/SmoothMan.h"
+#include "HZZWorkspace/SmoothMan.h"
 
 int main(int argc, char **argv) 
 {

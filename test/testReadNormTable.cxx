@@ -3,8 +3,8 @@
 #include <iostream>
 #include <map>
 
-#include "Hzzws/RooStatsHelper.h"
-#include "Hzzws/Helper.h"
+#include "HZZWorkspace/RooStatsHelper.h"
+#include "HZZWorkspace/Helper.h"
 
 using namespace std;
 int main(int argc, char** argv){

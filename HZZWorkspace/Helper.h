@@ -3,7 +3,7 @@
 #ifndef _HZZWS_HELPER_H
 #define _HZZWS_HELPER_H
 
-#include "Hzzws/Common.h"
+#include "HZZWorkspace/Common.h"
 
 #include <stdio.h>
 #include <RooRealVar.h>

@@ -3,7 +3,7 @@
 //    Description:  
 // 
 // ==========================================================================
-#include "Hzzws/SampleHistParam.h"
+#include "HZZWorkspace/SampleHistParam.h"
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
@@ -14,12 +14,12 @@
 #include <RooArgList.h>
 #include <RooRealVar.h>
 #include "RooStats/HistFactory/FlexibleInterpVar.h"
-#include "RooExpandedDataHist.h"
-#include "RooExpandedHistPdf.h"
+#include <RooFitExtensions/RooExpandedDataHist.h>
+#include <RooFitExtensions/RooExpandedHistPdf.h>
 #include "RooNDKeysPdf.h"
-#include "Roo1DMomentMorphFunction.h"
+#include <RooFitExtensions/Roo1DMomentMorphFunction.h>
 
-#include "Hzzws/Helper.h"
+#include "HZZWorkspace/Helper.h"
 
 SampleHistParam::SampleHistParam(const char* _name,
         const char* _input

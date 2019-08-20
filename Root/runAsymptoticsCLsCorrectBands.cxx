@@ -103,8 +103,8 @@ NOTE: The script runs significantly faster when compiled
 #include "RooCategory.h"
 #include "RooSimultaneous.h"
 #include "RooProduct.h"
-#include "Hzzws/runAsymptoticsCLsCorrectBands.h"
-#include "Hzzws/RooStatsHelper.h"
+#include "HZZWorkspace/runAsymptoticsCLsCorrectBands.h"
+#include "HZZWorkspace/RooStatsHelper.h"
 
 #include <map>
 #include <iostream>
@@ -168,14 +168,14 @@ void runAsymptoticsCLs(const char* infile,
 		       const char* modelConfigName,
 		       const char* dataName,
 		       const char* asimovDataName,
-		       const char* conditionalSnapshot,
-		       const char* nominalSnapshot,
+		       const char* /*conditionalSnapshot*/,
+		       const char* /*nominalSnapshot*/,
 		       string folder,
 		       double CL, const char* muName, const string& fix_var)
 {
 
-  conditionalSnapshot = ""; // warningless compile
-  nominalSnapshot = "";     // warningless compile
+  // conditionalSnapshot = ""; // warningless compile
+  // nominalSnapshot = "";     // warningless compile
 
   runAsymptoticsCLs(infile, workspaceName, modelConfigName, dataName, asimovDataName, folder, CL, muName, fix_var);
 }
@@ -187,8 +187,8 @@ void runAsymptoticsCLs(const char* infile,
 		       const char* modelConfigName,
 		       const char* dataName,
 		       const char* asimovDataName,
-		       string folder,
-		       double CL, const char* muName, const string& fix_var)
+		       string /*folder*/,
+		       double /*CL*/, const char* muName, const string& /*fix_var*/)
 {
 
 
@@ -227,7 +227,7 @@ void runAsymptoticsCLs(const char* infile,
 
 void run_limit(RooWorkspace* ws_, ModelConfig* mc_, 
         RooDataSet* data_, RooRealVar* firstPOI_, 
-        const char* asimovDataName,
+        const char* /*asimovDataName*/,
         stringstream* out_ss) 
 {
   cout<<"inside run_limit"<<std::endl;

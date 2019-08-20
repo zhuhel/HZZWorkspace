@@ -7,8 +7,8 @@
 #include <RooRealVar.h>
 #include "RooStats/HistFactory/FlexibleInterpVar.h"
 
-#include "Hzzws/SysText.h"
-#include "Hzzws/Helper.h"
+#include "HZZWorkspace/SysText.h"
+#include "HZZWorkspace/Helper.h"
 
 
 SysText::SysText(const char* text_path):

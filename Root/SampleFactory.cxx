@@ -1,4 +1,4 @@
-#include "Hzzws/SampleFactory.h"
+#include "HZZWorkspace/SampleFactory.h"
 
 // ===========================================================
 // ugly global def

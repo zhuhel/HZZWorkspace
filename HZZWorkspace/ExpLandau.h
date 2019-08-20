@@ -16,12 +16,12 @@ using namespace std;
 #include <RooArgList.h>
 #include <RooProduct.h>
 #include <RooAbsReal.h>
-#include <RooStats/HistFactory/RooBSplineBases.h>
+#include <RooFitExtensions/RooBSplineBases.h>
 
 #include "RooRealVar.h"
 #include "RooBinning.h"
 
-#include "Hzzws/SampleBase.h"
+#include "HZZWorkspace/SampleBase.h"
 
 
 class RooWorkspace;

@@ -1,7 +1,7 @@
 #include "TSystem.h"
 #include "TFile.h"
 #include "RooProduct.h"
-#include "Hzzws/PlotHelp.h"
+#include "HZZWorkspace/PlotHelp.h"
 #include "TGraphErrors.h"
 #include "TH1.h"
 #include "TMultiGraph.h"

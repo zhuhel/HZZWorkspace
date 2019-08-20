@@ -2,8 +2,8 @@
 #ifndef __HZZWS_ANALYTICHMBKG_H__
 #define __HZZWS_ANALYTICHMBKG_H__
 
-#include "Hzzws/SampleBase.h"
-#include "Hzzws/SysText.h"
+#include "HZZWorkspace/SampleBase.h"
+#include "HZZWorkspace/SysText.h"
 
 
 class AnalyticHMBkg : public SampleBase {

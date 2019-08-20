@@ -3,14 +3,14 @@
 using namespace std;
 #include <stdlib.h>
 
-#include <RooStats/HistFactory/RooBSpline.h>
+#include <RooFitExtensions/RooBSpline.h>
 #include <RooArgList.h>
 #include <RooArgSet.h>
 #include <RooRealVar.h>
 #include <RooProduct.h>
 #include <RooRealSumPdf.h>
 
-#include "Hzzws/ParametrizedSample.h"
+#include "HZZWorkspace/ParametrizedSample.h"
 
 ParametrizedSample::ParametrizedSample(const char* name,
         const char* para_name, float low, float hi):

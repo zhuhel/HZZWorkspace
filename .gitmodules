@@ -1,0 +1,4 @@
+[submodule "RooFitExtensions"]
+	path = RooFitExtensions
+	url = ../../../cburgard/RooFitExtensions.git
+	#url = https://:@gitlab.cern.ch:8443/cburgard/RooFitExtensions.git

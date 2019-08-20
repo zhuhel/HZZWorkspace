@@ -13,10 +13,10 @@
 #include <RooArgSet.h>
 #include <RooArgList.h>
 #include <RooAbsReal.h>
-#include <RooMCHistConstraint.h>
+#include <RooFitExtensions/RooMCHistConstraint.h>
 
-#include "Hzzws/Coefficient.h"
-#include "Hzzws/SysText.h"
+#include "HZZWorkspace/Coefficient.h"
+#include "HZZWorkspace/SysText.h"
 
 using namespace std;
 class SampleBase{
@@ -31,7 +31,9 @@ class SampleBase{
         virtual bool setChannel(const RooArgSet& observable, const char* channelName, bool with_sys);
 
         /* add shape and normalization systematic*/
-        virtual bool addShapeSys(const TString& npName) { return false;}
+        virtual bool addShapeSys(const TString& npName ) { log_warn("Careful! You are calling addShapeSys (\"%s\") for a sample \"%s\" which uses the SampleBase::addShapeSys implementation - will do NOTHING!",npName.Data(),pdf_name_.c_str()); 
+            return false;
+        }  // MG: Is this supposed to do nothing??
         virtual bool addNormSys(const TString& npName);
 
         /* return final PDF for this Sample in _channelName_ */

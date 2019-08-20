@@ -1,10 +1,10 @@
 /*
  */
-#include "Hzzws/SampleKeys.h"
-#include "Hzzws/Helper.h"
+#include "HZZWorkspace/SampleKeys.h"
+#include "HZZWorkspace/Helper.h"
 
 #include <RooDataSet.h>
-#include <RooParamKeysPdf.h>
+#include <RooFitExtensions/RooParamKeysPdf.h>
 #include <TString.h>
 
 #include <stdlib.h>

@@ -6,7 +6,7 @@
 #include "TROOT.h"
 #include "TStyle.h"
 #include "TGraphErrors.h"
-#include "Hzzws/PlotHelp.h"
+#include "HZZWorkspace/PlotHelp.h"
 #include "RooWorkspace.h"
 #include "RooAbsPdf.h"
 #include "RooRealVar.h"

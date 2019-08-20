@@ -1,4 +1,4 @@
-#include "Hzzws/IntegralHelper.h"
+#include "HZZWorkspace/IntegralHelper.h"
 
 #include <TMath.h>
 #include <math.h>

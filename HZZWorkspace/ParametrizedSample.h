@@ -6,10 +6,10 @@
 #include <vector>
 #include <string>
 
-#include <Hzzws/SampleBase.h>
+#include <HZZWorkspace/SampleBase.h>
 using namespace std;
 
-#include <RooStats/HistFactory/RooBSplineBases.h>
+#include <RooFitExtensions/RooBSplineBases.h>
 
 class ParametrizedSample : public SampleBase
 {

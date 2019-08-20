@@ -6,8 +6,8 @@
 #include <RooArgSet.h>
 #include <RooAbsPdf.h>
 
-#include "Hzzws/SampleBase.h"
-#include "Hzzws/Coefficient.h"
+#include "HZZWorkspace/SampleBase.h"
+#include "HZZWorkspace/Coefficient.h"
 
 
 class CBGaussSum : public SampleBase {

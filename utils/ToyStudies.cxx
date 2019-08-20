@@ -25,7 +25,7 @@
 
 #include <RooWorkspace.h>
 #include <RooRealVar.h>
-#include "Hzzws/RooStatsHelper.h"
+#include "HZZWorkspace/RooStatsHelper.h"
 
 
 using namespace std;
@@ -89,7 +89,7 @@ int main(int argc, char** argv)
     if (obs_data){
         // profile to the S+B fit
         unique_ptr<RooNLLVar> nll_SBfixed(RooStatsHelper::createNLL(obs_data, mc));
-        RooStatsHelper::minimize(nll_SBfixed.get(), workspace);
+        RooStatsHelper::minimize(nll_SBfixed.get());
     } else {
       std::cout<<"could not find dataset:"<<dataName<<". Skipping conditional step!"<<std::endl;
     }

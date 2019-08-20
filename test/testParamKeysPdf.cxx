@@ -5,7 +5,7 @@
 
 #include <RooRealVar.h>
 #include <RooRealSumPdf.h>
-#include <RooParamKeysPdf.h>
+#include <RooFitExtensions/RooParamKeysPdf.h>
 #include <RooProduct.h>
 #include <RooDataSet.h>
 #include <RooPlot.h>
@@ -15,10 +15,10 @@
 #include <TCanvas.h>
 #include <TChain.h>
 
-#include "Hzzws/ParametrizedSample.h"
-#include "Hzzws/SampleHist.h"
-#include <RooStats/HistFactory/RooBSpline.h>
-#include <RooStats/HistFactory/RooBSplineBases.h>
+#include "HZZWorkspace/ParametrizedSample.h"
+#include "HZZWorkspace/SampleHist.h"
+#include <RooFitExtensions/RooBSpline.h>
+#include <RooFitExtensions/RooBSplineBases.h>
 
 void generate_para_ws();
 void plot_para_norm();

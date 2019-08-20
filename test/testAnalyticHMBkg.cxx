@@ -1,4 +1,4 @@
-#include "Hzzws/AnalyticHMBkg.h"
+#include "HZZWorkspace/AnalyticHMBkg.h"
 #include "TCanvas.h"
 #include "RooPlot.h"
 #include "RooAbsPdf.h"

@@ -3,7 +3,7 @@
 //    Description:  
 // 
 // ==========================================================================
-#include "Hzzws/ExpLandau.h"
+#include "HZZWorkspace/ExpLandau.h"
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
@@ -18,11 +18,11 @@
 #include "RooArgList.h"
 #include "RooRealVar.h"
 #include "RooStats/HistFactory/FlexibleInterpVar.h"
-#include <RooStats/HistFactory/RooBSpline.h>
-#include "RooExpandedDataHist.h"
-#include "RooExpandedHistPdf.h"
+#include <RooFitExtensions/RooBSpline.h>
+#include <RooFitExtensions/RooExpandedDataHist.h>
+#include <RooFitExtensions/RooExpandedHistPdf.h>
 #include "RooNDKeysPdf.h"
-#include "Roo1DMomentMorphFunction.h"
+#include <RooFitExtensions/Roo1DMomentMorphFunction.h>
 #include "RooPolyVar.h"
 #include "RooCBShape.h"
 #include "RooAddPdf.h"
@@ -32,14 +32,14 @@
 #include "RooFormula.h"
 #include "RooGenericPdf.h"
 
-#include "Hzzws/Helper.h"
+#include "HZZWorkspace/Helper.h"
 
 using namespace RooStats;
 using namespace HistFactory;
 
 ExpLandau::ExpLandau(const char* _name, 
         const char* _input,  
-        const char* _shape_sys,
+        const char* ,       // MG: Intentionally not using the shapeSys par?
         bool _doSys ) : SampleBase(_name)
     , workspace(new RooWorkspace("ExpLandau"))
     , doSys(_doSys)

@@ -3,13 +3,13 @@
 //    Description:
 //
 // ==========================================================================
-#include "Hzzws/SampleBase.h"
+#include "HZZWorkspace/SampleBase.h"
 #include <iostream>
 
 #include <RooRealVar.h>
 #include <RooUniform.h>
 
-#include "Hzzws/Helper.h"
+#include "HZZWorkspace/Helper.h"
 
 SampleBase::SampleBase(const char* _name):
     pdf_name_(_name)

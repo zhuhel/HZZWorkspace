@@ -6,8 +6,8 @@
 #include <string>
 #include <vector>
 
-#include "Hzzws/SampleBase.h"
-#include "Hzzws/Coefficient.h"
+#include "HZZWorkspace/SampleBase.h"
+#include "HZZWorkspace/Coefficient.h"
 
 #include "RooAbsPdf.h"
 #include "RooArgList.h"
@@ -32,6 +32,7 @@ class EFTMorph : public SampleBase {
     private:
 
         RooArgSet createHCMorphParaSet(std::string parlist); 
+        RooArgSet createGeneralMorphParaSet(std::string parlist);
         RooArgSet couplingsDatabase;
         RooArgSet formulaDatabase;
         RooAbsReal* getOverallNormalization();

@@ -3,9 +3,9 @@
 //    Description:  
 // 
 // ==========================================================================
-#include "Hzzws/CBGauss.h"
-#include "Hzzws/RelativisticBW.h"
-#include "Hzzws/RelativisticBWInt.h"
+#include "HZZWorkspace/CBGauss.h"
+#include "HZZWorkspace/RelativisticBW.h"
+#include "HZZWorkspace/RelativisticBWInt.h"
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
@@ -21,13 +21,13 @@
 #include "RooRealVar.h"
 #include "RooFFTConvPdf.h"
 #include "RooStats/HistFactory/FlexibleInterpVar.h"
-#include <RooStats/HistFactory/RooBSpline.h>
+#include <RooFitExtensions/RooBSpline.h>
 #include "RooPolyVar.h"
 #include "RooCBShape.h"
 #include "RooAddPdf.h"
 #include "RooWorkspace.h"
 
-#include "Hzzws/Helper.h"
+#include "HZZWorkspace/Helper.h"
 
 using namespace RooStats;
 using namespace HistFactory;
@@ -124,6 +124,7 @@ void CBGauss::makeCBGParameterization()
     RooAbsReal* a1cb = variable("CB_mu_p1");
     RooAbsReal* a2cb = variable("CB_mu_p2");
     RooAbsReal* a3cb = variable("CB_mu_p3");
+    RooAbsReal* a4cb = variable("CB_mu_p4");
 
     //If we are doing a convolution, then the mH is included as parameter in the truth shape, not here
     if (doConv){
@@ -131,15 +132,16 @@ void CBGauss::makeCBGParameterization()
       a1cb = new RooFormulaVar(Form("%s_CB_mu_p1_nomH",base_name_.Data()),"@0-1",RooArgList(*a1cb));
     }
 
-    RooPolyVar meanPoly( ( base_name_ + "_mean" ).Data(), "CB #mu", *mH, RooArgList( *a0cb, *a1cb, *a2cb, *a3cb ) );
+    RooPolyVar meanPoly( ( base_name_ + "_mean" ).Data(), "CB #mu", *mH, RooArgList( *a0cb, *a1cb, *a2cb, *a3cb, *a4cb ) );
     workspace->import(meanPoly);
 
     //The alpha parameter
     RooAbsReal* a0cba = variable("CB_alpha_p0");
     RooAbsReal* a1cba = variable("CB_alpha_p1");
-    RooAbsReal* a2cba = variable("CB_alpha_p2");      
-    RooAbsReal* a3cba = variable("CB_alpha_p3");      
-    RooPolyVar alphaCB( ( base_name_ + "_alphaCB" ).Data(), "CB alpha", *mH, RooArgList( *a0cba, *a1cba, *a2cba, *a3cba ) );
+    RooAbsReal* a2cba = variable("CB_alpha_p2");
+    RooAbsReal* a3cba = variable("CB_alpha_p3");
+    RooAbsReal* a4cba = variable("CB_alpha_p4");
+    RooPolyVar alphaCB( ( base_name_ + "_alphaCB" ).Data(), "CB alpha", *mH, RooArgList( *a0cba, *a1cba, *a2cba, *a3cba, *a4cba ) );
     workspace->import(alphaCB);
 
     //The n parameter
@@ -147,7 +149,8 @@ void CBGauss::makeCBGParameterization()
     RooAbsReal* a1nnCB = variable("CB_nn_p1");
     RooAbsReal* a2nnCB = variable("CB_nn_p2");
     RooAbsReal* a3nnCB = variable("CB_nn_p3");
-    RooPolyVar nCB( ( base_name_ + "_nCB" ).Data(), "CB n", *mH, RooArgList( *a0nnCB, *a1nnCB, *a2nnCB, *a3nnCB) );
+    RooAbsReal* a4nnCB = variable("CB_nn_p4");
+    RooPolyVar nCB( ( base_name_ + "_nCB" ).Data(), "CB n", *mH, RooArgList( *a0nnCB, *a1nnCB, *a2nnCB, *a3nnCB, *a4nnCB ) );
     workspace->import(nCB);
 
     //The s parameter
@@ -155,7 +158,8 @@ void CBGauss::makeCBGParameterization()
     RooAbsReal* a1ga = variable("GA_s_p1");
     RooAbsReal* a2ga = variable("GA_s_p2");
     RooAbsReal* a3ga = variable("GA_s_p3");
-    RooPolyVar sGA( ( base_name_ + "_sGA" ).Data(), "CB #mu", *mH, RooArgList(*a0ga, *a1ga, *a2ga, *a3ga) );
+    RooAbsReal* a4ga = variable("GA_s_p4");
+    RooPolyVar sGA( ( base_name_ + "_sGA" ).Data(), "CB #mu", *mH, RooArgList( *a0ga, *a1ga, *a2ga, *a3ga, *a4ga ) );
     workspace->import(sGA);
 
     //The f parameter 
@@ -163,7 +167,8 @@ void CBGauss::makeCBGParameterization()
     RooAbsReal* f1cb = variable("CB_f_p1");
     RooAbsReal* f2cb = variable("CB_f_p2");
     RooAbsReal* f3cb = variable("CB_f_p3");
-    RooPolyVar fCB( ( base_name_ + "_fCB" ).Data(), "CB f", *mH, RooArgList(*f0cb, *f1cb, *f2cb, *f3cb) );
+    RooAbsReal* f4cb = variable("CB_f_p4");
+    RooPolyVar fCB( ( base_name_ + "_fCB" ).Data(), "CB f", *mH, RooArgList( *f0cb, *f1cb, *f2cb, *f3cb, *f4cb ) );
     workspace->import(fCB);
 
     //The sCB parameter
@@ -171,7 +176,8 @@ void CBGauss::makeCBGParameterization()
     RooAbsReal* a1cbs = variable("CB_s_p1");
     RooAbsReal* a2cbs = variable("CB_s_p2");
     RooAbsReal* a3cbs = variable("CB_s_p3");
-    RooPolyVar sCB( ( base_name_ + "_sCB" ).Data(), "CB #sigma", *mH, RooArgList(*a0cbs, *a1cbs, *a2cbs, *a3cbs) );
+    RooAbsReal* a4cbs = variable("CB_s_p4");
+    RooPolyVar sCB( ( base_name_ + "_sCB" ).Data(), "CB #sigma", *mH, RooArgList( *a0cbs, *a1cbs, *a2cbs, *a3cbs, *a4cbs ) );
     workspace->import(sCB);
 
     // acceptance in truth level

@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <iostream>
 
-#include "Hzzws/PlotHelp.h"
+#include "HZZWorkspace/PlotHelp.h"
 #include "TCanvas.h"
 #include "RooPlot.h"
 #include "RooWorkspace.h"

@@ -1,0 +1,41 @@
+variables:   
+  GIT_SUBMODULE_STRATEGY: recursive
+  ATLAS_LOCAL_ROOT_BASE: /cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase 
+
+stages:   
+  - build 
+
+cmake_asg_compile:
+  stage: build
+  image: atlas/analysisbase:latest
+  artifacts:
+    expire_in: 1d
+    untracked: true
+    paths:
+    - build
+    - source
+
+  script:
+    - source /home/atlas/release_setup.sh
+    - mkdir source 
+    - mkdir source/HZZWorkspace 
+    - ls | grep -v source | xargs -i mv {} source/HZZWorkspace/
+    - mv source/HZZWorkspace/CMakeLists.topLevel.txt source/CMakeLists.txt
+    - mkdir build
+    - cd build
+    - cmake ../source
+    - make
+
+
+# Build docker image used for tests
+build_docker:
+  stage: build
+  variables:
+    TO: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME
+    # all submodules will be cloned recursively upon start of CI job
+    GIT_SUBMODULE_STRATEGY: recursive
+    GIT_SSL_NO_VERIFY: "true"
+  tags:
+    - docker-image-build
+  script:
+    - ignore

@@ -2,7 +2,7 @@
 #include "TFile.h"
 #include "RooAbsReal.h"
 #include "RooAbsArg.h"
-#include "Hzzws/Helper.h"
+#include "HZZWorkspace/Helper.h"
 #include "RooCategory.h"
 #include "RooWorkspace.h"
 #include "RooAddition.h"

@@ -9,8 +9,8 @@
 #include <RooArgSet.h>
 #include <RooArgList.h>
 
-#include "Hzzws/SampleBase.h"
-#include "Hzzws/SystematicsManager.h"
+#include "HZZWorkspace/SampleBase.h"
+#include "HZZWorkspace/SystematicsManager.h"
 using namespace std;
 
 class Category {

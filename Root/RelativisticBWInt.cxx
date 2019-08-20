@@ -8,7 +8,7 @@
 
 #include "Riostream.h"
 
-#include "Hzzws/RelativisticBWInt.h"
+#include "HZZWorkspace/RelativisticBWInt.h"
 #include "RooAbsReal.h"
 #include "RooAbsCategory.h"
 #include <math.h>

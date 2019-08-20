@@ -1,4 +1,4 @@
-#include "Hzzws/RooHistParamPdf.h"
+#include "HZZWorkspace/RooHistParamPdf.h"
 
 #include "TCanvas.h"
 #include "RooPlot.h"

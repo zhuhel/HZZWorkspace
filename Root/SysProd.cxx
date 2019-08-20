@@ -23,8 +23,8 @@
 #include "RooKeysPdf.h"
 #include "RooNDKeysPdf.h"
 
-#include "Hzzws/Helper.h"
-#include "Hzzws/SysProd.h"
+#include "HZZWorkspace/Helper.h"
+#include "HZZWorkspace/SysProd.h"
 
 using namespace std;
 using namespace RooFit;
@@ -185,7 +185,7 @@ void SysProd::process() {
              TH1* histNom_norm  = getHist(hName+"_norm", samplesNames[i], catList[j].c_str(), fNameList, obsname, p_dic[catList[j]]["cuts"].c_str(), weightVarName, "");
 
              // get shape systematics histograms
-             for(int s=0; s<nSystDirs; s++){
+             for(size_t s=0; s<nSystDirs; s++){
                fname  = p_dic["main"]["path"] + "/" + p_dic["main"]["sysDir"] + "/" + systDirs[s] + "/" + samplesList[i].c_str();
                fNameList.clear();
                for(size_t fI = 0; fI < flist.size(); fI++)
@@ -246,7 +246,7 @@ void SysProd::process() {
 
              //	if(!checkNormNP(outNormSystWeightName, fname, p_dic["main"]["treename"].c_str())) { cout << "ERROR: please check norm-like NP in the config file!" <<endl; return;} 
 
-             for(int s=0; s<nNormSyst; s++){
+             for(size_t s=0; s<nNormSyst; s++){
                  string systHistName  = "";
                  if(s%2==0){systHistName = obsname+"-"+outNormSystHistName[s]+"-"+catList[j]+"-down";}
                  else      {systHistName = obsname+"-"+outNormSystHistName[s]+"-"+catList[j]+"-up";}
@@ -419,9 +419,10 @@ TH1* SysProd::getHist(string hName, string sample, string cat, vector<string> fn
     if(p_dic[cat].count("bins")){
         vector<string> tmpBins;
         Helper::tokenizeString(p_dic[cat]["bins"].c_str(), '/', tmpBins);
-        double xbins[tmpBins.size()];
+        std::vector<double> xbins(tmpBins.size());
+        // double xbins[tmpBins.size()];
         for(size_t i=0; i<tmpBins.size(); ++i){ xbins[i] = (double)::atof(tmpBins[i].c_str()); }
-        return hist->Rebin(tmpBins.size()-1, hName.c_str(), xbins);
+        return hist->Rebin(tmpBins.size()-1, hName.c_str(), &(xbins[0]));
     }
     else {
         hist->SetName(hName.c_str());

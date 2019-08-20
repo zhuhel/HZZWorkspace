@@ -19,8 +19,8 @@
 #include <TTree.h>
 #include <RooWorkspace.h>
 #include <RooRealVar.h>
-#include "Hzzws/RooStatsHelper.h"
-#include "Hzzws/Helper.h"
+#include "HZZWorkspace/RooStatsHelper.h"
+#include "HZZWorkspace/Helper.h"
 #include "TMath.h"
 
 

@@ -5,7 +5,7 @@
 
 #include <TString.h>
 #include <RooArgList.h>
-#include "Hzzws/Helper.h"
+#include "HZZWorkspace/Helper.h"
 
 #include <string>
 #include <map>

@@ -12,8 +12,8 @@
 #include <RooPlot.h>
 #include <RooSimultaneous.h>
 
-#include "Hzzws/RooStatsHelper.h"
-#include "Hzzws/Helper.h"
+#include "HZZWorkspace/RooStatsHelper.h"
+#include "HZZWorkspace/Helper.h"
 
 using namespace std;
 using namespace RooFit;
@@ -22,7 +22,11 @@ using namespace RooStats;
 
 int main(int argc, char** argv)
 {
+    if (argc < 7){
+        log_err(" Please provide the following 6 args:fileName - mcName - dataName - obsName - wsName - option ");
+        return EXIT_FAILURE;
 
+    }
     string fileName(argv[1]);
     string mcName(argv[2]);
     string dataName(argv[3]);

@@ -3,7 +3,7 @@
 //    Description:  
 // 
 // ==========================================================================
-#include "Hzzws/SampleCount.h"
+#include "HZZWorkspace/SampleCount.h"
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
@@ -15,13 +15,13 @@
 #include <RooRealVar.h>
 #include <RooProdPdf.h>
 #include "RooStats/HistFactory/FlexibleInterpVar.h"
-#include "RooExpandedDataHist.h"
-#include "RooExpandedHistPdf.h"
+#include <RooFitExtensions/RooExpandedDataHist.h>
+#include <RooFitExtensions/RooExpandedHistPdf.h>
 #include "RooNDKeysPdf.h"
-#include "Roo1DMomentMorphFunction.h"
+#include <RooFitExtensions/Roo1DMomentMorphFunction.h>
 
-#include "Hzzws/Helper.h"
-#include "Hzzws/BinningUtil.h"
+#include "HZZWorkspace/Helper.h"
+#include "HZZWorkspace/BinningUtil.h"
 
 SampleCount::SampleCount(const char* _name)
     : SampleBase(_name)
@@ -49,11 +49,11 @@ RooAbsPdf* SampleCount::get_mc_constraint(){
 
     TIterator* iter = gammas.createIterator();
     TIter next(iter);
-    RooRealVar* gamma;
+    // RooRealVar* gamma;
     RooRealVar* var;
     while ( (var = (RooRealVar*) next()) ){
         if(! nuisance_obs_list_.contains(*var) ) nuisance_obs_list_.add(*var);
-        gamma = var;
+        // gamma = var;
         TString np(var->GetName());
         //add poisson constraints
         if(np.Contains("MCSTAT") && np.Contains(category_name_)) {

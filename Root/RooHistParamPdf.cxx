@@ -8,7 +8,7 @@
 
 #include "Riostream.h" 
 
-#include "Hzzws/RooHistParamPdf.h" 
+#include "HZZWorkspace/RooHistParamPdf.h" 
 #include "RooAbsReal.h" 
 #include "RooAbsCategory.h" 
 #include <math.h> 

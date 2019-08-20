@@ -11,9 +11,9 @@
 #include <vector>
 #include <string>
 
-#include "Hzzws/SampleBase.h"
-#include "Hzzws/SysText.h"
-#include "Hzzws/Helper.h"
+#include "HZZWorkspace/SampleBase.h"
+#include "HZZWorkspace/SysText.h"
+#include "HZZWorkspace/Helper.h"
 
 
 using namespace std;
