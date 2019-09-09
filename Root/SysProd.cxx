@@ -29,6 +29,14 @@
 using namespace std;
 using namespace RooFit;
 
+//-----------------------------------------------------------------------------
+// Produces systematic uncertainty inputs.
+//
+// Execute through the runSyst executable 
+//
+// WARNING: JER (jet energy resolution) hardcoded
+//-----------------------------------------------------------------------------
+
 SysProd::SysProd(const string& configFile) {
 readConfig(configFile);
 }
@@ -46,7 +54,7 @@ bool SysProd::checkConfig() {
    if(p_dic["main"].count("categories") && p_dic["main"].count("samples") && p_dic["main"].count("path") && p_dic["main"].count("treename")  && p_dic["main"].count("NPlist"))
      check = true;
    // check samples
-   vector<string> samples; 
+   vector<string> samples;
    Helper::tokenizeString(p_dic["main"]["samples"].c_str(), ',', samples);
    for(size_t i=0; i<samples.size(); ++i){
       if(!p_dic["samples"].count(samples[i].c_str()))
@@ -58,7 +66,7 @@ bool SysProd::checkConfig() {
    for(size_t i=0; i<categories.size(); ++i){
       if(!p_dic.count(categories[i].c_str()))
       {log_err("ERROR: look at categories!");  check = false;}
-   } 
+   }
    if (p_dic["main"].count("outdir")) m_outDir = p_dic["main"]["outdir"];
    else m_outDir="./";
    log_info("configured outDir to be :%s",m_outDir.c_str());
@@ -82,7 +90,7 @@ void SysProd::process() {
    Helper::readConfig(p_dic["main"]["NPlist"].c_str(), '=', NP_dic);
    Helper::printDic(NP_dic);
    // dump NP list and dirs into vectors
-   vector<string> systDirs; 
+   vector<string> systDirs;
    vector<string> outSystHistName;
    vector<string> outNormSystWeightName;
    vector<string> outNormSystHistName;
@@ -96,7 +104,7 @@ void SysProd::process() {
         systDirs.push_back(iterator->first);
         outSystHistName.push_back(iterator->second);
       }
-   } 
+   }
    for(it_type iterator = NP_dic["normLike"].begin(); iterator != NP_dic["normLike"].end(); iterator++) {
       outNormSystWeightName.push_back(iterator->first);
       outNormSystHistName.push_back(iterator->second);
@@ -108,15 +116,15 @@ void SysProd::process() {
 
 
    // check shape like NP
-   if(!checkNP(systDirs))              { log_err("ERROR: please check shape-like NP in the config file (up/down, etc.)!"); return;} 
+   if(!checkNP(systDirs))              { log_err("ERROR: please check shape-like NP in the config file (up/down, etc.)!"); return;}
    // check norm like NP
-   if(!checkNP(outNormSystWeightName)) { log_err("ERROR: please check norm-like NP in the config file (up/down, etc.)!"); return;} 
-   
+   if(!checkNP(outNormSystWeightName)) { log_err("ERROR: please check norm-like NP in the config file (up/down, etc.)!"); return;}
+
    // get sample list
-   vector<string> samplesList, samplesNames; 
+   vector<string> samplesList, samplesNames;
    Helper::tokenizeString(p_dic["main"]["samples"].c_str(), ',', samplesList);
    for(size_t i=0; i<samplesList.size(); ++i){
-      samplesNames.push_back(samplesList[i].c_str()); 
+      samplesNames.push_back(samplesList[i].c_str());
       samplesList[i]  = p_dic["samples"][samplesList[i].c_str()].c_str();
    }
 
@@ -125,8 +133,8 @@ void SysProd::process() {
       log_info("Working on %s",(samplesList[i]).c_str());
 
       // loop over categories
-      string obsname=""; 
-      vector<string> catList; 
+      string obsname="";
+      vector<string> catList;
       Helper::tokenizeString(p_dic["main"]["categories"].c_str(), ',', catList);
 
       size_t nSystDirs = systDirs.size();
@@ -165,7 +173,7 @@ void SysProd::process() {
 
              // get nominal histogram
              string fname  = p_dic["main"]["path"] + "/Nominal/" + samplesList[i].c_str();
- 
+
              vector<string> fNameList;
              vector<string> flist;
              Helper::tokenizeString(samplesList[i].c_str(), ',', flist);
@@ -178,7 +186,7 @@ void SysProd::process() {
              }
 
 
-             string hName = obsname+"-"+samplesNames[i]+"-"+catList[j];      
+             string hName = obsname+"-"+samplesNames[i]+"-"+catList[j];
              systHistVecNom.push_back( getHist(hName, samplesNames[i], catList[j].c_str(), fNameList, obsname, p_dic[catList[j]]["cuts"].c_str(), weightVarName, smooth) );
              hName = obsname+"-"+samplesNames[i]+"-"+catList[j]; //unique name, obsname not empty
              systHistVecNom[nomHistCounter]->SetNameTitle(hName.c_str(), hName.c_str());
@@ -196,9 +204,9 @@ void SysProd::process() {
 
                string systHistName  = "";
                if(s%2==0){systHistName = obsname+"-"+outSystHistName[s]+"-"+catList[j]+"-down";}
-               else      {systHistName = obsname+"-"+outSystHistName[s]+"-"+catList[j]+"-up";} 
+               else      {systHistName = obsname+"-"+outSystHistName[s]+"-"+catList[j]+"-up";}
                // get histogram
-               systHistVec[systHistCounter] = getHist(systHistName, samplesNames[i], catList[j].c_str(), fNameList, obsname, p_dic[catList[j]]["cuts"].c_str(), weightVarName, smooth);       
+               systHistVec[systHistCounter] = getHist(systHistName, samplesNames[i], catList[j].c_str(), fNameList, obsname, p_dic[catList[j]]["cuts"].c_str(), weightVarName, smooth);
                systHistVec[systHistCounter]->SetNameTitle(systHistName.c_str(), systHistName.c_str());
                systHistVecOut[systHistCounter] = (TH1*)systHistVec[systHistCounter]->Clone(); // make a copy for later use
 
@@ -221,7 +229,7 @@ void SysProd::process() {
                   // mean and sigma variations for high mass
                   normalizationValues_mean[systHistCounter]  = systHistVec[systHistCounter]->GetMean()/systHistVecNom[nomHistCounter]->GetMean();
                   normalizationValues_sigma[systHistCounter] = systHistVec[systHistCounter]->GetRMS()/systHistVecNom[nomHistCounter]->GetRMS();
-               } 
+               }
 
                // scale to nominal hist
                systHistVec[systHistCounter]->Scale(systHistVecNom[nomHistCounter]->Integral()/systHistVec[systHistCounter]->Integral());
@@ -230,8 +238,8 @@ void SysProd::process() {
                bool divOk = systHistVec[systHistCounter]->Divide(systHistVecNom[nomHistCounter]);
                if(!divOk) { cout << "ERROR: dividing histograms!" << endl; return;}
                fillEmptyBins(catList[j], systHistVec[systHistCounter]); // 1st argument used to define dimentionality of the hist
-              
-               systHistCounter++;     
+
+               systHistCounter++;
                }
 
              // get normalization systematics histograms integrals
@@ -244,7 +252,7 @@ void SysProd::process() {
                  cout<<"Using File for norm sys: "<<fNameList[fI]<<endl;
              }
 
-             //	if(!checkNormNP(outNormSystWeightName, fname, p_dic["main"]["treename"].c_str())) { cout << "ERROR: please check norm-like NP in the config file!" <<endl; return;} 
+             //	if(!checkNormNP(outNormSystWeightName, fname, p_dic["main"]["treename"].c_str())) { cout << "ERROR: please check norm-like NP in the config file!" <<endl; return;}
 
              for(size_t s=0; s<nNormSyst; s++){
                  string systHistName  = "";
@@ -257,14 +265,14 @@ void SysProd::process() {
 
                  systHistVecNorm[systNormHistCounter] = getHist(systHistName, samplesNames[i], catList[j].c_str(), fNameList, obsname, p_dic[catList[j]]["cuts"].c_str(), normWeightVar.c_str(), "");
 
-                 normalizationValuesW[systNormHistCounter] = systHistVecNorm[systNormHistCounter]->Integral()/histNom_norm->Integral(); 
+                 normalizationValuesW[systNormHistCounter] = systHistVecNorm[systNormHistCounter]->Integral()/histNom_norm->Integral();
                  if (normalizationValuesW[systNormHistCounter]==0 || std::isnan(normalizationValuesW[systNormHistCounter])) normalizationValuesW[systNormHistCounter]=1.0;
 
                  std::cout<<"set value of "<<systHistName<<" to "<<normalizationValuesW[systNormHistCounter]<<std::endl;
 
                  // mean and sigma variations for high mass
-                 normalizationValuesW_mean[systNormHistCounter]  = systHistVecNorm[systNormHistCounter]->GetMean()/histNom_norm->GetMean(); 
-                 normalizationValuesW_sigma[systNormHistCounter] = systHistVecNorm[systNormHistCounter]->GetRMS()/histNom_norm->GetRMS(); 
+                 normalizationValuesW_mean[systNormHistCounter]  = systHistVecNorm[systNormHistCounter]->GetMean()/histNom_norm->GetMean();
+                 normalizationValuesW_sigma[systNormHistCounter] = systHistVecNorm[systNormHistCounter]->GetRMS()/histNom_norm->GetRMS();
 
                  if (normalizationValuesW_mean[systNormHistCounter]==0 || std::isnan(normalizationValuesW_mean[systNormHistCounter])) normalizationValuesW_mean[systNormHistCounter]=1.0;
                  if (normalizationValuesW_sigma[systNormHistCounter]==0 || std::isnan(normalizationValuesW_sigma[systNormHistCounter])) normalizationValuesW_sigma[systNormHistCounter]=1.0;
@@ -274,7 +282,7 @@ void SysProd::process() {
              }
 
       nomHistCounter++;
-  
+
       } // end cat.
 
 
@@ -293,7 +301,7 @@ void SysProd::process() {
       for(size_t t=0; t<systHistVecOut.size(); ++t) { systHistVecOut[t]->Write(); }
       fout->Close();
       delete fout;
-  
+
       // write normalization file
       string normFileName = m_outDir+"/"+"norm_"+samplesNames[i]+".txt";
       fillNormFile(normFileName, catList, outSystHistName, outNormSystHistName,
@@ -309,7 +317,7 @@ void SysProd::process() {
                    normalizationValues_sigma, normalizationValuesW_sigma);
       }
 
- 
+
       // delete
       for(size_t t=0; t<systHistVecNom.size(); ++t)  {delete systHistVecNom[t];}
       for(size_t t=0; t<systHistVecOut.size(); ++t)  {delete systHistVecOut[t];}
@@ -328,7 +336,7 @@ void SysProd::process() {
 
    } // end samples
 
-    
+
 }
 
 TH1* SysProd::getHist(string hName, string sample, string cat, vector<string> fname, string& obsname, string cuts, string weightLabel, string smooth) {
@@ -337,7 +345,7 @@ TH1* SysProd::getHist(string hName, string sample, string cat, vector<string> fn
 
     // hard-coded to add cuts
     RooArgSet treeobs;
-    getObs(cat, obsname, treeobs); 
+    getObs(cat, obsname, treeobs);
     RooArgSet obsAndCut(treeobs);
 
 
@@ -347,7 +355,7 @@ TH1* SysProd::getHist(string hName, string sample, string cat, vector<string> fn
 
     //if we know we won't smooth we can shortcut very easily
     if (smooth.empty() || smooth.find(sample)==string::npos){
-        RooRealVar *x = (RooRealVar*)obsList.at(0); 
+        RooRealVar *x = (RooRealVar*)obsList.at(0);
 
         std::cout<<"going to draw "<<x->GetName()<<" with weight "<< Form("%s*(%s)",weightLabel.c_str(),cuts.c_str())<<std::endl;
 
@@ -357,7 +365,7 @@ TH1* SysProd::getHist(string hName, string sample, string cat, vector<string> fn
             tcut->Draw(Form("%s>>%s",x->GetName(),hName.c_str()),Form("%s*(%s)",weightLabel.c_str(),cuts.c_str()));
         }
         else if (obsList.getSize()==2){
-            RooRealVar *y = (RooRealVar*)obsList.at(1); 
+            RooRealVar *y = (RooRealVar*)obsList.at(1);
             hist = new TH2F(Form("%s", hName.c_str()),Form("%s", hName.c_str()), x->getBinning().numBins(), x->getMin(), x->getMax(), y->getBinning().numBins(), y->getMin(), y->getMax());
             tcut->Draw(Form("%s:%s>>%s",x->GetName(),y->GetName(),hName.c_str()),Form("%s*(%s)",weightLabel.c_str(),cuts.c_str()));
         }
@@ -378,32 +386,32 @@ TH1* SysProd::getHist(string hName, string sample, string cat, vector<string> fn
         std::cout<<"variables to be read:"<<std::endl;
         obsAndCut.Print("v");
 
-        RooDataSet *ds = new RooDataSet(Form("%s_RooDataSet", obsname.c_str()), "dataset", 
+        RooDataSet *ds = new RooDataSet(Form("%s_RooDataSet", obsname.c_str()), "dataset",
                 obsAndCut, RooFit::Import(*tcut),
                 RooFit::Cut(cuts.c_str()),
                 RooFit::WeightVar(weightLabel.c_str()));
 
-        RooRealVar *x = (RooRealVar*)obsList.at(0); 
+        RooRealVar *x = (RooRealVar*)obsList.at(0);
 
         if(obsList.getSize()==1){     // 1D
             double rho(1.);
-            getRho(sample, smooth, rho); 
+            getRho(sample, smooth, rho);
             RooKeysPdf *keyspdf = new RooKeysPdf(Form("%s_RooKeysPdf", obsname.c_str()), "keyspdf", *x, *ds, RooKeysPdf::NoMirror, rho);
             hist = (TH1*)keyspdf->createHistogram(Form("%s", hName.c_str()), *x, RooFit::Binning(x->getBinning()));
             delete keyspdf;
 
         }
         else if(obsList.getSize()==2){ // 2D
-            RooRealVar *y = (RooRealVar*)obsList.at(1); 
+            RooRealVar *y = (RooRealVar*)obsList.at(1);
             RooCmdArg arg = RooFit::YVar(*y, RooFit::Binning(y->getBinning()));
 
-            double rho_x(1.), rho_y(1.);                 
-            getRhoVec(sample, smooth, rho_x, rho_y); 
+            double rho_x(1.), rho_y(1.);
+            getRhoVec(sample, smooth, rho_x, rho_y);
             TVectorD rhovec(2);
             rhovec(0) = rho_x;
             rhovec(1) = rho_y;
             RooNDKeysPdf *keyspdf = new RooNDKeysPdf(Form("%s_RooNDKeysPdf", obsname.c_str()), "keyspdf", treeobs, *ds, rhovec, "m");
-            hist =(TH1*)keyspdf->createHistogram(Form("%s", hName.c_str()), *x, RooFit::Binning(x->getBinning()), arg); 
+            hist =(TH1*)keyspdf->createHistogram(Form("%s", hName.c_str()), *x, RooFit::Binning(x->getBinning()), arg);
             delete keyspdf;
             rhovec.Delete();
         }
@@ -432,37 +440,37 @@ TH1* SysProd::getHist(string hName, string sample, string cat, vector<string> fn
 
 void SysProd::getRho(string sample, string smooth, double &rho){
    rho = 1.;
-   vector<string> rho_vec;  
+   vector<string> rho_vec;
    Helper::tokenizeString(smooth.c_str(), ';', rho_vec);
    for(size_t i=0; i<rho_vec.size(); ++i){
       if(rho_vec[i].find(sample) != string::npos){
-      vector<string> rho_val; 
+      vector<string> rho_val;
       Helper::tokenizeString(rho_vec[i].c_str(), ':', rho_val);
-      rho = (double)::atof(rho_val.at(1).c_str()); 
+      rho = (double)::atof(rho_val.at(1).c_str());
       }
    }
 }
 
 void SysProd::getRhoVec(string sample, string  smooth, double &rho_x, double &rho_y){
-   rho_x = 1.; 
+   rho_x = 1.;
    rho_y = 1.;
-   vector<string> rho_vec; 
+   vector<string> rho_vec;
    Helper::tokenizeString(smooth.c_str(), ';', rho_vec);
    for(size_t i=0; i<rho_vec.size(); ++i){
       if(rho_vec[i].find(sample) != string::npos){
-      vector<string> rho_tmp, rho_val; 
+      vector<string> rho_tmp, rho_val;
       Helper::tokenizeString(rho_vec[i].c_str(), ':', rho_tmp);
       Helper::tokenizeString(rho_tmp.at(1).c_str(), ',', rho_val);
-      rho_x = (double)::atof(rho_val.at(0).c_str()); 
-      rho_y = (double)::atof(rho_val.at(1).c_str());  
+      rho_x = (double)::atof(rho_val.at(0).c_str());
+      rho_y = (double)::atof(rho_val.at(1).c_str());
       }
    }
 }
 
-void SysProd::getObs(string cat, string &oname, RooArgSet &treeobs) 
+void SysProd::getObs(string cat, string &oname, RooArgSet &treeobs)
 {
     oname = "";
-    vector<string> branch;  
+    vector<string> branch;
     Helper::tokenizeString(p_dic[cat]["observables"], ';', branch);
 
     for (int i=0; i<(int)branch.size(); ++i){
@@ -476,11 +484,11 @@ void SysProd::getObs(string cat, string &oname, RooArgSet &treeobs)
         }
 
         RooRealVar *v = new RooRealVar(tmp_branch.c_str(), tmp_branch.c_str(), atof(tmp_obs.at(2).c_str()), atof(tmp_obs.at(3).c_str()));
-        v->setBins( atoi(tmp_obs.at(1).c_str()) ); 
+        v->setBins( atoi(tmp_obs.at(1).c_str()) );
         treeobs.add(*v);
         if((int)branch.size()==1)
           oname = tmp_obs.at(0);
-        else if(i==((int)branch.size()-1))  
+        else if(i==((int)branch.size()-1))
           oname += tmp_obs.at(0);
         else
           oname += tmp_obs.at(0) + "_";
@@ -491,14 +499,14 @@ void SysProd::fillEmptyBins(string cat, TH1 *hist){
 
    RooArgSet treeobs;
    string obsname = "";
-   getObs(cat, obsname, treeobs); 
+   getObs(cat, obsname, treeobs);
    RooArgList obsList(treeobs);
 
    if(obsList.getSize()==1){      // 1D
      for(int ibinx = 1; ibinx <= hist->GetNbinsX(); ibinx++) {
         if(hist->GetBinContent(ibinx) == 0.0) {
-           hist->SetBinContent(ibinx, 1.); 
-           hist->SetBinError(ibinx, sqrt(1.)); 
+           hist->SetBinContent(ibinx, 1.);
+           hist->SetBinError(ibinx, sqrt(1.));
         }
       }
    }
@@ -506,7 +514,7 @@ void SysProd::fillEmptyBins(string cat, TH1 *hist){
      for(int ibinx = 1; ibinx <= hist->GetNbinsX(); ibinx++) {
         for(int ibiny = 1; ibiny <= hist->GetNbinsY(); ibiny++) {
            if(hist->GetBinContent(ibinx, ibiny) == 0.0) {
-             hist->SetBinContent(ibinx, ibiny, 1.); 
+             hist->SetBinContent(ibinx, ibiny, 1.);
              hist->SetBinError(ibinx, ibiny, 0.5);
            }
         }
@@ -539,13 +547,13 @@ void SysProd::fillNormFile(const string& normFileName, vector<string> catList, v
             else      {sysOut << " " << Form("%.6f",normalizationValues[systHistCounter]) <<endl;}
             systHistCounter++;
          }
-       
+
          for(size_t s=0; s<outNormSystHistName.size(); s++){
             if(s%2==0){sysOut << outNormSystHistName[s] << " = " << Form("%.6f",normalizationValuesW[systNormHistCounter]); }
             else      {sysOut << " " << Form("%.6f",normalizationValuesW[systNormHistCounter]) <<endl;}
             systNormHistCounter++;
          }
-        
+
       }
       sysOut.close();
 }
@@ -553,7 +561,7 @@ void SysProd::fillNormFile(const string& normFileName, vector<string> catList, v
 bool SysProd::checkNP(vector<string> systDirs){
    if(systDirs.size() == 1) { cout << "ERROR: You must have up/down dirs for NP!" <<endl; return false;}
 
-   int countUpDown=0; 
+   int countUpDown=0;
    for(size_t i=0; i<systDirs.size(); i++){
 
       if(systDirs[i].compare("JET_JER_SINGLE_NP__1up")==0) continue; // skip JER
@@ -573,21 +581,19 @@ bool SysProd::checkNormNP(vector<string> outNormSystWeightName, string fName, st
 
    for(size_t i=0; i<outNormSystWeightName.size(); i++){
       TBranch* branch = (TBranch*)input->GetListOfBranches()->FindObject(outNormSystWeightName[i].c_str());
-      if(!branch) { 
-         cout << "ERROR: Branch " << outNormSystWeightName[i] << " does not exist in the tree!" <<endl; 
+      if(!branch) {
+         cout << "ERROR: Branch " << outNormSystWeightName[i] << " does not exist in the tree!" <<endl;
          delete branch;
-         delete input;    
+         delete input;
          f->Close();
          delete f;
          return false;}
-      else {delete branch;} 
+      else {delete branch;}
    }
 
-   delete input;    
+   delete input;
    f->Close();
    delete f;
 
    return true;
 }
-
-

@@ -10,6 +10,12 @@
 #include "HZZWorkspace/SysText.h"
 #include "HZZWorkspace/Helper.h"
 
+//-----------------------------------------------------------------------------
+// Create a systematic uncertainty object based on a text file
+// * Apply systematics cutoff ("all" case)
+// * Does not process shape systematics -- norm only
+// * Shape sysematics handled through SampleBase and its derived classes 
+//-----------------------------------------------------------------------------
 
 SysText::SysText(const char* text_path):
     file_name_(text_path)
@@ -20,7 +26,7 @@ SysText::SysText(const char* text_path):
 
     // please comment it out after debugging!
     // Helper::printDic<string>(sys_all_);
-    
+
     ch_name_ = "";
     SetCutoff(Helper::getSysCutoff("all"));
     SetMCStatCutoff(Helper::getSysCutoff("mcstat"));
@@ -29,7 +35,7 @@ SysText::SysText(const char* text_path):
     m_cutoff_mcstat = 0.;
 }
 
-SysText::SysText(const map<string, map<string, string> >& sys_all) 
+SysText::SysText(const map<string, map<string, string> >& sys_all)
 {
     sys_all_.clear();
     sys_global_.clear();
@@ -141,7 +147,7 @@ void SysText::addSys(const TString& npName, double low, double up)
     RooRealVar* npVar;
     string npNameIn=Form("%s", npName.Data());
     TString npVarName;
-    if(!npName.Contains("MCSTAT")) { 
+    if(!npName.Contains("MCSTAT")) {
       npVar = Helper::createNuisanceVar(npName.Data());
       np_.add(*npVar);
       low_.push_back(low);
@@ -149,7 +155,7 @@ void SysText::addSys(const TString& npName, double low, double up)
       log_info("added systematic: %s", npName.Data());
     } else { // MC stat
       // scale factor to be applied to the yield: 1 + stat_errr
-      // nominal:1   
+      // nominal:1
       // stat_err: poisson constraint
       if(npNameIn.find("gamma_stat") == string::npos)
         npVarName="gamma_stat_"+npName;
@@ -163,14 +169,14 @@ void SysText::addSys(const TString& npName, double low, double up)
 RooAbsReal* SysText::GetSys(const char* name) {
     string nameIn=Form("%s", name);
 
-    if (low_.size() < 1){ 
+    if (low_.size() < 1){
         log_info("%s: Tried GetSys but I don't have any systematics... returning NULL", file_name_.c_str());
         return NULL;
     }
-    if(nameIn.find("gamma_stat") == string::npos) { 
+    if(nameIn.find("gamma_stat") == string::npos) {
       auto* fiv = new RooStats::HistFactory::FlexibleInterpVar(name, name, np_, 1., low_, high_);
       // 4: piece-wise log outside boundaries, polynomial interpolation inside
-      fiv->setAllInterpCodes(4); 
+      fiv->setAllInterpCodes(4);
       return fiv;
     } else { // MC stat
       if(gamma_.getSize() < 1) {
@@ -218,12 +224,12 @@ void SysText::Print() const{
 }
 
 
-void SysText::SetCutoff(float in){ 
+void SysText::SetCutoff(float in){
     log_info("received call to SysText::SetCutoff... overriding %.6f to %.6f",m_cutoff,in);
     m_cutoff=in;
 }
 
-void SysText::SetMCStatCutoff(float in){ 
+void SysText::SetMCStatCutoff(float in){
     log_info("received call to SysText::SetMCStatCutoff... overriding %.6f to %.6f",m_cutoff_mcstat,in);
     m_cutoff_mcstat=in;
 }

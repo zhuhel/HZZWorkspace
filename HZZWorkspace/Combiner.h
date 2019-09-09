@@ -18,6 +18,15 @@
 #include <vector>
 #include <map>
 using namespace std;
+
+//-----------------------------------------------------------------------------
+// Header file for class Combiner
+//
+// "Combiner" class -
+// This class reads a supplied configuration file and coordinates the create of
+// a RooWorkspace containing the data, MC, and likelihood described in the config.
+//-----------------------------------------------------------------------------
+
 class Combiner{
 
     public:
@@ -45,9 +54,9 @@ class Combiner{
         TChain* mc_chain;
         map<string, Coefficient*> allCoefficients; // map for co-efficients
         SystematicsManager* sysMan;
-	
-	std::string weight_var_name;//name of weight variable in minitree, default is 'weight'
-	
+
+	      std::string weight_var_name;//name of weight variable in minitree, default is 'weight'
+
 
         // operations
         string findCategoryConfig(const string& cat_name, const string& name);

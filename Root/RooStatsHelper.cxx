@@ -23,6 +23,16 @@
 #include "HZZWorkspace/RooStatsHelper.h"
 #include "HZZWorkspace/Helper.h"
 
+//-----------------------------------------------------------------------------
+// Statistics helper class to
+// * facilitate minimization
+// * create NLL
+// * create Asimov data
+// * estimate significance
+// * generate toys
+// * scan POI
+// * get observed number of events
+//-----------------------------------------------------------------------------
 
 void RooStatsHelper::setDefaultMinimize(){
   ROOT::Math::MinimizerOptions::SetDefaultMinimizer("Minuit2");
@@ -37,7 +47,7 @@ RooFitResult* RooStatsHelper::minimize(RooNLLVar* nll, RooWorkspace* ){
     return minimize(nll);
 }
 
-RooFitResult* RooStatsHelper::minimize(RooNLLVar* nll, 
+RooFitResult* RooStatsHelper::minimize(RooNLLVar* nll,
         bool save, const RooArgSet* minosSet)
 {
     nll->enableOffsetting(true);
@@ -47,9 +57,9 @@ RooFitResult* RooStatsHelper::minimize(RooNLLVar* nll,
     if (printLevel < 0) RooMsgService::instance().setGlobalKillBelow(RooFit::FATAL);
 
     int strat = ROOT::Math::MinimizerOptions::DefaultStrategy();
-  
+
     RooMinimizer minim(*nll);
-    minim.optimizeConst(2); 
+    minim.optimizeConst(2);
     minim.setStrategy(strat);
     minim.setPrintLevel(printLevel);
     // minim.setProfile();  // print running time
@@ -125,7 +135,7 @@ void RooStatsHelper::setVarfixed(RooWorkspace* combined, const char* varName, do
         cout<<varName<<" fixed to " << value<<endl;
         _var->setVal(value);
         _var->setConstant(1);
-    } 
+    }
     else {
         cout << "Error: cannot find " << varName <<endl;
     }
@@ -149,15 +159,15 @@ pair<double,double> RooStatsHelper::getVarVal(const RooWorkspace& combined, cons
     if (mhiggs) {
         return make_pair(mhiggs ->getVal(),mhiggs->getError());
     } else {
-        return make_pair(-9999.,-9999.); 
+        return make_pair(-9999.,-9999.);
     }
 }
 
 RooNLLVar* RooStatsHelper::createNLL(RooAbsData* _data, RooStats::ModelConfig* _mc)
 {
     const RooArgSet& nuis = *_mc->GetNuisanceParameters();
-    RooNLLVar* nll = (RooNLLVar*)_mc->GetPdf()->createNLL(*_data, 
-            RooFit::Constrain(nuis), 
+    RooNLLVar* nll = (RooNLLVar*)_mc->GetPdf()->createNLL(*_data,
+            RooFit::Constrain(nuis),
             RooFit::GlobalObservables(*_mc->GetGlobalObservables())
             );
     // RooCmdArg agg = condVarSet.getSize() > 0?RooFit::ConditionalObservables(condVarSet):RooCmdArg::none(); // for conditional RooFit
@@ -166,10 +176,10 @@ RooNLLVar* RooStatsHelper::createNLL(RooAbsData* _data, RooStats::ModelConfig* _
     return nll;
 }
 
-double RooStatsHelper::getPvalue(RooWorkspace* combined, 
-        RooStats::ModelConfig* mc, 
-        RooAbsData* data, 
-        const char* muName, 
+double RooStatsHelper::getPvalue(RooWorkspace* combined,
+        RooStats::ModelConfig* mc,
+        RooAbsData* data,
+        const char* muName,
         bool isRatioLogLikelihood)
 {
     if(!combined || !mc || !data){
@@ -186,9 +196,9 @@ double RooStatsHelper::getPvalue(RooWorkspace* combined,
     } else {
         combPdf->Print();
     }
-    
+
     if (data->numEntries() <= 0) {
-        log_err("total number of events is less than 0: %d", 
+        log_err("total number of events is less than 0: %d",
                 data->numEntries());
         return 1.0;
     }
@@ -215,10 +225,10 @@ double RooStatsHelper::getPvalue(RooWorkspace* combined,
 
     PrintExpEvts(combPdf, mu, mc->GetObservables(), data);
     RooNLLVar* nll = createNLL(data, mc);
-    
+
     minimize(nll);
     double obs_nll_min = nll ->getVal();
-    cout << "mu_hat for " << data->GetName() << " " << mu->getVal() << 
+    cout << "mu_hat for " << data->GetName() << " " << mu->getVal() <<
         " " << mu->getError() << " " << obs_nll_min << endl;
     delete nll;
     PrintExpEvts(combPdf, mu, mc->GetObservables(), data);
@@ -228,7 +238,7 @@ double RooStatsHelper::getPvalue(RooWorkspace* combined,
     // combined->writeToFile("UnCond_XS_ggF_combined_HZZ_1200GeV_llqq_vvqq_afterPara.root");
 
     cout<<"Fitting background only hypothesis "<< mu->GetName()<<endl;
-    
+
     mu ->setVal(1.0e-200);
     mu ->setConstant(1);
     RooNLLVar* nllCond = createNLL(data, mc);
@@ -239,8 +249,8 @@ double RooStatsHelper::getPvalue(RooWorkspace* combined,
 
     double obs_q0 = 2*(obs_nll_min_bkg - obs_nll_min);
     if(reverse) obs_q0 = -obs_q0;
-    double sign = int(obs_q0 == 0 ? 0 : obs_q0 / fabs(obs_q0));  
-    double obs_sig = sign*sqrt(fabs(obs_q0));  
+    double sign = int(obs_q0 == 0 ? 0 : obs_q0 / fabs(obs_q0));
+    double obs_sig = sign*sqrt(fabs(obs_q0));
     cout<<"NLL min: "<< obs_nll_min <<" "<< obs_nll_min_bkg <<" "<< obs_sig<<endl;
 
     return RooStats::SignificanceToPValue(obs_sig);
@@ -248,17 +258,17 @@ double RooStatsHelper::getPvalue(RooWorkspace* combined,
 
 double RooStatsHelper::calculateSignificance(double obs_nll_min, double obs_nll_bkg){
     double obs_q0 = 2*(obs_nll_bkg - obs_nll_min);
-    double sign = int(obs_q0 == 0 ? 0 : obs_q0 / fabs(obs_q0));  
-    double obs_sig = sign*sqrt(fabs(obs_q0));  
+    double sign = int(obs_q0 == 0 ? 0 : obs_q0 / fabs(obs_q0));
+    double obs_sig = sign*sqrt(fabs(obs_q0));
     return obs_sig;
 }
 
-RooDataSet* RooStatsHelper::makeAsimovData(RooWorkspace* combined, 
-        double muval, 
-        double profileMu, 
-        const char* muName, 
-        const char* mcname, 
-        const char* dataname, 
+RooDataSet* RooStatsHelper::makeAsimovData(RooWorkspace* combined,
+        double muval,
+        double profileMu,
+        const char* muName,
+        const char* mcname,
+        const char* dataname,
         bool doprofile)
 {
     RooMsgService::instance().setGlobalKillBelow(RooFit::ERROR);
@@ -278,7 +288,7 @@ RooDataSet* RooStatsHelper::makeAsimovData(RooWorkspace* combined,
     const RooArgSet& mc_nuis  = *mcInWs->GetNuisanceParameters();
 
     RooDataSet* combData = NULL;
-    try { 
+    try {
         combData = (RooDataSet*) combined->data(dataname);
     } catch (...) {}
 
@@ -318,7 +328,7 @@ RooDataSet* RooStatsHelper::makeAsimovData(RooWorkspace* combined,
 
     mu ->setVal(profileMu);
     if (profileMu > 1)
-    { // would profile to the \hat_mu, 
+    { // would profile to the \hat_mu,
         mu ->setConstant(kFALSE);
         // mu ->setRange(-40,40); // !!!!Do that outside the function!!!
         RooNLLVar* conditioning_nll = createNLL(combData, mcInWs);
@@ -334,7 +344,7 @@ RooDataSet* RooStatsHelper::makeAsimovData(RooWorkspace* combined,
         minimize(conditioning_nll);
     }
 
-    // loop over the nui/glob list, grab the corresponding variable from the tmp ws, 
+    // loop over the nui/glob list, grab the corresponding variable from the tmp ws,
     // and set the glob to the value of the nui
     TIter glob_iter (mc_globs.createIterator());
     TIter nuis_iter (mc_nuis.createIterator());
@@ -364,7 +374,7 @@ RooDataSet* RooStatsHelper::makeAsimovData(RooWorkspace* combined,
     return adata;
 }
 
-RooDataSet* RooStatsHelper::makeUnconditionalAsimov(RooWorkspace* combined, RooStats::ModelConfig* mcInWs, const char * dataname) 
+RooDataSet* RooStatsHelper::makeUnconditionalAsimov(RooWorkspace* combined, RooStats::ModelConfig* mcInWs, const char * dataname)
 {
 
 
@@ -446,7 +456,7 @@ RooDataSet* RooStatsHelper::makeUnconditionalAsimov(RooWorkspace* combined, RooS
             if (Y) Y->setVal(hist->GetYaxis()->GetBinCenter(iy));
             if (Z) Z->setVal(hist->GetZaxis()->GetBinCenter(iz));
 
-            obsDataUnbinned->add(*obstmp, hist->GetBinContent(ix,iy,iz)); 
+            obsDataUnbinned->add(*obstmp, hist->GetBinContent(ix,iy,iz));
           }
         }
       }
@@ -502,17 +512,17 @@ void RooStatsHelper::randomizeSet(RooAbsPdf* pdf, RooArgSet* globs, int seed)
 
 void RooStatsHelper::SetRooArgSetConst(RooArgSet& argset, bool flag)
 {
-    argset.setAttribAll("Constant",flag); 
+    argset.setAttribAll("Constant",flag);
 }
-void RooStatsHelper::fitData(RooWorkspace* w, const char* mcName, 
+void RooStatsHelper::fitData(RooWorkspace* w, const char* mcName,
         const char* dataName,
         const char* muName, double poival, map<string,double>& result)
 {
     RooAbsData* data = w->data(dataName);
-    fitData(w, mcName, data, muName, poival, result); 
+    fitData(w, mcName, data, muName, poival, result);
 }
 
-void RooStatsHelper::fitData(RooWorkspace* w, const char* mcName, 
+void RooStatsHelper::fitData(RooWorkspace* w, const char* mcName,
         RooAbsData* data,
         const char* muName, double poival, map<string,double>& result)
 {
@@ -534,7 +544,7 @@ void RooStatsHelper::fitData(RooWorkspace* w, const char* mcName,
   int status = (minimize(nll_SBfixed) == NULL)?0:1;
 
   result["nll_SB_fixed"] = nll_SBfixed->getVal();
-  result["poi_SB_fixed"] = muVar->getVal(); 
+  result["poi_SB_fixed"] = muVar->getVal();
   result["status_SB_fixed"] = status*1.0;
   delete nll_SBfixed;
 
@@ -547,7 +557,7 @@ void RooStatsHelper::fitData(RooWorkspace* w, const char* mcName,
   RooNLLVar* nll_SBfree = createNLL(data, mc);
   status = (minimize(nll_SBfree) == NULL)?0:1;
   result["nll_SB_free"] = nll_SBfree->getVal();
-  result["poi_SB_free"] = muVar->getVal(); 
+  result["poi_SB_free"] = muVar->getVal();
   result["status_SB_free"] = status*1.0;
   delete nll_SBfree;
   w->saveSnapshot("bestNP", *nuisanceParameters);
@@ -557,12 +567,12 @@ void RooStatsHelper::fitData(RooWorkspace* w, const char* mcName,
 
 
 
-void RooStatsHelper::generateToy(RooWorkspace* w , 
-        const char* poi_name, double poi_value, int seed, 
+void RooStatsHelper::generateToy(RooWorkspace* w ,
+        const char* poi_name, double poi_value, int seed,
         map<string, double>& result)
 {
     /**
-     * before call this function, 
+     * before call this function,
      * perform conditional fit first
      * and saved snapshot of NP and GO(global observables)
      * w->saveSnapshot("condNP", *(mc->GetNuisanceParameters()));
@@ -598,7 +608,7 @@ void RooStatsHelper::generateToy(RooWorkspace* w ,
     RooNLLVar* nll_SBfree = createNLL(toyData, mc);
     int status = (minimize(nll_SBfree) == NULL)?0:1;
     result["nll_SB_free"] = nll_SBfree->getVal();
-    result["poi_SB_free"] = muVar->getVal(); 
+    result["poi_SB_free"] = muVar->getVal();
     result["status_SB_free"] = status*1.0;
     delete nll_SBfree;
 
@@ -609,7 +619,7 @@ void RooStatsHelper::generateToy(RooWorkspace* w ,
     RooNLLVar* nll_SBfixed = createNLL(toyData, mc);
     status = (minimize(nll_SBfixed) == NULL)?0:1;
     result["nll_SB_fixed"] = nll_SBfixed->getVal();
-    result["poi_SB_fixed"] = muVar->getVal(); 
+    result["poi_SB_fixed"] = muVar->getVal();
     result["status_SB_fixed"] = status*1.0;
     delete nll_SBfixed;
 
@@ -625,7 +635,7 @@ void RooStatsHelper::generateToy(RooWorkspace* w ,
     RooNLLVar* nll_Bonly = createNLL(toyData, mc);
     status = (minimize(nll_Bonly) == NULL)?0:1;
     result["nll_B_fixed"] = nll_Bonly->getVal();
-    result["poi_B_fixed"] = muVar->getVal(); 
+    result["poi_B_fixed"] = muVar->getVal();
     result["status_B_fixed"] = status*1.0;
     delete nll_Bonly;
 
@@ -636,9 +646,9 @@ void RooStatsHelper::generateToy(RooWorkspace* w ,
     cout << "out of generating toys: " << endl;
 }
 
-bool RooStatsHelper::ScanPOI(RooWorkspace* ws, 
+bool RooStatsHelper::ScanPOI(RooWorkspace* ws,
         const string& data_name,
-        const string& poi_name, 
+        const string& poi_name,
         int total, double low, double hi,
         TTree* tree)
 {
@@ -677,7 +687,7 @@ bool RooStatsHelper::ScanPOI(RooWorkspace* ws,
     //get best fit
     RooNLLVar* nll = createNLL(dataset, mc_config);
 
-    int status = (minimize(nll) == NULL)?0:1 ; 
+    int status = (minimize(nll) == NULL)?0:1 ;
     timer.Stop();
     cout<<"One fit takes: "<< endl; Helper::printStopwatch(timer);
     timer.Reset(); timer.Start();
@@ -706,7 +716,7 @@ bool RooStatsHelper::ScanPOI(RooWorkspace* ws,
 }
 
 void RooStatsHelper::unfoldConstraints(
-        RooArgSet& initial, RooArgSet& final_, 
+        RooArgSet& initial, RooArgSet& final_,
         RooArgSet& obs, RooArgSet& nuis, int& counter
         )
 {
@@ -740,7 +750,7 @@ void RooStatsHelper::unfoldConstraints(
   delete itr;
 }
 
-void RooStatsHelper::PrintExpEvts(RooAbsPdf* inputPdf, 
+void RooStatsHelper::PrintExpEvts(RooAbsPdf* inputPdf,
         RooRealVar* mu, const RooArgSet* obs, RooAbsData* data)
 {
     auto simPdf = dynamic_cast<RooSimultaneous*>(inputPdf);
@@ -763,7 +773,7 @@ void RooStatsHelper::PrintExpEvts(RooAbsPdf* inputPdf,
         mu->setVal(old_mu);
         double all_evts = pdf->expectedEvents(*obs);
         double data_ch = (data_lists != NULL)? (dynamic_cast<RooDataSet*>(data_lists->At(obj->getVal())))->sumEntries() : 0;
-        
+
         printf("%s %.3f %.3f %.3f %.3f\n", label_name, all_evts, all_evts-bkg_evts, bkg_evts, data_ch);
     }
     mu->setVal(old_mu);
@@ -801,7 +811,7 @@ RooAbsData* RooStatsHelper::generatePseudoData(RooWorkspace* w, const char* poi_
 {
     cout<<"in generate pseudo-data with seed: "<< seed << ", poi name: " << poi_name << endl;
     /**
-     * before call this function, 
+     * before call this function,
      * perform conditional fit first
      * and saved snapshot of NP and GO(global observables)
      * w->saveSnapshot("condNP", *(mc->GetNuisanceParameters()));
@@ -826,7 +836,7 @@ RooAbsData* RooStatsHelper::generatePseudoData(RooWorkspace* w, const char* poi_
     RooArgSet* nuisanceParameters = (RooArgSet*) mc->GetNuisanceParameters();
     RooArgSet* globalObservables = (RooArgSet*) mc->GetGlobalObservables();
 
-    /* Fix nuisance parameters, 
+    /* Fix nuisance parameters,
      * set global observables to np values,
      * need to match the global to the nuisance!
      * make asimov data **/
@@ -951,7 +961,7 @@ RooAbsData* RooStatsHelper::generatePseudoData(RooWorkspace* w, const char* poi_
     return toyData;
 }
 
-bool RooStatsHelper::fixTermsWithPattern(RooStats::ModelConfig* mc, const char* pat) 
+bool RooStatsHelper::fixTermsWithPattern(RooStats::ModelConfig* mc, const char* pat)
 {
     RooArgSet nuis(*mc->GetNuisanceParameters());
     TIter iter(nuis.createIterator());
@@ -964,7 +974,7 @@ bool RooStatsHelper::fixTermsWithPattern(RooStats::ModelConfig* mc, const char* 
     return true;
 }
 
-void RooStatsHelper::fixVariables(RooWorkspace* workspace, const string& options, RooStats::ModelConfig* mc) 
+void RooStatsHelper::fixVariables(RooWorkspace* workspace, const string& options, RooStats::ModelConfig* mc)
 {
     // options can be like: "mG:750,GkM:0.02,noSys"
     // or "mH=750,width=200,noSys"
@@ -1046,7 +1056,7 @@ bool RooStatsHelper::CheckNuisPdfConstraint(const RooArgSet* nuis, const RooArgS
         RooRealVar* nuisVal;
         RooAbsPdf* pdfCon;
         while((nuisVal = (RooRealVar*)iterNuis->Next())){
-            TString constrainName(Form("%sConstraint",nuisVal->GetName())); 
+            TString constrainName(Form("%sConstraint",nuisVal->GetName()));
             if(pdfConstraint->find(constrainName.Data()) == NULL){
                 cout <<nuisVal->GetName()<<" not Constraint"<<endl;
             }

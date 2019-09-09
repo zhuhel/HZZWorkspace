@@ -1,7 +1,7 @@
 // =========================================================================
-// 
-//    Description:  
-// 
+//
+//    Description:
+//
 // ==========================================================================
 #include "HZZWorkspace/CBGauss.h"
 #include "HZZWorkspace/RelativisticBW.h"
@@ -31,13 +31,22 @@
 
 using namespace RooStats;
 using namespace HistFactory;
+//-----------------------------------------------------------------------------
+// Crystal-Ball + Gaussian (CBG) PDF for high mass analysis
+// * NWA
+// * LWA, no interference
+// * LWA, with interference
+// Breit-Wigner convoluted with CBG for LWA
+//
+// mH bounds currently hardcoded!!!
+//-----------------------------------------------------------------------------
 
-CBGauss::CBGauss(const char* _name, 
-        const char* _input,  
+CBGauss::CBGauss(const char* _name,
+        const char* _input,
         const char* _shape_sys,
-        bool _doConv,
+        bool _doConv, // Large width
         bool _doSys,
-        bool _add_int
+        bool _add_int // Add interference given large width scenario
         ) : SampleBase(_name),
     inputParameterFile(_input),
     workspace(new RooWorkspace(Form("CBGauss_%s", _name))),
@@ -67,7 +76,7 @@ CBGauss::~CBGauss()
     if(mH) delete mH;
     //delete workspace;
     delete masses_;
-    
+
     if(doSys) {
         for (size_t i=0; i<shape_mean_sys_.size(); ++i)
             delete shape_mean_sys_[i];
@@ -83,7 +92,7 @@ bool CBGauss::setChannel(const RooArgSet& _obs, const char* _ch_name, bool with_
 {
     SampleBase::setChannel(_obs,_ch_name,with_sys);
     textInputParameterValues.clear(); // clean up and get prepared
-    
+
     if (doSys){
         std::cout<<"setting channel for shape_mean_sys_"<<std::endl;
         for (auto& s: shape_mean_sys_)
@@ -162,7 +171,7 @@ void CBGauss::makeCBGParameterization()
     RooPolyVar sGA( ( base_name_ + "_sGA" ).Data(), "CB #mu", *mH, RooArgList( *a0ga, *a1ga, *a2ga, *a3ga, *a4ga ) );
     workspace->import(sGA);
 
-    //The f parameter 
+    //The f parameter
     RooAbsReal* f0cb = variable("CB_f_p0");
     RooAbsReal* f1cb = variable("CB_f_p1");
     RooAbsReal* f2cb = variable("CB_f_p2");
@@ -248,7 +257,7 @@ bool CBGauss::addShapeSys(const TString& npName)
     bool resultSigma = true;                                  //Sigma shape systematics
     if (!resultCB){
         for(const auto& nSysHandler : shape_sigma_sys_){
-            if(! nSysHandler->AddSys(npName)){ 
+            if(! nSysHandler->AddSys(npName)){
                 resultSigma = false;
             }
         }
@@ -301,7 +310,7 @@ RooAbsPdf* CBGauss::getPDF()
     }
 
 
-    //build pdfs 
+    //build pdfs
     RooCBShape* tmpcb=new RooCBShape( ( base_name_ + "_cb" ).Data(), "Crystal Ball", m, *mean, *sCB, *alphaCB, *nCB );
     RooGaussian* tmpga=new RooGaussian( ( base_name_ + "_ga" ).Data(), "Gaussian", m, *mean, *sGA );
     RooAbsPdf* finalPdf=new RooAddPdf( (base_name_  + "_cbga" ).Data(), "Crystal Ball + Gaussian", *tmpcb , *tmpga , *fCB );
@@ -414,7 +423,7 @@ void CBGauss::loadTextInputFile()
         exit(3);
     }
 
-    cout << "Parsed " << parsedLines << " lines from input text file " 
+    cout << "Parsed " << parsedLines << " lines from input text file "
         << gSystem->ExpandPathName(fullFileName.c_str()) << endl;
     if (parsedLines==0) {
         exit(3);
@@ -487,7 +496,7 @@ RooAbsReal* CBGauss::variable(const string& parname)
     return (RooProduct*)workspace->obj(name.c_str());
 }
 
-FlexibleInterpVar* CBGauss::flexibleInterpVar(const string& fivName, vector<string>& names, 
+FlexibleInterpVar* CBGauss::flexibleInterpVar(const string& fivName, vector<string>& names,
         vector<double>& lowValues, vector<double>& highValues)
 {
     RooArgList variables;
@@ -543,7 +552,7 @@ RooAbsReal* CBGauss::getShapeSys(std::string name)
     std::string outputName = category_name_;
 
     std::vector<SysText*>* sysvec;
-    if (name=="mean") { 
+    if (name=="mean") {
         sysvec = &shape_mean_sys_;
     } else if (name=="sigma") {
         sysvec = &shape_sigma_sys_;

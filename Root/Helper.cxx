@@ -15,8 +15,18 @@
 
 #include <algorithm>
 
-namespace Helper{
+//-----------------------------------------------------------------------------
+// Operational class to assist Combiner class and others
+// * Toolbox of extra methods
+//
+// Warning: several static variables assigned through these methods
+// - addPoiName()
+// - getAndImportPath()
+// - getWorkspace()
+// - getSysCutoff()
+//-----------------------------------------------------------------------------
 
+namespace Helper{
 
 bool readConfig(const char* filename, char delim,
         map<string, map<string, string> >& all_dic)
@@ -34,7 +44,7 @@ bool readConfig(const char* filename, char delim,
     string tagName;
     string token;
     while ( getline(file, line) )
-    { 
+    {
         boost::algorithm::trim(line);
         if (line.empty()) continue;
         if( line[0] == '[' ){
@@ -129,7 +139,7 @@ tstrvec fileList(const char* pattern, std::map<float, TString>* map)
 }
 
 
-void readAcceptancePoly(std::vector<double>& params, const char* prod, const char* chan, const char* sys) { 
+void readAcceptancePoly(std::vector<double>& params, const char* prod, const char* chan, const char* sys) {
 
     if (!params.empty()){
     cerr <<"ERROR: "<< __func__ <<" given params vector must be empty!"<<endl;
@@ -147,7 +157,7 @@ void readAcceptancePoly(std::vector<double>& params, const char* prod, const cha
         //loop until we find right sys
         while (getline(myfile, line) ){
           if (line.find(sys)!=string::npos){
-            paramString = line; 
+            paramString = line;
             break;
           }
         }
@@ -238,13 +248,13 @@ RooAbsPdf* createMCStatConstraint(const char* npName, RooRealVar* np, RooArgList
     RooPoisson*  roo_poisson = new RooPoisson(constr_id.Data(), constr_id.Data(), *roo_nominal, *roo_poismean);
     roo_poisson->setNoRounding(true);
 
-    if(globalSet) 
+    if(globalSet)
       if(! globalSet->contains(*roo_nominal) ) globalSet->addClone(*roo_nominal);
 
     return roo_poisson;
 }
 
-void readNormTable(const char* file_name, 
+void readNormTable(const char* file_name,
         dbldic& all_norm_dic,
         double multiplier )
 {
@@ -286,7 +296,7 @@ void readNormTable(const char* file_name,
             all_norm_dic[cat_name] = sample_dic;
             sample_dic.clear();
         }
-    } 
+    }
     file.close();
     cout << "end of reading normalization table: " << file_name << endl;
 }
@@ -299,7 +309,7 @@ void readScaleFile(const char* file_name, map<string, double>& all_dic)
    while (file >> sample_name >> scale_value){
         all_dic[sample_name] = scale_value;
    }
-  file.close(); 
+  file.close();
 }
 
 TChain* loader(const string& inFile_name, const string& chain_name)
@@ -441,10 +451,10 @@ void getListOfNames(const string& cut, strvec& name_list, strmap& name_map) {
         if(currStr.IsFloat()) name_list.erase(name_list.begin() + i);
     }
 
-    // remove duplicated names. 
+    // remove duplicated names.
     // unique--> only remove duplication if two objects are nearby
-    // therefore need to sort vector first, then call unique.. 
-    // But I don't want to do that. 
+    // therefore need to sort vector first, then call unique..
+    // But I don't want to do that.
     // Orders matter!
     strvec new_list;
     new_list.clear();
@@ -476,9 +486,9 @@ void getListOfNames(const string& cut, strvec& name_list, strmap& name_map) {
               exit(1);
             }
           } else indx = cutStr_org.Index(x, indx+1); // find the next one
-        } 
+        }
         if(!found_range) name_map[x]="";
-      } 
+      }
     }
 
 }
@@ -490,7 +500,7 @@ void readObservable(const string& str, vector<string>& obs_str, string& branch_n
     if(obs_str.at(0).find(":") != string::npos){
       vector<string> tmp_vec;
       Helper::tokenizeString(obs_str.at(0), ':', tmp_vec);
-      branch_name = tmp_vec.at(0); 
+      branch_name = tmp_vec.at(0);
       obs_str.at(0) = tmp_vec.at(1);
       }
     else{ // uses leftmost part of branch name: varName_aaaa_bbbb
@@ -498,13 +508,13 @@ void readObservable(const string& str, vector<string>& obs_str, string& branch_n
       vector<string> tmp;
       Helper::tokenizeString(obs_str.at(0), '_', tmp);
       obs_str.at(0) = tmp.at(0);
-      } 
-} 
+      }
+}
 
 std::string removeSpaces(const std::string& s){TString s2=s.c_str();s2.ReplaceAll(" ","");return s2.Data();}
 
 std::string extractDecay(const std::string& s){
-    const char* n[4]={"4mu","4e","2e2mu","2mu2e"}; 
+    const char* n[4]={"4mu","4e","2e2mu","2mu2e"};
     for (int i(0);i<4;++i) if (s.find(n[i])!=std::string::npos) return n[i];
     return "";
 }
@@ -515,8 +525,8 @@ bool isMathSyntax(const string& str){
 }
 
 int isBoolean(const string& str){
-    if (!(str=="true" || str=="false" || 
-                str=="1" || str=="0" || 
+    if (!(str=="true" || str=="false" ||
+                str=="1" || str=="0" ||
                 str=="t" || str=="f"))
     {
         return -1;

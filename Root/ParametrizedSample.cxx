@@ -12,6 +12,10 @@ using namespace std;
 
 #include "HZZWorkspace/ParametrizedSample.h"
 
+//-----------------------------------------------------------------------------
+// PDF class to create RooParamKeysPDFs 
+//-----------------------------------------------------------------------------
+
 ParametrizedSample::ParametrizedSample(const char* name,
         const char* para_name, float low, float hi):
     SampleBase(name),
@@ -25,9 +29,9 @@ ParametrizedSample::ParametrizedSample(const char* name,
 }
 
 ParametrizedSample::~ParametrizedSample(){
-    for(auto sample : *signal_samples_) 
+    for(auto sample : *signal_samples_)
         if(sample) delete sample;
-   
+
     if(signal_samples_) delete signal_samples_;
     if(masses_) delete masses_;
     if(mH_) delete mH_;
@@ -42,7 +46,7 @@ bool ParametrizedSample::AddSample(SampleBase* signal)
     return true;
 }
 
-bool ParametrizedSample::setChannel(const RooArgSet& observable, 
+bool ParametrizedSample::setChannel(const RooArgSet& observable,
         const char* channelName, bool with_sys)
 {
     SampleBase::setChannel(observable, channelName, with_sys);
@@ -77,9 +81,9 @@ RooAbsPdf* ParametrizedSample::getPDF()
         controlPoints->add(*(sample->getPDF()) );
     }
     const char* bs_pdf_name = Form("bs_%s", base_name_.Data());
-    auto* bs_pdf = new RooStats::HistFactory::RooBSpline(bs_pdf_name, bs_pdf_name, *controlPoints, *bases_, RooArgSet()); 
+    auto* bs_pdf = new RooStats::HistFactory::RooBSpline(bs_pdf_name, bs_pdf_name, *controlPoints, *bases_, RooArgSet());
     const char* category_pdf_name = Form("%s_Para", base_name_.Data());
-    auto* one = new RooRealVar("one", "one", 1.0); 
+    auto* one = new RooRealVar("one", "one", 1.0);
     return new RooRealSumPdf(category_pdf_name, category_pdf_name, RooArgList(*bs_pdf), RooArgList(*one));
 }
 

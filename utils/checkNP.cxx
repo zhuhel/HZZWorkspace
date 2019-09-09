@@ -155,7 +155,7 @@ int main(int argc, char* argv[]){
             leg->SetTextSize(doMini?0.05:0.035);
             leg->AddEntry(hist_down, "Down", "F");
             leg->AddEntry(hist_up,   "Up", "F");
-            leg->Draw(); 
+            leg->Draw();
             TLatex* lm = new TLatex();
             lm->SetTextSize(doMini?0.06:0.035);
             lm->SetTextFont(42);
@@ -177,4 +177,3 @@ int main(int argc, char* argv[]){
         }
     }
 }
-

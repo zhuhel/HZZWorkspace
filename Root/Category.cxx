@@ -15,6 +15,12 @@
 #include <RooDataHist.h>
 
 #include "HZZWorkspace/Helper.h"
+//-----------------------------------------------------------------------------
+// Operational class to define a given category, including
+// * Samples within that category
+// * Systematics to associate to the category (via SystematicsManager)
+//-----------------------------------------------------------------------------
+
 //________________________________________________________________________
     Category::Category(const string& label)
     : m_label(label)
@@ -24,7 +30,7 @@
 }
 
 //________________________________________________________________________
-Category::~Category() 
+Category::~Category()
 {
     for(auto sample : sample_container_){
         if(sample) delete sample;
@@ -71,7 +77,7 @@ void Category::addSample(SampleBase* sample, SystematicsManager* sysMan){
     if(!sample_pdf){
         log_err("Cannot find pdf for %s in %s", sample->get_pdf_name().c_str(), m_label.c_str());
         return;
-    } 
+    }
 
     RooHistPdf* histPdf = dynamic_cast<RooHistPdf*> (sample_pdf);
     if(histPdf)
@@ -81,7 +87,7 @@ void Category::addSample(SampleBase* sample, SystematicsManager* sysMan){
         {
             log_info("CheckStats - stats less than cutoff threshold dropping %s",sample->get_pdf_name().c_str());
             log_info("CheckStats - cat: %s",m_label.c_str());
-            
+
             return;
         }
     }

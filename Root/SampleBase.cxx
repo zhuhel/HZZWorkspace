@@ -1,7 +1,10 @@
 // =========================================================================
+// Operational class to define a common interface for all shape PDFs
 //
-//    Description:
+// Base class: all other samples (shape PDF classes) in this codebase derive
+// from this class
 //
+// Main user function: SampleBase.getPDF()
 // ==========================================================================
 #include "HZZWorkspace/SampleBase.h"
 #include <iostream>
@@ -14,6 +17,7 @@
 SampleBase::SampleBase(const char* _name):
     pdf_name_(_name)
 {
+  // Constructing this class produces a dummy uniform shape
     nickname_ = pdf_name_.substr(pdf_name_.find_last_of('_')+1);
     mc_constraint = nullptr;
     use_adpt_bin_ = false;
@@ -74,7 +78,7 @@ void SampleBase::useAdaptiveBinning(){
 void SampleBase::addCoefficient(Coefficient* c){
   if (c)
     coef_ = c;
-  else 
+  else
     log_err("Empty coefficient given! :(");
 }
 

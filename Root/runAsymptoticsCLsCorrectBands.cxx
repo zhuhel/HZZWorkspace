@@ -1,3 +1,8 @@
+//-----------------------------------------------------------------------------
+// Limit setting class, imported from Run 1
+//-----------------------------------------------------------------------------
+
+
 /*
 Author: Aaron Armbruster
 Date:   2012-05-25
@@ -24,15 +29,15 @@ Description: Script to run asymptotic CLs.
 //////PREAMBLE///////
 /////////////////////
 
-The script uses an iterative process to find the crossing of qmu with the qmu95(mu/sigma) curve, 
-where qmu95(mu/sigma) is found assuming asymptotic formula for the distribution of the 
+The script uses an iterative process to find the crossing of qmu with the qmu95(mu/sigma) curve,
+where qmu95(mu/sigma) is found assuming asymptotic formula for the distribution of the
 test statistic f(qmu|mu') (arxiv 1007.1727) and of the test statistic qmu (or tilde)
 
 The sequence is
 
 mu_i+1 = mu_i - gamma_i*(mu_i - mu'_i)
 
-where gamma_i is a dynamic damping factor used for convergence (nominal gamma_i = 1), and mu'_i is 
+where gamma_i is a dynamic damping factor used for convergence (nominal gamma_i = 1), and mu'_i is
 determined by extrapolating the test statistic to the qmu95 curve assuming qmu is parabolic:
 
 qmu'_i = (mu'_i - muhat)^2 / sigma_i^2 = qmu95(mu'_i / sigma_i)
@@ -41,7 +46,7 @@ where sigma_i is determined by computing qmu_i (not '):
 
 sigma_i = (mu_i - muhat) / sqrt(qmu_i)
 
-At the crossing qmu_N = qmu95 the assumption that qmu is a parabola goes away, 
+At the crossing qmu_N = qmu95 the assumption that qmu is a parabola goes away,
 so we're not ultimately dependent on this assumption beyond its use in the asymptotic formula.
 
 The sequence ends when the relative correction factor gamma*(mu_i - mu'_i) / mu_i is less than some
@@ -68,7 +73,7 @@ The root file has a 7-bin TH1D named 'limit', where each bin is filled with the 
 6: -2 sigma
 7: mu=0 fit status (only meaningful if asimov data is generated within the macro)
 
-It will also store the result of the old bands procedure in a TH1D named 'limit_old'. 
+It will also store the result of the old bands procedure in a TH1D named 'limit_old'.
 
 
 
@@ -111,7 +116,7 @@ NOTE: The script runs significantly faster when compiled
 #include <sstream>
 #include <iomanip>
 
-using std::cout; 
+using std::cout;
 using std::endl;
 using namespace RooFit;
 using namespace RooStats;
@@ -209,7 +214,7 @@ void runAsymptoticsCLs(const char* infile,
     return;
   }
 
-  auto firstPOI_ = (RooRealVar*) w->var(muName); 
+  auto firstPOI_ = (RooRealVar*) w->var(muName);
   if(!firstPOI_ || firstPOI_ ==NULL){
       cout<< muName <<" does not exist"<<endl;
   }
@@ -221,15 +226,15 @@ void runAsymptoticsCLs(const char* infile,
       cout << "ERROR::Dataset: " << dataName << " doesn't exist!" << endl;
       return;
   }
-  
+
   //
   run_limit(w_, mc_, data_, firstPOI_, asimovDataName);
 }
 
-void run_limit(RooWorkspace* ws_, ModelConfig* mc_, 
-        RooDataSet* data_, RooRealVar* firstPOI_, 
+void run_limit(RooWorkspace* ws_, ModelConfig* mc_,
+        RooDataSet* data_, RooRealVar* firstPOI_,
         const char* /*asimovDataName*/,
-        stringstream* out_ss) 
+        stringstream* out_ss)
 {
   cout<<"inside run_limit"<<std::endl;
 
@@ -254,7 +259,7 @@ void run_limit(RooWorkspace* ws_, ModelConfig* mc_,
   }
   w = ws_;
   mc = mc_;
-  localdata = data_; 
+  localdata = data_;
   firstPOI = firstPOI_;
 
   double CL = 0.95;
@@ -321,7 +326,7 @@ void run_limit(RooWorkspace* ws_, ModelConfig* mc_,
   double mu_up_n1 = mu_up_n1_approx;
   double mu_up_n2 = mu_up_n2_approx;
 
-  cout<<"proximation: "<< mu_up_n2_approx <<" "<<mu_up_n1_approx<<" "<< med_limit<<" "<<mu_up_p1_approx<<" "<<mu_up_p2_approx<<" "<<endl; 
+  cout<<"proximation: "<< mu_up_n2_approx <<" "<<mu_up_n1_approx<<" "<< med_limit<<" "<<mu_up_p1_approx<<" "<<mu_up_p2_approx<<" "<<endl;
   firstPOI->setRange(-5*sigma, 5*sigma);
   map<int, int> N_status;
   if (betterBands && doExp) // no better time than now to do this
@@ -431,7 +436,7 @@ void run_limit(RooWorkspace* ws_, ModelConfig* mc_,
   cout << "Median:   " << med_limit << endl;
   cout << "Observed: " << obs_limit << endl;
   cout << endl;
-  cout <<"Limit: " 
+  cout <<"Limit: "
       << mu_up_n2 <<" "
       << mu_up_n1 <<" "
       << med_limit<<" "
@@ -460,7 +465,7 @@ double getLimit(RooNLLVar* nll, double initial_guess)
     cout<<"Range of mu: "<< firstPOI ->GetName()<<" "<<firstPOI ->getMin()<<" "<< firstPOI ->getMax()<<endl;
     global_status=0;
 
-    if (nll == asimov_0_nll) 
+    if (nll == asimov_0_nll)
     {
         std::cout<<"nll is asimov"<<std::endl;
         setMu(0);
@@ -537,7 +542,7 @@ double getLimit(RooNLLVar* nll, double initial_guess)
         if (nll != asimov_0_nll)
         {
             if (nrItr == 0) loadSnapshot(asimov_0_nll, map_nll_muhat[asimov_0_nll]);
-            else if (usePredictiveFit) 
+            else if (usePredictiveFit)
             {
                 if (nrItr == 1) doPredictiveFit(nll, map_nll_muhat[asimov_0_nll], mu_pre, mu_guess);
                 else doPredictiveFit(nll, mu_pre2, mu_pre, mu_guess);
@@ -556,7 +561,7 @@ double getLimit(RooNLLVar* nll, double initial_guess)
         double corr = damping_factor*(mu_guess - findCrossing(sigma_guess, sigma_b, muhat));
         for (map<double, double>::iterator itr=guess_to_corr.begin();itr!=guess_to_corr.end();itr++)
         {
-            if (fabs(itr->first - (mu_guess-corr)) < direction*mu_guess*0.02 && fabs(corr) > direction*mu_guess*precision) 
+            if (fabs(itr->first - (mu_guess-corr)) < direction*mu_guess*0.02 && fabs(corr) > direction*mu_guess*precision)
             {
                 damping_factor *= 0.8;
                 cout << "Changing damping factor to " << damping_factor << ", nrDamping = " << nrDamping << endl;
@@ -748,7 +753,7 @@ double findCrossing(double sigma_obs, double sigma, double muhat)
         double corr = damping_factor*(qmu-qmu95)/dqmu_dmu;
         for (map<double, double>::iterator itr=guess_to_corr.begin();itr!=guess_to_corr.end();itr++)
         {
-            if (fabs(itr->first - mu_guess) < direction*mu_guess*precision) 
+            if (fabs(itr->first - mu_guess) < direction*mu_guess*precision)
             {
                 damping_factor *= 0.8;
                 if (verbose) cout << "Changing damping factor to " << damping_factor << ", nrDamping = " << nrDamping << endl;
@@ -834,7 +839,7 @@ double getQmu95(double sigma, double mu)
             double corr = damping_factor*(calcCLs(qmu95_guess, sigma, mu)-target_CLs)/calcDerCLs(qmu95_guess, sigma, mu);
             for (map<double, double>::iterator itr=guess_to_corr.begin();itr!=guess_to_corr.end();itr++)
             {
-                if (fabs(itr->first - qmu95_guess) < 2*qmu95_guess*precision) 
+                if (fabs(itr->first - qmu95_guess) < 2*qmu95_guess*precision)
                 {
                     damping_factor *= 0.8;
                     if (verbose) cout << "Changing damping factor to " << damping_factor << ", nrDamping = " << nrDamping << endl;
@@ -852,7 +857,7 @@ double getQmu95(double sigma, double mu)
 
             if (verbose)
             {
-                cout << "next guess = " << qmu95_guess << endl; 
+                cout << "next guess = " << qmu95_guess << endl;
                 cout << "precision = " << 2*qmu95_guess*precision << endl;
                 cout << endl;
             }
@@ -866,7 +871,7 @@ double getQmu95(double sigma, double mu)
         qmu95 = qmu95_guess;
     }
 
-    if (qmu95 != qmu95) 
+    if (qmu95 != qmu95)
     {
         qmu95 = getQmu95_brute(sigma, mu);
     }
@@ -925,7 +930,7 @@ double calcDerCLs(double qmu, double sigma, double mu)
         double zmu = sqrt(qmu);
         dpmu_dq = -1./(2*sqrt(qmu*2*TMath::Pi()))*exp(-zmu*zmu/2);
     }
-    else 
+    else
     {
         double zmu = (qmu+mu*mu/(sigma*sigma))/(2*fabs(mu/sigma));
         dpmu_dq = -1./(2*fabs(mu/sigma))*1./(sqrt(2*TMath::Pi()))*exp(-zmu*zmu/2);
@@ -1144,7 +1149,7 @@ RooDataSet* makeAsimovData(bool doConditional, RooNLLVar* conditioning_nll, doub
         //RooRealVar* thisNui = (RooRealVar*)pdf->getObservables();
 
 
-        //need this incase the observable isn't fundamental. 
+        //need this incase the observable isn't fundamental.
         //in this case, see which variable is dependent on the nuisance parameter and use that.
         RooArgSet* components = pdf->getComponents();
         //     cout << "\nPrinting components" << endl;
@@ -1474,7 +1479,7 @@ RooDataSet* makeAsimovData(bool doConditional, RooNLLVar* conditioning_nll, doub
 }
 
 }
-/*** 
+/***
   int main(int argc, char* argv[]){
   string inFile(argv[1]);
   string wsName(argv[2]);

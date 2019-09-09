@@ -11,6 +11,11 @@
 
 using namespace RooFit;
 
+//-----------------------------------------------------------------------------
+// Class to produce qqZZ/ggZZ background PDF for high mass analysis
+//-----------------------------------------------------------------------------
+
+
 ClassImp(AnalyticHMBkg)
 
 AnalyticHMBkg::AnalyticHMBkg(const char* _name,
@@ -127,7 +132,7 @@ RooAbsPdf* AnalyticHMBkg::getPDF(){
         }
     }
     log_info("Found %ld parameters for poly",  poly_order_names.size());
-    stringstream oss; 
+    stringstream oss;
     float eps = 1E-6;
     RooArgList f3_x0_list(*x0);
     RooArgList f3_x_list(*x);
@@ -137,7 +142,7 @@ RooAbsPdf* AnalyticHMBkg::getPDF(){
         if( fabs(order) < eps && i!=0){
             log_err("please put zero order in the beginning!");
             log_err("Correct it.");
-            break; 
+            break;
         }
 
         if( fabs(order) < eps) {

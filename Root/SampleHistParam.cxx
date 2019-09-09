@@ -1,7 +1,7 @@
 // =========================================================================
-// 
-//    Description:  
-// 
+// Parameterized histogram shape PDF class
+//    Description:  Derives from  SampleBase 
+//
 // ==========================================================================
 #include "HZZWorkspace/SampleHistParam.h"
 #include <iostream>
@@ -30,7 +30,7 @@ SampleHistParam::SampleHistParam(const char* _name,
     cout <<"name: " << _name << endl;
     cout <<"input: " << _input << endl;
 
-    // expect _input has: 
+    // expect _input has:
     // one root file for signal and one root file for background
     vector<string> inputNames;
     Helper::tokenizeString(_input, ';', inputNames);
@@ -43,7 +43,7 @@ SampleHistParam::SampleHistParam(const char* _name,
     bkg_file_ = TFile::Open(Form("%s/%s", Helper::getInputPath().c_str(), inputNames.at(1).c_str()));
 
     if(!sig_file_ || sig_file_->IsZombie() ||
-            !bkg_file_ || bkg_file_->IsZombie() ) 
+            !bkg_file_ || bkg_file_->IsZombie() )
     {
         log_err("%s does not exist", sig_file_->GetName());
     }
@@ -66,7 +66,7 @@ bool SampleHistParam::setChannel(const RooArgSet& _obs, const char* _ch_name, bo
 
     if (obs_list_.getSize() != 1){
         log_err("What you are doing? Only 1D is supported");
-    } 
+    }
     obsname = string(obs_list_.at(0)->GetName());
 
     return true;

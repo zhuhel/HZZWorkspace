@@ -1,7 +1,7 @@
 // =========================================================================
-// 
-//    Description:  
-// 
+//
+//    Description:
+//
 // ==========================================================================
 #include "HZZWorkspace/CoefficientFactory.h"
 #include "HZZWorkspace/EFTMorph.h"
@@ -27,6 +27,10 @@
 #include "RooArgList.h"
 #include "RooRealSumPdf.h"
 
+//-----------------------------------------------------------------------------
+// PDF specific for EFT Analysis
+// * Includes both category and coefficient creation (TBC)
+//-----------------------------------------------------------------------------
 
 EFTMorph::EFTMorph(const char* name,
         const char* configfile,bool _shape_BSM_only) : SampleBase(name),
@@ -115,10 +119,10 @@ bool EFTMorph::setChannel(const RooArgSet& _obs, const char* _ch_name, bool with
   Helper::tokenizeString(morph_dic[_ch_name]["samples"],',',samplesvec);
   for (auto& s: samplesvec) samples->add(*(new RooStringVar(s.c_str(),s.c_str(),s.c_str())));
 
-  m_eftfunc = 
+  m_eftfunc =
     new RooLagrangianMorphFunc(Form("%s_mf",base_name_.Data()),
         Form("%s_mf",base_name_.Data()),
-        (Helper::getInputPath()+morph_dic[_ch_name]["file"]).c_str(), 
+        (Helper::getInputPath()+morph_dic[_ch_name]["file"]).c_str(),
         (morph_dic[_ch_name]["folder"] + _obs.first()->GetName()).c_str() ,
         *prodMorphPara,
         *decMorphPara,
@@ -134,7 +138,7 @@ bool EFTMorph::setChannel(const RooArgSet& _obs, const char* _ch_name, bool with
 }
 
 RooAbsPdf* EFTMorph::getPDF(){
-  
+
   //manually build RooRealSumPdf with my extra factors in it
   RooAbsPdf* finalpdf = new RooRealSumPdf(base_name_,Form("RooRealSumPdf of morphing terms for %s in %s",nickname_.c_str(),category_name_.c_str()), *m_morphfuncs, *m_morphcoefs);
   return finalpdf;
@@ -143,9 +147,9 @@ RooAbsPdf* EFTMorph::getPDF(){
 
 RooArgSet EFTMorph::createHCMorphParaSet(std::string parlist){
 
-  
+
 //   RooRealVar* lambda = dynamic_cast<RooRealVar*>(couplingsDatabase.find("Lambda"));
-//   
+//
 //   if(!lambda){
 //       lambda= new RooRealVar("Lambda","Lambda",1000.);
 //       lambda->setConstant();
@@ -158,7 +162,7 @@ RooArgSet EFTMorph::createHCMorphParaSet(std::string parlist){
       cosa= new RooRealVar("cosa","cosa",1./(TMath::Sqrt(2.)),0,1);
       couplingsDatabase.add(*cosa);
       Helper::addPoiName(cosa->GetName());
-  } 
+  }
 
   RooArgSet* morphPara = new RooArgSet();
 
@@ -187,7 +191,7 @@ RooArgSet EFTMorph::createHCMorphParaSet(std::string parlist){
     if(!k){
       k= new RooRealVar(sk.Data(),sk.Data(),1.,-100,100);//FIXME I default the value to 1.0!
       couplingsDatabase.add(*k);
-    } 
+    }
     Helper::addPoiName(k->GetName());
 
 //     RooArgList list = isBSM  ? RooArgList(*cosa,*k,*lambda) : RooArgList(*cosa,*k);
@@ -197,7 +201,7 @@ RooArgSet EFTMorph::createHCMorphParaSet(std::string parlist){
       if(!_g){
         _g= new RooFormulaVar(cname.Data(),formulak.Data(),list);
         formulaDatabase.add(*_g);
-      } 
+      }
     log_info("formula %s %s",_g->GetName(),_g->GetTitle());
     _g->Print("t");
     morphPara->add(*_g);
@@ -251,8 +255,8 @@ RooAbsReal* EFTMorph::getOverallNormalization(){
 
 
     //get raw coefficient from morphing
-    RooAbsReal* coefi = (RooAbsReal*)&((*tempmorphcoefs)[i]); 
-    
+    RooAbsReal* coefi = (RooAbsReal*)&((*tempmorphcoefs)[i]);
+
     //add custom coefficient (if one exists) to add systematics to that coefficient
     RooAbsReal* sysTerm=NULL;
     TString name = (*m_morphfuncs)[i].GetName();
@@ -293,7 +297,7 @@ RooAbsReal* EFTMorph::getOverallNormalization(){
   //add up all these integrals: this is the expected # of events
   RooAddition* morphcoefsum = new RooAddition(Form("morph_coef_sum_%s",base_name_.Data()),"",*allexp);
   log_info("total expected from morphing model: %.2f",morphcoefsum->getVal());
-  
+
   return morphcoefsum;
 }
 
@@ -305,7 +309,7 @@ RooAbsReal* EFTMorph::getCoefficient(const char* customname){
 
   return SampleBase::getCoefficient(customname);
 }
-  
+
 
 bool EFTMorph::addShapeSys(const TString& npName){
   bool ret=false;
@@ -315,26 +319,3 @@ bool EFTMorph::addShapeSys(const TString& npName){
   }
   return ret;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

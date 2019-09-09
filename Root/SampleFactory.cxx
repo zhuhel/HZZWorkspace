@@ -1,4 +1,8 @@
 #include "HZZWorkspace/SampleFactory.h"
+//-----------------------------------------------------------------------------
+// Operational class to create instances of PDF classes
+// * Directly communicates with Combiner 
+//-----------------------------------------------------------------------------
 
 // ===========================================================
 // ugly global def
@@ -307,7 +311,7 @@ SampleBase* SampleFactory::FactoryCBGauss(strvec& args){
     }
     bool doSys = (bool) res_doSys;
 
-    bool doInt = false; 
+    bool doInt = false;
     if(args.size() > 5){
         int res_doInt = Helper::isBoolean(args.at(5));
         if(res_doInt < 0){
@@ -427,7 +431,7 @@ SampleBase* SampleFactory::FactoryAnalyticHMBkg(strvec& args){
 // AddKeysSample
 // ===========================================================
 
-bool SampleFactory::AddKeysSample(SampleBase* samplebase, strvec& args){ 
+bool SampleFactory::AddKeysSample(SampleBase* samplebase, strvec& args){
     if (!samplebase) return false;
 
     auto parametrizedSample = dynamic_cast<ParametrizedSample*>(samplebase);
@@ -467,9 +471,9 @@ bool SampleFactory::AddKeysSample(SampleBase* samplebase, strvec& args){
 
             double mH = (double)atof(keys_dict.at("mH").c_str());
             string minitree(minitree_dir + keys_dict.at("minitree"));
-            auto* keys_pdf = new SampleKeys(Form("%s_%.f",parametrizedSample->get_pdf_name().c_str(), mH), 
+            auto* keys_pdf = new SampleKeys(Form("%s_%.f",parametrizedSample->get_pdf_name().c_str(), mH),
                     mH, lo, hi,
-                    minitree.c_str(), 
+                    minitree.c_str(),
                     keys_dict.at("shape").c_str());
             parametrizedSample->AddSample(keys_pdf);
         }
@@ -484,7 +488,7 @@ bool SampleFactory::AddKeysSample(SampleBase* samplebase, strvec& args){
 // ===========================================================
 
 SampleBase* SampleFactory::FactoryEFTMorph(strvec& args){
-  
+
 
   if (args.size()!=2 and args.size()!=3){
     log_err("Error: EFTMorph requires 2 or 3 arguments, user provided %lu instead! \
@@ -507,7 +511,7 @@ SampleBase* SampleFactory::FactoryEFTMorph(strvec& args){
         log_err("EFTMorph missing mandatory argument 'input'");
         return NULL;
     }
-    
+
     if (args.size() == 3){
         int onlyShapeBSMsensitive = Helper::isBoolean(args.at(2));
         if(onlyShapeBSMsensitive > 0){
@@ -549,5 +553,3 @@ SampleBase* SampleFactory::FactorySimpleMorph(strvec& args){
 
     return new SimpleMorph(name.c_str(),input.c_str());
 }
-
-

@@ -1,6 +1,6 @@
-// 
-//    Description:  
-// 
+//
+//    Description:
+//
 #include "HZZWorkspace/SmoothMan.h"
 
 #include <fstream>
@@ -16,6 +16,11 @@
 #include "HZZWorkspace/Helper.h"
 
 using namespace std;
+
+//-----------------------------------------------------------------------------
+// Manager class to do smoothing based on dedicated configuration file
+//-----------------------------------------------------------------------------
+
 SmoothMan::SmoothMan(const char *configFile) {
     readConfig(configFile);
 }
@@ -96,12 +101,12 @@ void SmoothMan::process() {
   }
 }
 
-void SmoothMan::processSmoother(Smoother *sm, const string& infile_name) 
+void SmoothMan::processSmoother(Smoother *sm, const string& infile_name)
 {
   std::cout<<__func__<<" on "<<infile_name<<std::endl;
     string oname, treename;
     RooArgSet treeobs;
-    if (m_dic["main"].count("treename") && m_dic["main"].count("observables")) 
+    if (m_dic["main"].count("treename") && m_dic["main"].count("observables"))
     {
         getObs("main", oname, treename, treeobs);
     }
@@ -116,7 +121,7 @@ void SmoothMan::processSmoother(Smoother *sm, const string& infile_name)
         cout << "Category: " << c << endl;
 
         string cut = m_dic[c]["cut"];
-        
+
         if ((m_dic[c].count("treename") && m_dic[c].count("observables")) || (m_dic["main"].count("treename") && m_dic[c].count("observables"))) {
             string onametemp, treenametemp;
             RooArgSet treeobstemp;
@@ -142,14 +147,14 @@ void SmoothMan::readObservable(const string& str, vector<string>& obs_str, strin
       std::cout<<"ERROR: invalid observable argument!! must be \"branchname,nBins,low,high\" or \"branchname:nickname,nBins,low,high\""<<std::endl;
       return;
     }
-} 
+}
 
-void SmoothMan::getObs(string cat, string &oname, string &treename, RooArgSet &treeobs) 
+void SmoothMan::getObs(string cat, string &oname, string &treename, RooArgSet &treeobs)
 {
     if(m_dic[cat].count("treename"))  treename = m_dic[cat]["treename"];
     else  treename = m_dic["main"]["treename"];
 
-    vector<string> branch;  
+    vector<string> branch;
     Helper::tokenizeString(m_dic[cat]["observables"], ';', branch);
 
     for (size_t i=0; i<branch.size(); ++i){
@@ -163,9 +168,8 @@ void SmoothMan::getObs(string cat, string &oname, string &treename, RooArgSet &t
         }
 
         RooRealVar *v = new RooRealVar(tmp_branch.c_str(), tmp_branch.c_str(), atof(tmp_obs.at(2).c_str()), atof(tmp_obs.at(3).c_str()));
-        v->setBins( atoi(tmp_obs.at(1).c_str()) ); 
+        v->setBins( atoi(tmp_obs.at(1).c_str()) );
         treeobs.add(*v);
         oname += tmp_obs.at(0) + "_";
     }
 }
-

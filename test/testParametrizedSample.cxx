@@ -21,7 +21,7 @@ const char* ws_file_name = "combined_para_test.root";
 const char* ch_name = "ggF_4e_13TeV";
 const char* obs_name = "m4l";
 int main(int argc, char** argv){
-    // generate_keys_ws();
+    generate_keys_ws();
     // generate_para_ws();
     plot_para_norm();
     return 1;
@@ -65,7 +65,7 @@ void generate_para_ws()
     RooProduct* coeff = (RooProduct*) sample_ggF->getCoefficient();
     pdf->Print();
     coeff->Print();
-    
+
     auto* workspace = new RooWorkspace("combined");
     workspace->import(*pdf, RooFit::RecycleConflictNodes());
     workspace->import(*coeff, RooFit::RecycleConflictNodes());
@@ -81,21 +81,21 @@ void generate_para_ws()
 void generate_keys_ws()
 {
     auto* workspace = new RooWorkspace("combined");
-    const char* path = "/afs/cern.ch/atlas/groups/HSG2/H4l/run2/2015/MiniTrees/Prod_v01/mc/Nominal/";
-    // const char* tree_name = "tree_incl_all";
-    const char* f1 = Form("%s/mc15_13TeV.341946.Pythia8EvtGen_A14NNPDF23LO_ZH124_ZZ4l.root", path);
-    const char* f2 = Form("%s/mc15_13TeV.341947.Pythia8EvtGen_A14NNPDF23LO_ZH125_ZZ4l.root", path);
-    const char* f3 = Form("%s/mc15_13TeV.341948.Pythia8EvtGen_A14NNPDF23LO_ZH126_ZZ4l.root", path);
+   // const char* path = "/afs/cern.ch/atlas/groups/HSG2/H4l/run2/2015/MiniTrees/Prod_v01/mc/Nominal/";
+	const char* path = "/Users/hannahelizabeth/Desktop/2016_mc";
+// const char* tree_name = "tree_incl_all";
+    const char* f1 = Form("%s/mc15_13TeV.341504.PowhegPythia8EvtGen_CT10_AZNLOCTEQ6L1_ggH124_ZZ4lep_noTau.root", path);
+    const char* f2 = Form("%s/mc15_13TeV.341505.PowhegPythia8EvtGen_CT10_AZNLOCTEQ6L1_ggH125_ZZ4lep_noTau.root", path);
+    const char* f3 = Form("%s/mc15_13TeV.341506.PowhegPythia8EvtGen_CT10_AZNLOCTEQ6L1_ggH126_ZZ4lep_noTau.root", path);
 
     // const char* norm_sys = "norm_ggF_125_Low.txt";
 
     auto* sample_h124 = new SampleKeys("ATLAS_Signal_ggH124", 124, 110, 140,
             f1,"");
-    auto* sample_h125 = new SampleKeys("ATLAS_Signal_ggH125", 125, 110, 140, 
+    auto* sample_h125 = new SampleKeys("ATLAS_Signal_ggH125", 125, 110, 140,
             f2,"");
     auto* sample_h126 = new SampleKeys("ATLAS_Signal_ggH126", 126, 110, 140,
             f3,"");
-
     auto* sample_ggF = new ParametrizedSample("ATLAS_Signal_ggH");
     // sample_ggF->SetParaRange("nominal", 200, 600);
     sample_ggF->AddSample(sample_h124);
@@ -107,9 +107,9 @@ void generate_keys_ws()
     sample_ggF->setChannel(RooArgSet(*obs), ch_name, with_sys);
 
     RooRealSumPdf* pdf = (RooRealSumPdf*) sample_ggF->getPDF();
-    RooProduct* coeff = (RooProduct*) sample_ggF->getCoefficient();
+
+    cout << "HELLO 6"  << endl;
     pdf->Print();
-    coeff->Print();
 
     // sample_h124->SaveDataSet(workspace);
     // sample_h125->SaveDataSet(workspace);
@@ -120,7 +120,6 @@ void generate_keys_ws()
 
     delete workspace;
     delete pdf;
-    delete coeff;
     delete obs;
     delete sample_ggF;
 }
@@ -129,7 +128,7 @@ void plot_para_norm()
 {
     auto* file_in = TFile::Open(ws_file_name, "read");
     auto* workspace = (RooWorkspace*) file_in->Get("combined");
-    const char* prod = "ZH";
+    const char* prod = "ggH";
     // RooRealSumPdf* pdf = (RooRealSumPdf*) workspace->obj(Form("ATLAS_Signal_ggH_%s_Para", ch_name));
     // auto* bases = (RooStats::HistFactory::RooBSplineBases*) workspace->obj("bases_ggF");
     RooRealSumPdf* pdf = (RooRealSumPdf*) workspace->obj(Form("ATLAS_Signal_%s_%s_Para", prod,ch_name));
@@ -138,7 +137,7 @@ void plot_para_norm()
     for(auto& value : tvalues){
         cout <<"value: " << value << endl;
     }
-    
+
     RooRealVar* mH = (RooRealVar*) workspace->var("mH");
     RooRealVar* m4l = (RooRealVar*) workspace->var(obs_name);
     mH->Print();
@@ -154,7 +153,7 @@ void plot_para_norm()
         // cout << "mass: " << ini_mass << endl;
         mH->setVal(ini_mass);
         // cout << "yield: " << coeff->getVal() << endl;
-        pdf->plotOn(m4l_frame, RooFit::LineStyle(7), 
+        pdf->plotOn(m4l_frame, RooFit::LineStyle(7),
                 RooFit::LineColor(color++),
                 RooFit::LineWidth(2));
     }

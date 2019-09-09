@@ -1,7 +1,9 @@
 // =========================================================================
-// 
-//    Description:  
-// 
+// Counting PDF
+//    Description:
+//  * Just a number
+//  * Shape is a uniform distribution
+//  * Derives from SampleBase 
 // ==========================================================================
 #include "HZZWorkspace/SampleCount.h"
 #include <iostream>
@@ -64,4 +66,3 @@ RooAbsPdf* SampleCount::get_mc_constraint(){
 
     return NULL;
 }
-

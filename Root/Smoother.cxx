@@ -18,6 +18,11 @@
 
 #include "HZZWorkspace/Helper.h"
 
+//-----------------------------------------------------------------------------
+// Operational class to do smoothing work based on a dedicated configuration file
+// ** Manager class "SmoothMan" interprets the config file and executes this class 
+//-----------------------------------------------------------------------------
+
 
 Smoother::Smoother(const string& outname, std::vector<float> rho, std::string mirror){
     outfile = TFile::Open(outname.c_str(), "RECREATE");
@@ -31,9 +36,9 @@ Smoother::~Smoother() {
 }
 
 
-void Smoother::smooth(const string& input_name, 
-        const string& oname, const string& treename, 
-        const RooArgSet &treeobs, const string& cut) const 
+void Smoother::smooth(const string& input_name,
+        const string& oname, const string& treename,
+        const RooArgSet &treeobs, const string& cut) const
 {
 
   TChain* tcut = Helper::loader(input_name, treename);
@@ -57,7 +62,7 @@ void Smoother::smooth(const string& input_name,
   std::cout<<"variables to be read:"<<std::endl;
   obsAndCut.Print("v");
 
-  RooDataSet *ds = new RooDataSet(Form("%s_RooDataSet", oname.c_str()), "dataset", 
+  RooDataSet *ds = new RooDataSet(Form("%s_RooDataSet", oname.c_str()), "dataset",
       obsAndCut, RooFit::Import(*tcut),
       RooFit::Cut(cut.c_str()),
       RooFit::WeightVar("weight")
@@ -67,7 +72,7 @@ void Smoother::smooth(const string& input_name,
 
   RooArgList obsList(treeobs);
   RooCmdArg arg2 = RooCmdArg::none();
-  RooRealVar *x = (RooRealVar*) obsList.at(0); 
+  RooRealVar *x = (RooRealVar*) obsList.at(0);
 
   // 1D pdf
   TH1F *h1 = NULL;
@@ -83,7 +88,7 @@ void Smoother::smooth(const string& input_name,
     h1->SetName(oname.c_str());
 
     RooPlot* frame=NULL;
-    if (m_makeValidPlots){ 
+    if (m_makeValidPlots){
       int bins = ds->numEntries()/60;
       if (bins>100) bins=100;
       if (bins<10) bins=10;
@@ -125,14 +130,14 @@ void Smoother::smooth(const string& input_name,
         c->Print(plotName.Data());
       }
       h1->Write();
-      delete keyspdf;   
+      delete keyspdf;
     }
   }
 
   // 2D pdf
   TH2F *h2 = NULL;
   if (obsList.getSize() == 2){
-    RooRealVar *y = (RooRealVar*) obsList.at(1); 
+    RooRealVar *y = (RooRealVar*) obsList.at(1);
     arg2 = RooFit::YVar(*y, RooFit::Binning(y->getBinning()));
 
     Double_t rhoarr[2] = { m_rho[0], m_rho[1] };
@@ -145,7 +150,7 @@ void Smoother::smooth(const string& input_name,
 
     RooPlot* frameX=NULL;
     RooPlot* frameY=NULL;
-    if (m_makeValidPlots){ 
+    if (m_makeValidPlots){
       int bins = ds->numEntries()/40;
       if (bins>100) bins=100;
       if (bins<10) bins=10;
@@ -200,7 +205,7 @@ void Smoother::smooth(const string& input_name,
         }
       }
       h2->Write();
-      delete keyspdf;   
+      delete keyspdf;
     }
   }
 

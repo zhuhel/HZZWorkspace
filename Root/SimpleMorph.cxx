@@ -1,7 +1,7 @@
 // =========================================================================
-// 
-//    Description:  
-// 
+// Some kind of morphing and smoothing class
+//    Description:
+// Makes  some kind of smoothed shape, maybe 
 // ==========================================================================
 #include "HZZWorkspace/SampleFactory.h"
 #include "HZZWorkspace/SimpleMorph.h"
@@ -129,9 +129,9 @@ RooAbsPdf* SimpleMorph::getPDF(){
         RooArgList controlPoints;
         for (auto& s:m_shapemap) {
             RooAbsPdf* pdf = s.second->getPDF();
-            if (m_morphType.Contains("param")) { 
-                RooAbsPdf* pdftmp = ConvertToParamKeys(pdf, obs_list_, s.first, multiplicativeScaleFactor); 
-                delete pdf; pdf = pdftmp; 
+            if (m_morphType.Contains("param")) {
+                RooAbsPdf* pdftmp = ConvertToParamKeys(pdf, obs_list_, s.first, multiplicativeScaleFactor);
+                delete pdf; pdf = pdftmp;
             }
             controlPoints.add(*pdf);
         }
@@ -173,7 +173,7 @@ RooAbsPdf* SimpleMorph::ConvertToParamKeys(RooAbsPdf* in, RooArgList& obs, const
 
 
   auto pdf = new RooParamKeysPdf(Form("%s_paramkeys",in->GetName()),"",x, *m_basevar, mass, (sf?*sf:RooFit::RooConst(1.)), *ds, RooParamKeysPdf::MirrorBoth, 0.1);
-  
+
   /*
   auto frame = x.frame();
   ds->plotOn(frame);
@@ -189,32 +189,3 @@ RooAbsPdf* SimpleMorph::ConvertToParamKeys(RooAbsPdf* in, RooArgList& obs, const
   return pdf;
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

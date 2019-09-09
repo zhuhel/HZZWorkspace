@@ -1,7 +1,9 @@
 // =========================================================================
-// 
-//    Description:  
-// 
+// PDF class for Expontial + Landau
+//    Description:  High mass Analysis
+// * Preliminary attempt to handle qqZZ/ggZZ
+// * Hardcoded numbers!! 
+//
 // ==========================================================================
 #include "HZZWorkspace/ExpLandau.h"
 #include <iostream>
@@ -37,8 +39,8 @@
 using namespace RooStats;
 using namespace HistFactory;
 
-ExpLandau::ExpLandau(const char* _name, 
-        const char* _input,  
+ExpLandau::ExpLandau(const char* _name,
+        const char* _input,
         const char* ,       // MG: Intentionally not using the shapeSys par?
         bool _doSys ) : SampleBase(_name)
     , workspace(new RooWorkspace("ExpLandau"))
@@ -76,7 +78,7 @@ RooAbsPdf* ExpLandau::getPDF()
     RooProduct* n3 = variable("n3");
     RooProduct* n4 = variable("n4");
     RooProduct* n5 = variable("n5");
-    
+
     RooArgList* arg_list = new RooArgList();
     arg_list->add(*p0);
     arg_list->add(*p1);
@@ -94,13 +96,13 @@ RooAbsPdf* ExpLandau::getPDF()
             obs->GetName(), obs->GetName(), p3->GetName(), obs->GetName());
     string func_low = Form("%s*TMath::Landau(%s,%s,%s)+%s*%s+%s*%s*%s+%s*%s*%s*%s",
             n0->GetName(), obs->GetName(), n1->GetName(), n2->GetName(),
-            n3->GetName(), obs->GetName(), 
+            n3->GetName(), obs->GetName(),
             n4->GetName(), obs->GetName(), obs->GetName(),
             n5->GetName(), obs->GetName(), obs->GetName(), obs->GetName());
 
-    RooFormula formula_low("formula_low", func_low.c_str(), 
+    RooFormula formula_low("formula_low", func_low.c_str(),
             RooArgList(*obs, *n0, *n1, *n2, *n3, *n4, *n5));
-    RooFormula formula_hi("formula_hi", func_high.c_str(), 
+    RooFormula formula_hi("formula_hi", func_high.c_str(),
             RooArgList(*obs, *p0, *p1, *p2, *p3));
     obs->setVal(300);
 
@@ -114,7 +116,7 @@ RooAbsPdf* ExpLandau::getPDF()
 
     arg_list->add(*ratio);
 
-    string formula = Form("%s*(%s>300)+(%s<=300)*%s*%s",func_high.c_str(), 
+    string formula = Form("%s*(%s>300)+(%s<=300)*%s*%s",func_high.c_str(),
             obs->GetName(), obs->GetName(), ratio->GetName(), func_low.c_str());
     string output_name = Form("%s_generic", base_name_.Data());
     auto* pdf_cat = new RooGenericPdf(output_name.c_str(),
@@ -122,8 +124,8 @@ RooAbsPdf* ExpLandau::getPDF()
     pdf_cat->Print();
     pdf_cat->Print("v");
     workspace->import(*pdf_cat);
-    
-    delete arg_list; 
+
+    delete arg_list;
     delete obs_set;
     delete ratio;
     delete pdf_cat;
@@ -173,7 +175,7 @@ RooProduct* ExpLandau::variable(const string& parname)
     double ratio = value == 0?0:error/value;
 
     string name(Form("%s_%s", base_name_.Data(),parname.c_str()));
-    
+
     // ignore the systematics that have less than per-mill effect
     if (doSys && fabs(ratio) > 1e-3)
     {
@@ -209,7 +211,7 @@ RooProduct* ExpLandau::variable(const string& parname)
     return (RooProduct*)workspace->obj(name.c_str());
 }
 
-FlexibleInterpVar* ExpLandau::flexibleInterpVar(const string& fivName, vector<string>& names, 
+FlexibleInterpVar* ExpLandau::flexibleInterpVar(const string& fivName, vector<string>& names,
         vector<double>& lowValues, vector<double>& highValues)
 {
     RooArgList variables;

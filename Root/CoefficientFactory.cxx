@@ -1,5 +1,10 @@
 #include "HZZWorkspace/CoefficientFactory.h"
 
+//-----------------------------------------------------------------------------
+// Wrapper class to check eligibility to build coeffiencts
+// * Produces "coefficient" class objects
+//-----------------------------------------------------------------------------
+
 // ===========================================================
 // CreateCoefficient
 // ===========================================================
@@ -19,9 +24,9 @@ Coefficient* CoefficientFactory::CreateCoefficient(const std::string& coefline){
   /***
   for (auto& s: coef_splitbysemi){
     TString s2 = s.c_str();
-     * Since we treat the input as Map, it's find to have extra terms.
+     * Since we treat the input as Map, it's fine to have extra terms.
     if (!(
-            s2.Contains("factors") || s2.Contains("poi") || 
+            s2.Contains("factors") || s2.Contains("poi") ||
             s2.Contains("sys") || s2.Contains("global") ||
             s2.Contains("INT") // for interference term.
         )){
@@ -45,7 +50,7 @@ Coefficient* CoefficientFactory::CreateCoefficient(const std::string& coefline){
   log_info("CoefficientFactory received arguments:");
   for (auto& m:coefTypeMap)
     log_info("type=%s, args=%s",(m.first).c_str(),(m.second).c_str());
-/*** 
+/***
   if (coefTypeMap.size()>4){
     log_err("Coefficient type map is larger than size 4.. something is wrong");
     return NULL;
