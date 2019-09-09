@@ -111,7 +111,8 @@ NOTE: The script runs significantly faster when compiled
 #include <sstream>
 #include <iomanip>
 
-using namespace std;
+using std::cout; 
+using std::endl;
 using namespace RooFit;
 using namespace RooStats;
 
@@ -149,7 +150,7 @@ map<RooNLLVar*, string> map_snapshots;
 map<RooNLLVar*, map<double, double> > map_nll_mu_sigma;
 RooWorkspace* w = NULL;
 ModelConfig* mc = NULL;
-RooDataSet* data = NULL;
+RooDataSet* localdata = NULL;
 RooRealVar* firstPOI = NULL;
 RooNLLVar* asimov_0_nll = NULL;
 RooNLLVar* obs_nll = NULL;
@@ -253,7 +254,7 @@ void run_limit(RooWorkspace* ws_, ModelConfig* mc_,
   }
   w = ws_;
   mc = mc_;
-  data = data_;
+  localdata = data_; 
   firstPOI = firstPOI_;
 
   double CL = 0.95;
@@ -273,9 +274,9 @@ void run_limit(RooWorkspace* ws_, ModelConfig* mc_,
   std::cout<<"Global:"<<std::endl;
   mc->GetGlobalObservables()->Print("v");
 
-  obs_nll = createNLL(data);
+  obs_nll = createNLL(localdata);
   map_snapshots[obs_nll] = "nominalGlobs";
-  map_data_nll[data] = obs_nll;
+  map_data_nll[localdata] = obs_nll;
   w->saveSnapshot("nominalGlobs",*mc->GetGlobalObservables());
   w->saveSnapshot("nominalNuis",*mc->GetNuisanceParameters());
 
