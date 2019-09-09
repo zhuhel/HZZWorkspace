@@ -20,7 +20,7 @@
 float lumi=36.1;
 bool doNWA=true;
 std::string workspace="/afs/cern.ch/atlas/groups/HSG2/H4l/run2/2016/Workspaces/HighMass/Prod_v12/20170505_NWA/combined_scaled_corrected_buggy_sherpa_qqZZ.root";
-std::string data="/afs/cern.ch/atlas/groups/HSG2/H4l/run2/2016/MiniTrees/Prod_v12/data/Nominal/data_13TeV.root";
+std::string localdata="/afs/cern.ch/atlas/groups/HSG2/H4l/run2/2016/MiniTrees/Prod_v12/data/Nominal/data_13TeV.root";
 // ------------------------------
 
 
@@ -126,7 +126,7 @@ int main(){
       if (sample=="data"){
         //read from minitree
         TChain* chain = new TChain("tree_incl_all","tree_incl_all");
-        chain->Add(data.c_str());
+        chain->Add(localdata.c_str());
 
         chain->Draw(Form("m4l_constrained_HM>>%s",hname),cutmap[cats[c]].c_str());
         hist->SetMarkerStyle(20);
