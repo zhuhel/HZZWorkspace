@@ -49,6 +49,18 @@ foreach(_exeFile ${files})
     LINK_LIBRARIES ${ROOT_LIBRARIES} HZZWorkspaceLib RooFitExtensions )
 endforeach()
 
+# Add "test" directory applications 
+file(GLOB_RECURSE files "test/*.cxx")
+foreach(_exeFile ${files})
+    get_filename_component(_theExec ${_exeFile} NAME_WE)
+    get_filename_component(_theLoc ${_exeFile} DIRECTORY)
+    # we specify a folder for programs we do not want to compile. Useful during r21 transition...
+    atlas_add_executable( ${_theExec}
+    ${_exeFile}
+    INCLUDE_DIRS ${ROOT_INCLUDE_DIRS} 
+    LINK_LIBRARIES ${ROOT_LIBRARIES} HZZWorkspaceLib RooFitExtensions )
+endforeach()
+
 
 # Install python modules, joboptions, and share content
 #atlas_install_python_modules( python/*.py )
