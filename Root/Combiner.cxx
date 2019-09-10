@@ -232,7 +232,7 @@ void Combiner::readConfig(const char* configName)
         ///////////////////////////////////
         RooArgSet ch_obs_minitree; // observables in mini-tree
         RooArgSet ch_obs_ws;       // observables in workspace
-        string obs_str = findCategoryConfig("observables", category_name);
+        string obs_str = findCategoryConfig( category_name, "observables" );
         bool use_adaptive_binning = false;
         getObservables(obs_str, ch_obs_ws, ch_obs_minitree, use_adaptive_binning);
         category->setObservables(ch_obs_ws);
@@ -577,8 +577,8 @@ void Combiner::getObservables(
             minitree_name = obs_names.substr(0, pos_semi_comma);
             ws_name = obs_names.substr(pos_semi_comma+1, obs_names.size());
         }
-        cout <<" MINITREE name: " << minitree_name << endl;
-        cout <<" WSNAME: " << ws_name << endl;
+        cout <<" MINITREE branch name: " << minitree_name << endl;
+        cout <<" Observable name in WS: " << ws_name << endl;
         if(rename_map_.find(minitree_name) == rename_map_.end()) {
             rename_map_[minitree_name] = ws_name;
         }
