@@ -252,7 +252,8 @@ void Combiner::readConfig(const char* configName)
         ///////////////////////////////////
         RooArgSet ch_obs_minitree; // observables in mini-tree
         RooArgSet ch_obs_ws;       // observables in workspace
-        string obs_str = findCategoryConfig("observables", category_name);
+        //string obs_str = findCategoryConfig("observables", category_name);
+        string obs_str = findCategoryConfig( category_name, "observables" );
         bool use_adaptive_binning = false;
         getObservables(obs_str, ch_obs_ws, ch_obs_minitree, use_adaptive_binning);
         category->setObservables(ch_obs_ws);
@@ -478,11 +479,13 @@ Coefficient* Combiner::getCoefficient(string& name)
 string Combiner::findCategoryConfig(const string& sec_name, const string& key_name)
 {
     string token = "";
-    try {
+    try { // Try locating the section name as is own section
+        // Parse the section according to the keys (categories)
         token = all_dic.at(sec_name).at(key_name);
     } catch (const out_of_range& orr) {
-        try {
+        try { // Try locating section name in the [main] section (global namespace)
             token = all_dic.at("main").at(key_name);
+            //token = all_dic.at( "main" ).at( sec_name );
         } catch (const out_of_range& orr) {
             // Loop over the section names and try to match sec_name
             int ntimes = 0;
@@ -597,8 +600,8 @@ void Combiner::getObservables(
             minitree_name = obs_names.substr(0, pos_semi_comma);
             ws_name = obs_names.substr(pos_semi_comma+1, obs_names.size());
         }
-        cout <<" MINITREE name: " << minitree_name << endl;
-        cout <<" WSNAME: " << ws_name << endl;
+        cout <<" MINITREE branch name: " << minitree_name << endl;
+        cout <<" Observable name in WS: " << ws_name << endl;
         if(rename_map_.find(minitree_name) == rename_map_.end()) {
             rename_map_[minitree_name] = ws_name;
         }
