@@ -1,7 +1,7 @@
 /*
  * =====================================================================================
  *
- *    Description:  toy stduies for global pvalue
+ *    Description:  toy studies for global pvalue
  *
  *        Version:  1.0
  *        Created:  09/04/2017 12:51:49 AM
@@ -11,6 +11,16 @@
  *         Author:  Xiangyang Ju (), xiangyang.ju@gmail.com
  *
  * =====================================================================================
+ Input:
+ - Workspace ROOT file name
+ - POI name
+ - number of toys
+ - optional:
+    - initial value (seed) for randomizer
+    - Variables in a list to be fixed to supplied values [var=value,var=value...]
+
+Intended to evaluate global p-value for an excess (High mass search)
+------------------------------------------------------------------------------
  */
 #include <stdlib.h>
 #include <string>
@@ -74,7 +84,7 @@ int main(int argc, char** argv)
     cout<<"input seed = "<< seed_init <<std::endl;
     cout<<" Fix variables: " << fix_variables << endl;
     cout<<"outName " << out_name << endl;
-    
+
     auto file_in = TFile::Open(input_name.c_str());
     auto workspace = (RooWorkspace*) file_in->Get(wsName.c_str());
     auto mc = dynamic_cast<RooStats::ModelConfig*>(workspace->obj(mcName.c_str()));
@@ -112,7 +122,7 @@ int main(int argc, char** argv)
     timer.Stop();
     double minutes = timer.RealTime()/60.;
     cout << "[Timer] " << minutes << " min for conditional fit" << endl;
-    timer.Reset(); 
+    timer.Reset();
 
     // prepare tree for output
     auto fout = TFile::Open(Form("%s/%s",out_dir.c_str(),out_name.c_str()), "recreate");
@@ -134,7 +144,7 @@ int main(int argc, char** argv)
     res["status_s2"] = -1;
     res["nll_s2"] = -1;
     for( auto& dic : res){
-        physics->Branch(dic.first.c_str(), 
+        physics->Branch(dic.first.c_str(),
                 &(dic.second), Form("%s/D",dic.first.c_str()));
     }
 
@@ -161,7 +171,7 @@ int main(int argc, char** argv)
         mH_var->setVal(400); // otherwise fit does not converge.
         mH_var->setConstant(true); // otherwise fit does not converge.
         cout << "MH is at: " << mH_var->getVal() << endl;
-        RooDataSet* pseduo_data = dynamic_cast<RooDataSet*>( 
+        RooDataSet* pseduo_data = dynamic_cast<RooDataSet*>(
                 RooStatsHelper::generatePseudoData(workspace, poi_name.c_str(), itoy+seed_init)
                 );
 
