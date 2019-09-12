@@ -151,10 +151,10 @@ void Combiner::readConfig(const char* configName)
     try {
         string input_mc = main_dic.at("mc");
 	strvec mc_weight_config;
-	Helper::tokenizeString(input_mc,',',mc_weight_config);  
-	// first argument must be input mc file	  
+	Helper::tokenizeString(input_mc,',',mc_weight_config);
+	// first argument must be input mc file
 	input_mc = mc_weight_config.size() > 0 ? mc_weight_config[0] : "";
-	// loop over additional arguments   
+	// loop over additional arguments
 	for(unsigned int iarg = 1; iarg < mc_weight_config.size() ; ++iarg){
 	  string full_arg (mc_weight_config[iarg]);
 	  strvec arg;
@@ -169,7 +169,7 @@ void Combiner::readConfig(const char* configName)
 	}
         mc_chain = Helper::loader(input_mc.c_str(), "tree_incl_all");
 	if(mc_chain){
-	  // check if input tree contains weight variable	
+	  // check if input tree contains weight variable
 	  if(!mc_chain->GetListOfBranches()->FindObject(weight_var_name.c_str())){
 	    log_err("MC weight var %s not contained in input tree -> no MC will be added",weight_var_name.c_str());
 	    mc_chain = 0;
@@ -204,7 +204,7 @@ void Combiner::readConfig(const char* configName)
         cout << "you are going to remove PDF based on the avaliable stats" << endl;
         cout << "limit is "<< thres << endl;
         pdfStatThreshold    = (double) atof(thres.c_str());
-        
+
     } catch (const out_of_range& oor) {
             pdfStatThreshold = -1;
     }
@@ -226,13 +226,16 @@ void Combiner::readConfig(const char* configName)
         Helper::tokenizeString( mcsets, ',', mcsets_names) ;
         Category* category = new Category(category_name);
         category->setStatThreshold(pdfStatThreshold);
-        
+
         ///////////////////////////////////
         // add observables
         ///////////////////////////////////
         RooArgSet ch_obs_minitree; // observables in mini-tree
         RooArgSet ch_obs_ws;       // observables in workspace
-        string obs_str = findCategoryConfig( category_name, "observables" );
+        // Look for a section of the configuration file called "observables"
+        // and retrieve the observables defined for each category
+        // NB: global observables are not supported at this time. 
+        string obs_str = findCategoryConfig( "observables", category_name );
         bool use_adaptive_binning = false;
         getObservables(obs_str, ch_obs_ws, ch_obs_minitree, use_adaptive_binning);
         category->setObservables(ch_obs_ws);
@@ -361,7 +364,7 @@ void Combiner::readConfig(const char* configName)
 
             if(poiInfo.size() != 3)
             {
-                log_err("Poi default does not contain 3 arguemnts. Format is <poiName> = <centralVal>, <lower limit>, <upper limit>: aborting Combiner!"); exit(-1);            
+                log_err("Poi default does not contain 3 arguemnts. Format is <poiName> = <centralVal>, <lower limit>, <upper limit>: aborting Combiner!"); exit(-1);
             }
 
             float centralVal    = (double) atof(poiInfo.at(0).c_str());
@@ -370,7 +373,7 @@ void Combiner::readConfig(const char* configName)
 
             if(lwrLim > uprLim)
             {
-                log_err("Lower limit for poi greater than the upper limit: aborting Combiner!"); exit(-1);            
+                log_err("Lower limit for poi greater than the upper limit: aborting Combiner!"); exit(-1);
             }
             TString poiName(defaultPoi.first);
 
@@ -414,7 +417,7 @@ void Combiner::readConfig(const char* configName)
 
         for (auto & par : opt.second){
             RooRealVar* var = workspace->var(par.first.c_str());
-            if (var) 
+            if (var)
                 var->setVal( atof(par.second.c_str()) );
             else {
                 log_err("Trying to build asimov but received an invalid parameter: %s",par.first.c_str());
@@ -427,7 +430,7 @@ void Combiner::readConfig(const char* configName)
     }
 
     workspace->loadSnapshot("ParamsBeforeAsimovGeneration");
-    
+
     //////////////////////////////////////////
     // Import Disconnected Objects marked for saving
     /////////////////////////////////////////
