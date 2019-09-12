@@ -252,7 +252,6 @@ void Combiner::readConfig(const char* configName)
         ///////////////////////////////////
         RooArgSet ch_obs_minitree; // observables in mini-tree
         RooArgSet ch_obs_ws;       // observables in workspace
-        //string obs_str = findCategoryConfig("observables", category_name);
         string obs_str = findCategoryConfig( category_name, "observables" );
         bool use_adaptive_binning = false;
         getObservables(obs_str, ch_obs_ws, ch_obs_minitree, use_adaptive_binning);
