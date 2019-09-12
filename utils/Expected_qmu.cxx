@@ -9,7 +9,7 @@
  *         Author:  Xiangyang Ju (), xiangyang.ju@gmail.com
  *
  * =====================================================================================
-   Requires 6 arguments
+   Requires 9 arguments
    - Input workspace ROOT file
    - Output ROOT file name for nll
    - muName: POI name
@@ -20,7 +20,8 @@
    - ntoys: number of toys to use in this test
    - seed: initial value for randomizer
 
-Assumes all POI are associated with signal
+Assumes all POI are associated with signal.
+Tests background-only hypothesis, signal + background hypothesis. Requires generating events.
 ------------------------------------------------------------------------------
  */
 
