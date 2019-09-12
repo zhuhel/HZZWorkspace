@@ -12,6 +12,12 @@
 #include <map>
 #include <algorithm>
 
+//------------------------------------------------------------------------------
+// Takes workspace and prints normalizations for each category
+//
+// Legacy
+//------------------------------------------------------------------------------
+
 void extractMatch(TString in, std::vector<TString>& options, TString& out){
     for (auto& o : options){
         if (in.Contains(o)) out=o;
@@ -116,7 +122,7 @@ int main(int argc, char** argv){
         std::cout<<"no sources provided - determining them on-the-fly.."<<std::endl;
 
         std::set<TString> uniquesources;
-        
+
         RooArgSet* allNorms = (RooArgSet*)wsp->allFunctions().selectByName("nTot*");
         TIterator* iter(allNorms->createIterator());
         for (RooAbsArg* a = (RooAbsArg*)iter->Next(); a!=0; a=(RooAbsArg*)iter->Next()){
@@ -230,7 +236,7 @@ int main(int argc, char** argv){
             normResultsSorted.push_back(std::make_pair(remainderA.first, resChan));
         }
     }
-            
+
     ////// END SCARY CODE
 
 
@@ -255,4 +261,3 @@ int main(int argc, char** argv){
     }
 
 }
-
