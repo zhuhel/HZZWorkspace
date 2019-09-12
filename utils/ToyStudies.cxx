@@ -3,7 +3,7 @@
  *
  *       Filename:  testToyStudies.cxx
  *
- *    Description:  toy stduies for low mass 
+ *    Description:  toy studies for low mass
  *
  *        Version:  1.0
  *        Created:  11/03/2015 11:41:49 PM
@@ -11,9 +11,11 @@
  *       Compiler:  gcc
  *
  *         Author:  Xiangyang Ju (), xiangyang.ju@gmail.com
- *   Organization:  
+ *   Organization:
  *
  * =====================================================================================
+ Generate toys for a given POI
+------------------------------------------------------------------------------
  */
 #include <stdlib.h>
 #include <string>
@@ -65,7 +67,7 @@ int main(int argc, char** argv)
     // cout<<" Fix variables: " << fix_variables << endl;
     cout<<"mH: " << mH_val<< endl;
     cout<<"outName " << out_name << endl;
-    
+
 
     auto file_in = TFile::Open(input_name.c_str());
     auto workspace = (RooWorkspace*) file_in->Get(wsName.c_str());
@@ -100,7 +102,7 @@ int main(int argc, char** argv)
     timer.Stop();
     double minutes = timer.RealTime()/60.;
     cout << "[Timer] " << minutes << " min for conditional fit" << endl;
-    timer.Reset(); 
+    timer.Reset();
 
     // prepare tree for output
     auto fout = TFile::Open(Form("%s/%s",out_dir.c_str(),out_name.c_str()), "recreate");
@@ -119,7 +121,7 @@ int main(int argc, char** argv)
     res["mH"] = 0;
     res["seed"] = 0;
     for( auto& dic : res){
-        physics->Branch(dic.first.c_str(), 
+        physics->Branch(dic.first.c_str(),
                 &(dic.second), Form("%s/D",dic.first.c_str()));
     }
 
@@ -128,7 +130,7 @@ int main(int argc, char** argv)
 
     res["mH"] = mH_val;
     res["mu"] = poi_val;
-    
+
     timer.Start();
     for(int itoy = 0; itoy < ntoys; itoy++)
     {
