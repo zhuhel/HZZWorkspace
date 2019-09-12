@@ -20,6 +20,11 @@
 #include <fstream>
 #include <stdio.h>
 
+//------------------------------------------------------------------------------
+// Building acceptance polynomial for high mass given minitree input  
+//
+// Heavily hard coded! Use with care!
+//------------------------------------------------------------------------------
 int main(){
 
   std::string minitreeDir = "/afs/cern.ch/atlas/groups/HSG2/H4l/run2/2016/MiniTrees/Prod_v10/mc/Nominal/";
@@ -66,7 +71,7 @@ int main(){
 
 
   //Mass Msmt
- 
+
   categories.push_back("ggF_4mu"); color.push_back(kViolet); marker.push_back(24); catlabels.push_back("4#mu");
   categories.push_back("ggF_4e"); color.push_back(kOrange); marker.push_back(25); catlabels.push_back("4e");
   categories.push_back("ggF_2mu2e"); color.push_back(kGreen+2); marker.push_back(26); catlabels.push_back("2#mu2e");
@@ -80,7 +85,7 @@ int main(){
   //cuts.push_back("(pass_vtx4lCut==1 && 110<m4l_fsr&&m4l_fsr<135&&event_type==2)");
   //cuts.push_back("(pass_vtx4lCut==1 && 110<m4l_fsr&&m4l_fsr<135&&event_type==3)");
 
-  
+
   //NWA
   /*
   categories.push_back("ggF_4mu"); color.push_back(kViolet); marker.push_back(24); catlabels.push_back("4#mu ggF-like");
@@ -92,9 +97,9 @@ int main(){
   cuts.push_back("(pass_vtx4lCut==1 && 140<m4l_constrained_HM&&m4l_constrained_HM<3000&&(event_type==3||event_type==2) && !(dijet_invmass>400 && dijet_deltaeta>3.3))");
   cuts.push_back("(pass_vtx4lCut==1 && 140<m4l_constrained_HM&&m4l_constrained_HM<3000 && (dijet_invmass>400 && dijet_deltaeta>3.3))");
   */
-  
-  
-  
+
+
+
   //LWA
   /*
   categories.push_back("ggF_4mu"); color.push_back(kViolet); marker.push_back(24); catlabels.push_back("4#mu ggF-like");
@@ -106,7 +111,7 @@ int main(){
   */
 
   //MELA
-/* 
+/*
   categories.push_back("ggF_4mu_MELA1"); color.push_back(kMagenta+4); marker.push_back(20); catlabels.push_back("4#mu MELA 0.0-0.2");
   categories.push_back("ggF_4mu_MELA2"); color.push_back(kMagenta+3); marker.push_back(21); catlabels.push_back("4#mu MELA 0.2-0.4");
   categories.push_back("ggF_4mu_MELA3"); color.push_back(kMagenta+2); marker.push_back(22); catlabels.push_back("4#mu MELA 0.4-0.6");
@@ -140,8 +145,8 @@ int main(){
   cuts.push_back(Form("((pass_vtx4lCut==1 && 200<m4l_constrained_HM&&m4l_constrained_HM<1200&&(event_type==2||event_type==3)) && %s>=0.6 && %s<0.8)",MELA,MELA));
   cuts.push_back(Form("((pass_vtx4lCut==1 && 200<m4l_constrained_HM&&m4l_constrained_HM<1200&&(event_type==2||event_type==3)) && %s>=0.8 && %s<=1.0)",MELA,MELA));
   */
-  
-  
+
+
   TFile* file = new TFile(Form("plots/%s",outTFileName.c_str()),"RECREATE");
   std::ofstream outfile;
   std::ofstream outfileSI;
@@ -274,7 +279,7 @@ int main(){
           float nom = polfit->Eval(masses[m]);
           outfileSys<<prod[p]<<"  "<<cat<<"  "<<masses[m]<<"  "<<Form("%.8f",(nom-rms)/nom)<<"   "<<Form("%.8f",(nom+rms)/nom)<<std::endl;
         }
-        
+
         //Printout for conf note table
         std::cout<<"prod "<<prod[p]<<" in category "<<cat<<" acceptance @125GeV = "<<100*polfit->Eval(125)<<"%,    @126GeV = "<<100*polfit->Eval(126)<<"%"<<std::endl;
 
@@ -312,8 +317,8 @@ int main(){
         //ATLASLabel(0.18,0.84,"Internal",kBlack);
 
         gSystem->Exec(Form("mkdir -p $PWD/plots/acceptance/%s/%s/",prod[p].c_str(),widths[w].c_str()));
-        //can.Print(Form("$PWD/plots/acceptance/%s/%s/acceptance_%s_%s_%s_%s.png",prod[p].c_str(),widths[w].c_str(),prod[p].c_str(),widths[w].c_str(),cat.c_str(),pol)); 
-        can.Print(Form("$PWD/plots/acceptance/%s/%s/acceptance_%s_%s_%s_%s.eps",prod[p].c_str(),widths[w].c_str(),prod[p].c_str(),widths[w].c_str(),cat.c_str(),pol)); 
+        //can.Print(Form("$PWD/plots/acceptance/%s/%s/acceptance_%s_%s_%s_%s.png",prod[p].c_str(),widths[w].c_str(),prod[p].c_str(),widths[w].c_str(),cat.c_str(),pol));
+        can.Print(Form("$PWD/plots/acceptance/%s/%s/acceptance_%s_%s_%s_%s.eps",prod[p].c_str(),widths[w].c_str(),prod[p].c_str(),widths[w].c_str(),cat.c_str(),pol));
 
         //STORE POLY PARAMS
         std::vector<double> polyParameters = fit->Parameters();
@@ -353,7 +358,7 @@ int main(){
           myLineText(x,y-0.05-0.04*c,color[c],kSolid,2,catlabels[c].c_str(),0.035);
 
       can.Update();
-      can.Print(Form("$PWD/plots/acceptance/%s/%s/acceptance_%s_%s_%s.eps",prod[p].c_str(),widths[w].c_str(),prod[p].c_str(),widths[w].c_str(),pol)); 
+      can.Print(Form("$PWD/plots/acceptance/%s/%s/acceptance_%s_%s_%s.eps",prod[p].c_str(),widths[w].c_str(),prod[p].c_str(),widths[w].c_str(),pol));
 
     } //end loop over widths
 
@@ -363,4 +368,3 @@ int main(){
   outfileSI.close();
   outfileSys.close();
 }
-
