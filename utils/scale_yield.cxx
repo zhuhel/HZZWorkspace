@@ -3,9 +3,21 @@
 #include <map>
 #include <fstream>
 #include <iostream>
-#include <iomanip> 
+#include <iomanip>
 
 #include "HZZWorkspace/Helper.h"
+//------------------------------------------------------------------------------
+// Scale input yields according to a configuration file
+// (useful for projection studies)
+//
+// Input files can be found in examples/Projections
+// scale.txt example:
+// ggF 1.23
+// VBF 1.28
+// qqZZ 0.84
+// ggZZ 0.84
+// zjet 0.99
+//------------------------------------------------------------------------------
 
 using namespace std;
 int main(int argc, char* argv[]){
@@ -21,7 +33,7 @@ int main(int argc, char* argv[]){
         input_name = string(argv[2]);
         output_name = string(argv[3]);
     }
-    
+
     map<string, double> scale_dic;
     Helper::readScaleFile(config_file.c_str(), scale_dic);
     map<string, map<string, double> > all_norm_dic;
@@ -33,13 +45,13 @@ int main(int argc, char* argv[]){
     getline(input_file, line);
     vector<string> category_names;
     Helper::tokenizeString(line, '&', category_names);
-    
+
     fstream out_file(output_name.c_str(), fstream::out);
     out_file << line << endl;
     for (const auto& key : all_norm_dic){
         const string& sample_name = key.first;
         const map<string, double>& sample_dic = key.second;
-        out_file << sample_name;  
+        out_file << sample_name;
         double scale_value = 1.0;
         try {
             scale_value = scale_dic.at(sample_name);
