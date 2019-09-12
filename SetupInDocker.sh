@@ -8,8 +8,9 @@ echo
 echo "For further documentation, please refer to  "
 echo "      https://gitlab.cern.ch/HZZ/HZZSoftware/HZZWorkspace/wikis/home"
 echo
+echo "You are in the HZZ build directory."
 echo "Thank you for using HZZWorkspace with Docker! "
 echo "============================================="
 source /home/atlas/release_setup.sh
 source ${AnalysisBase_PLATFORM}/setup.sh
-python verifysetup.py
+python ../source/HZZWorkspace/verifysetup.py
