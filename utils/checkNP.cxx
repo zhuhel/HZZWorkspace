@@ -26,11 +26,18 @@
 #include "TLatex.h"
 #include "TVectorD.h"
 
+//------------------------------------------------------------------------------
+// Plot nuisance parameters from text files generated with runSyst
+//
+// - Takes as input a path to all the systematics text files from runSyst
+// - Optional second argument gives a threshold for including the systematic
+// - Optional third argument defines an output directory for the plots 
+//------------------------------------------------------------------------------
 
 int main(int argc, char* argv[]){
 
     if (argc==1){
-        std::cout<<"provide workspace input path! \"checkNP /path/to/files/\""<<std::endl;
+        std::cout<<"Provide path to systematics text files! \"checkNP /path/to/files/\""<<std::endl;
         return -1;
     }
 
@@ -50,11 +57,21 @@ int main(int argc, char* argv[]){
     float thresh=-1;
     bool doMini=false;
     if (argc>2) thresh = TString(argv[2]).Atof();
+    TString outputDir( "plots" );
+    if( argc > 3 ) outputDir = TString( argv[ 3 ] );
 
-    std::cout<<"input directory: "<<path<<std::endl;
-    std::cout<<"threshold set at "<<thresh<<std::endl;
 
+    std::cout << "Input directory: " << path << std::endl;
+    std::cout << "Threshold set at " << thresh << std::endl;
+    std::cout << "Output directory: " << outputDir << std::endl;
+
+    // Load the systematics
     void* dirp = gSystem->OpenDirectory(path.Data());
+
+    // Make plots output directory if it does not exist
+    if( gSystem->OpenDirectory( outputDir.Data() ) == 0 ){
+      gSystem->MakeDirectory( outputDir.Data() );
+    }
 
     std::string str;
     const char* entry;
@@ -164,7 +181,7 @@ int main(int argc, char* argv[]){
 
             TString savename = str.c_str();
             savename.ReplaceAll(".txt","");
-            cv->Print(Form("plots/NPcheck_%s_%s.eps",savename.Data(),cat.first.c_str()));
+            cv->Print(Form("%s/NPcheck_%s_%s.eps", outputDir.Data(), savename.Data(),cat.first.c_str()));
             std::cout<<"\n===================="<<std::endl;
             std::cout<<savename.Data()<<" in category "<< cat.first <<std::endl;
             for (auto& w : wildMatch)
