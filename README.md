@@ -27,7 +27,8 @@ cd <workDir>
 mkdir source build run
 
 cd build
-asetup AnalysisBase,21.2.68,here
+asetup AnalysisBase,{latest release here},here
+# Confirmed numpy import working with 21.2.89 (does not work in 21.2.68)
 
 cd ../source
 git clone https://:@gitlab.cern.ch:8443/HZZ/HZZSoftware/HZZWorkspace.git
