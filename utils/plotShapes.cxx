@@ -29,6 +29,14 @@
 #include "HZZWorkspace/RooStatsHelper.h"
 
 using namespace std;
+
+//------------------------------------------------------------------------------
+// Plots shapes from workspace with option to perform a fit & error bars
+//
+// * Currently includes self-defined libraries for HGam high mass search
+// * Hardcoded
+// * LEGACY CODE 
+//------------------------------------------------------------------------------
 int main(int argc, char** argv)
 {
     if ((argc > 1 && string(argv[1]) == "help") ||
@@ -83,13 +91,13 @@ int main(int argc, char** argv)
         strategy = atoi(argv[opt_id]);
     }
     opt_id ++;
-    
+
     int fill_color = kGreen; // (416)
     if (argc > opt_id){
         fill_color = atoi(argv[opt_id]);
     }
     opt_id ++;
-    
+
     string fix_variables = "";
     if (argc > opt_id)
     {
@@ -110,8 +118,8 @@ int main(int argc, char** argv)
     gSystem->Load("/afs/cern.ch/user/x/xju/public/src/HggScalarLineShapePdf_cc.so");
     gSystem->Load("/afs/cern.ch/user/x/xju/public/src/HggGravitonLineShapePdf_cc.so");
     gSystem->Load("/afs/cern.ch/user/x/xju/public/src/FlexibleInterpVarMkII_cc.so");
-    
-   
+
+
     auto* file_in = TFile::Open(input_name.c_str(), "read");
     auto workspace = (RooWorkspace*) file_in->Get(wsName.c_str());
     auto* mc = (RooStats::ModelConfig*) workspace->obj(mcName.c_str());
@@ -128,7 +136,7 @@ int main(int argc, char** argv)
     }
 
     RooRealVar* obs = (RooRealVar*) mc->GetObservables()->first();
-    auto* mu = (RooRealVar*) workspace->var(muName.c_str()); 
+    auto* mu = (RooRealVar*) workspace->var(muName.c_str());
     auto* data =(RooDataSet*) workspace->data(dataName.c_str());
     if(!data) {
         log_err("data(%s) does not exist", dataName.c_str());
@@ -169,7 +177,7 @@ int main(int argc, char** argv)
 
 
     /* unconditional fit*/
-    if(fit_mode == 0) 
+    if(fit_mode == 0)
     { // background only
         mu->setVal(0);
         mu->setConstant();
@@ -179,7 +187,7 @@ int main(int argc, char** argv)
         auto mRes = workspace->var("ATLAS_mRes");
         if(hgg_bias) hgg_bias->setConstant(0);
         if (mRes) mRes ->setConstant(0);
-    } else if(fit_mode == 1) 
+    } else if(fit_mode == 1)
     { // signal + background fit
         mu->setConstant(0);
         auto mG = workspace->var("mG");
@@ -218,7 +226,7 @@ int main(int argc, char** argv)
     if(is_log) canvas->SetLogy();
 
     const RooCategory& category = *dynamic_cast<const RooCategory*>(&simPdf->indexCat());
-   
+
     RooCatType* obj;
     TList* data_lists = NULL;
     if(data) {
@@ -228,8 +236,8 @@ int main(int argc, char** argv)
     obs->setBins(nbins);
     auto* out_file = TFile::Open("out_hist.root", "recreate");
 
-    vector <bool> comp; 
-    comp.push_back(true); comp.push_back(false); 
+    vector <bool> comp;
+    comp.push_back(true); comp.push_back(false);
     for( int cp=0; cp<(int)comp.size(); cp++){
       float oldval=mu->getVal();
       if(!comp.at(cp)) {
@@ -246,7 +254,7 @@ int main(int argc, char** argv)
           auto* obs_frame = obs->frame(min_obs, max_obs, nbins);
           obs_frame->SetMarkerSize(0.015);
           int color = 2;
-          
+
           double bkg_evts = pdf->expectedEvents(RooArgSet(*obs));
           string component="bck";
           if(!comp.at(cp)) component="sb";
@@ -259,7 +267,7 @@ int main(int argc, char** argv)
           RooCmdArg add_arg = RooFit::VisualizeError(*fit_results);
           add_arg.Print();
           // possibly with band
-          pdf->plotOn(obs_frame, RooFit::LineStyle(1), 
+          pdf->plotOn(obs_frame, RooFit::LineStyle(1),
                       RooFit::LineColor(1),
                       RooFit::LineWidth(2),
                       RooFit::FillColor(fill_color),
@@ -267,13 +275,13 @@ int main(int argc, char** argv)
                       add_arg
                       );
           // no band
-          pdf->plotOn(obs_frame, RooFit::LineStyle(1), 
+          pdf->plotOn(obs_frame, RooFit::LineStyle(1),
                       RooFit::LineColor(1),
                       RooFit::LineStyle(2),
                       RooFit::LineWidth(1),
                       RooFit::Normalization(bkg_evts, RooAbsReal::NumEvent)
                       );
-          
+
           /* deal with nuisance parameters */
         if(np_names.size() > 0)
           {
@@ -294,7 +302,7 @@ int main(int argc, char** argv)
                     hist_sb_2s_up->Write();
                     delete hist_sb_2s_up;
                 }
-                pdf->plotOn(obs_frame, RooFit::LineStyle(7), 
+                pdf->plotOn(obs_frame, RooFit::LineStyle(7),
                         RooFit::LineColor(color++),
                         RooFit::LineWidth(2),
                         RooFit::Normalization(splusb_evts, RooAbsReal::NumEvent)
@@ -309,7 +317,7 @@ int main(int argc, char** argv)
                     hist_np_2sdown->Write();
                     delete hist_np_2sdown;
                 }
-                pdf->plotOn(obs_frame, RooFit::LineStyle(7), 
+                pdf->plotOn(obs_frame, RooFit::LineStyle(7),
                         RooFit::LineColor(color++),
                         RooFit::LineWidth(2),
                         RooFit::Normalization(splusb_evts, RooAbsReal::NumEvent)
@@ -325,8 +333,8 @@ int main(int argc, char** argv)
         {
             auto* data_ch = (RooDataSet*) data_lists->At(obj->getVal());
             // double num_data = data_ch->sumEntries();
-            data_ch->plotOn(obs_frame, 
-                    RooFit::LineStyle(1), 
+            data_ch->plotOn(obs_frame,
+                    RooFit::LineStyle(1),
                     RooFit::LineColor(1),
                     RooFit::LineWidth(2),
                     RooFit::DrawOption("ep")
@@ -357,7 +365,7 @@ int main(int argc, char** argv)
         nominal ->SetName(Form("nominal_%s_%s",component.c_str(),label_name));
         error_band->Write();
         nominal->Write();
-        
+
         obs_frame->SetName(Form("frame_obs_%s_%s",component.c_str(),label_name));
         obs_frame->Write();
         delete obs_frame;
@@ -366,7 +374,7 @@ int main(int argc, char** argv)
     }
     out_file->Close();
     delete canvas;
-    
+
     delete nll;
     file_in->Close();
     return 1;
