@@ -2,3 +2,7 @@
 	path = RooFitExtensions
 	url = ../../../cburgard/RooFitExtensions.git
 	#url = https://:@gitlab.cern.ch:8443/cburgard/RooFitExtensions.git
+[submodule "examples/WorkspaceConfiguration/MassMeasurement"]
+	path = examples/WorkspaceConfiguration/MassMeasurement
+	url = ../../../hherde/mass-measurement-workspaces-for-h4l.git
+	#url = ssh://git@gitlab.cern.ch:7999/hherde/mass-measurement-workspaces-for-h4l.git
