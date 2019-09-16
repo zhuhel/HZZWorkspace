@@ -17,7 +17,7 @@
 #include "HZZWorkspace/Helper.h"
 #include <map>
 
-typedef SampleBase* (*SBConstructor)(strvec&);
+typedef SampleBase* ( *SBConstructor )( strvec& );
 
 namespace SampleFactory{
 
@@ -25,26 +25,24 @@ namespace SampleFactory{
   // Any questions? Please contact graham.cree@cern.ch, xiangyang.Ju@cern.ch
 
 
-  SampleBase* FactorySampleCount(strvec& args);
-  SampleBase* FactorySampleHist(strvec& args);
-  SampleBase* FactorySampleHistParam(strvec& args);
-  SampleBase* FactorySampleKeys(strvec& args);
-  SampleBase* FactoryCBGauss(strvec& args);
-  SampleBase* FactoryCBGaussSum(strvec& args);
-  SampleBase* FactoryParametrizedSample(strvec& args);
-  SampleBase* FactoryExpLandau(strvec& args);
-  SampleBase* FactoryAnalyticHMBkg(strvec& args);
-  SampleBase* FactoryEFTMorph(strvec& args);
-  SampleBase* FactorySimpleMorph(strvec& args);
-  // SampleBase* FactoryYourSampleType(strvec& args);
+  SampleBase* FactorySampleCount( strvec& args );
+  SampleBase* FactorySampleHist( strvec& args );
+  SampleBase* FactorySampleHistParam( strvec& args );
+  SampleBase* FactorySampleKeys( strvec& args );
+  SampleBase* FactoryCBGauss( strvec& args );
+  SampleBase* FactoryCBGaussSum( strvec& args );
+  SampleBase* FactoryParametrizedSample( strvec& args );
+  SampleBase* FactoryExpLandau( strvec& args );
+  SampleBase* FactoryAnalyticHMBkg( strvec& args );
+  SampleBase* FactoryEFTMorph( strvec& args );
+  SampleBase* FactorySimpleMorph( strvec& args );
+  // SampleBase* FactoryYourSampleType( strvec& args );
 
-  SampleBase* CreateSample(const std::string& type, strvec& args);
+  SampleBase* CreateSample( const std::string& type, strvec& args );
 
+  bool AddKeysSample( SampleBase*, strvec& args );
 
-
-  bool AddKeysSample(SampleBase*, strvec& args);
-
-  strvec& Categories(strvec* in=NULL);
+  strvec& Categories( strvec* in = NULL );
 }
 
 #endif

@@ -19,45 +19,50 @@
 #include "HZZWorkspace/SysText.h"
 
 using namespace std;
+
 class SampleBase{
 
     public:
-        typedef map<TString, vector<float> >  NormDic;
+        typedef map< TString, vector< float > >  NormDic;
         virtual ~SampleBase();
 
         /* tell sample to provide information in _channelName_
          * return false, if no such channel.
          * */
-        virtual bool setChannel(const RooArgSet& observable, const char* channelName, bool with_sys);
+        virtual bool setChannel( const RooArgSet& observable, const char* channelName, bool with_sys );
 
         /* add shape and normalization systematic*/
-        virtual bool addShapeSys(const TString& npName ) { log_warn("Careful! You are calling addShapeSys (\"%s\") for a sample \"%s\" which uses the SampleBase::addShapeSys implementation - will do NOTHING!",npName.Data(),pdf_name_.c_str()); 
+        virtual bool addShapeSys( const TString& npName ) { log_warn( "Careful! You are calling addShapeSys (\"%s\") for a sample \"%s\" which uses the SampleBase::addShapeSys implementation - will do NOTHING!", npName.Data(), pdf_name_.c_str() );
             return false;
         }  // MG: Is this supposed to do nothing??
         virtual bool addNormSys(const TString& npName);
 
         /* return final PDF for this Sample in _channelName_ */
         virtual RooAbsPdf* getPDF();
+
         /* return MC constraint terms */
         virtual RooAbsPdf* get_mc_constraint();
 
-        virtual RooAbsReal* getCoefficient(const char* customname="");
-        void addCoefficient(Coefficient*);
+        virtual RooAbsReal* getCoefficient(const char* customname = "" );
+        void addCoefficient( Coefficient* );
 
-        void useAdaptiveBinning(); // use adaptive binning
+        // Use adaptive binning
+        void useAdaptiveBinning();
 
-        double get_mass() const {return mass_;}
-        void set_mass(double mass) { mass_ = mass; }
+        // Mass point manipulations
+        double get_mass() const { return mass_; }
+        void set_mass( double mass ) { mass_ = mass; }
 
         const string& get_pdf_name() { return pdf_name_; }
+
         const string& get_channel() { return category_name_; }
 
-        // get the associated obs/nps
+        // Get the associated obs/nps
         const RooArgList& getGlobal() { return global_obs_list_; }
-        const RooArgList& getNuisance() { return nuisance_obs_list_; } 
+        const RooArgList& getNuisance() { return nuisance_obs_list_; }
 
         // To get the stats that is used to make the histrogram
-        virtual int getStats() const {return -1;};
+        virtual int getStats() const { return -1; };
 
         /* name: used to construct PDF
          * nickname: used to name the signal strength, if it's signal
