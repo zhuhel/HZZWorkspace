@@ -1,0 +1,16 @@
+GA_s_p0 -1.259 0.534
+GA_s_p1 0.01909 0.002834
+GA_s_p2 1.046e-05 2.864e-06
+CB_s_p0 0 0
+CB_s_p1 0 0
+CB_alpha_p0 0 0
+CB_alpha_p1 0 0
+CB_alpha_p2 0 0
+CB_alpha_p3 0 0
+CB_f_p0 0 0
+CB_f_p1 0 0
+CB_f_p2 0 0
+CB_nn_p0 0 0
+CB_mu_p0 0 0
+CB_mu_p1 0 0
+CB_mu_p2 0 0
