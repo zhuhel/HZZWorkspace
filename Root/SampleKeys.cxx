@@ -10,10 +10,12 @@
 #include <stdlib.h>
 #include <fstream>
 #include <stdexcept>
-
+//-----------------------------------------------------------------------------
+//
+//-----------------------------------------------------------------------------
 SampleKeys::SampleKeys(const char* name,
-        double mH, double mH_low, double mH_hi, 
-        const char* minitree_dir, 
+        double mH, double mH_low, double mH_hi,
+        const char* minitree_dir,
         const char* shape_sys) :
     SampleBase(name),
     mh_low_(mH_low),
@@ -28,7 +30,7 @@ SampleKeys::SampleKeys(const char* name,
 
 void SampleKeys::init(){
     tree_name_ = "tree_incl_all";
-    /* channel_cuts_ is analysis dependant 
+    /* channel_cuts_ is analysis dependant
      * should not be here..
      * Try to improve that later.
      * ***/
@@ -41,11 +43,11 @@ void SampleKeys::init(){
         channel_cuts_->push_back("event_type==3"); // 2e2mu
     }
     channel_cuts_->push_back("event_type==1"); // 4e
-    
+
     ch_cut_index = -1;
     rho_ = 1.0;
     ds = NULL;
-    mH_var_ = nullptr; 
+    mH_var_ = nullptr;
     m4l_var_ = nullptr;
 }
 
@@ -65,7 +67,7 @@ bool SampleKeys::setChannel(const RooArgSet& obs, const char* ch_name, bool with
 {
     SampleBase::setChannel(obs, ch_name, with_sys);
     if(with_sys && shape_sys_handler_) shape_sys_handler_->SetChannel(ch_name);
-    ch_cut_index = get_channel_index(ch_name); 
+    ch_cut_index = get_channel_index(ch_name);
     return true;
 }
 
@@ -79,7 +81,7 @@ int SampleKeys::get_channel_index(const char* ch_name){
     TString chName(ch_name);
     int res = -1;
     if(chName.Contains("4mu")){
-        res = 0; 
+        res = 0;
     } else if (chName.Contains("2mu2e")) {
         res = 1;
     } else if(chName.Contains("2e2mu")) {
@@ -99,7 +101,7 @@ RooAbsPdf* SampleKeys::getPDF()
     if(m4l_var_ == nullptr) m4l_var_ = new RooRealVar("m4l_constrained", "m4l", mh_low_, mh_hi_);
     // RooRealVar m4l_var_("m4l_constrained", "m4l", mh_low_, mh_hi_);
     m4l_var_->Print();
-    RooAbsReal* multiplier = nullptr; 
+    RooAbsReal* multiplier = nullptr;
     if(shape_sys_handler_) {
         RooAbsReal* tmp = shape_sys_handler_->GetSys(Form("fiv_shape_%s", base_name_.Data()));
         if(tmp) multiplier = tmp;
@@ -113,9 +115,9 @@ RooAbsPdf* SampleKeys::getPDF()
     RooRealVar prod_type("prod_type", "prod_type", -10, 10);
     RooRealVar weight("weight", "weight", 0, 10000);
 
-    ds = new RooDataSet(Form("ds_%s",base_name_.Data()), "data set", 
-            RooArgSet(*m4l_var_, event_type, prod_type, weight), 
-            RooFit::Import(*chain), 
+    ds = new RooDataSet(Form("ds_%s",base_name_.Data()), "data set",
+            RooArgSet(*m4l_var_, event_type, prod_type, weight),
+            RooFit::Import(*chain),
             RooFit::Cut(channel_cuts_->at(ch_cut_index).c_str())
             // RooFit::WeightVar("weight")
             );
@@ -123,8 +125,8 @@ RooAbsPdf* SampleKeys::getPDF()
     ds->changeObservableName("m4l_constrained","m4l"); //FIXME cheap hardcoding
     ds_list_.push_back(ds);
     ds->Print();
-    auto* keyspdf = new RooParamKeysPdf(Form("key_%.f_%s",mass_, base_name_.Data()), 
-            "key pdf", *m4l_var_, *mH_var_, mass_, *multiplier, 
+    auto* keyspdf = new RooParamKeysPdf(Form("key_%.f_%s",mass_, base_name_.Data()),
+            "key pdf", *m4l_var_, *mH_var_, mass_, *multiplier,
             *ds, RooParamKeysPdf::NoMirror,  rho_);
     keyspdf->Print();
     delete chain;

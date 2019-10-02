@@ -21,12 +21,25 @@
 #include "HZZWorkspace/SampleKeys.h"
 #include "HZZWorkspace/RooStatsHelper.h"
 
+//-----------------------------------------------------------------------------
+// Source file for operational class Combiner
+// *** THIS IS THE MAIN CODE ***
+//
+// "Combiner" class -
+// This class reads a supplied configuration file and coordinates the creation of
+// a RooWorkspace containing the data, MC, and likelihood described in the config.
+// https://gitlab.cern.ch/HZZ/HZZSoftware/HZZWorkspace/wikis/Config/Introduction
+//-----------------------------------------------------------------------------
+
+// Combiner class constructor
 Combiner::Combiner(const char* _name, const char* _configName):
     ws_name_(_name),
     config_name_(_configName)
 {
+    // Print the output workspace name and the configuration name
     cout<<"workspace name: "<< ws_name_ << endl;
     cout<<"configuration name: " << config_name_ << endl;
+    // Initialize select class members
     file_path_ = "./";
     data_chain = nullptr;
     mc_chain = nullptr;
@@ -34,18 +47,25 @@ Combiner::Combiner(const char* _name, const char* _configName):
     weight_var_name = ("weight");
 }
 
+// Combiner class destructor
 Combiner::~Combiner(){
     if(workspace) delete workspace;
     if(data_chain) delete data_chain;
-    if (mc_chain) delete mc_chain;
+    if(mc_chain) delete mc_chain;
     if(sysMan) delete sysMan;
     for(auto& coef : allCoefficients) delete coef.second;
 }
 
+// Process the configuration file to populate the Combiner class members
 void Combiner::readConfig(const char* configName)
 {
+    // Create a dictionary
     Helper::readConfig(configName, '=', all_dic);
+
     Helper::printDic<string>(all_dic);
+
+    // Output workspace always has the internal name "combined"
+    // IDEA: replace with output filename, stripping .root
     workspace = new RooWorkspace("combined");
 
     auto& main_dic = all_dic.at("main");
@@ -469,11 +489,13 @@ Coefficient* Combiner::getCoefficient(string& name)
 string Combiner::findCategoryConfig(const string& sec_name, const string& key_name)
 {
     string token = "";
-    try {
+    try { // Try locating the section name as is own section
+        // Parse the section according to the keys (categories)
         token = all_dic.at(sec_name).at(key_name);
     } catch (const out_of_range& orr) {
-        try {
+        try { // Try locating section name in the [main] section (global namespace)
             token = all_dic.at("main").at(key_name);
+            //token = all_dic.at( "main" ).at( sec_name );
         } catch (const out_of_range& orr) {
             // Loop over the section names and try to match sec_name
             int ntimes = 0;

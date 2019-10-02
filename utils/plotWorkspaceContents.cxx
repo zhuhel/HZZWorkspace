@@ -12,6 +12,11 @@
 #include <stdio.h>
 #include "TObject.h"
 
+//------------------------------------------------------------------------------
+// Legacy; achievable with workspace->Print()
+//
+// May reappropriate for CI tests 
+//------------------------------------------------------------------------------
 int main(int argc, const char** argv){
 
   using namespace RooFit;
@@ -37,7 +42,7 @@ int main(int argc, const char** argv){
     std::cout<<"give valid arguments! options are \"pdfs\", \"functions\", \"vars\" (or \"p\",\"f\",\"v\")"<<std::endl;
     return -1;
   }
-  
+
 
   // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -86,7 +91,7 @@ int main(int argc, const char** argv){
         auto allPars = pdf->getParameters(data)->selectByName("alpha*");
         if (allPars->getSize()!=0)
           fileout->mkdir(Form("pdfs/%s/sysDependence",pdf->GetName()))->cd();
-        
+
         auto it3 = allPars->createIterator();
         while (auto par = it3->Next()){
 
@@ -109,7 +114,7 @@ int main(int argc, const char** argv){
       }
     }
   }
-  
+
   // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   if (doFunctions){
 
@@ -137,10 +142,10 @@ int main(int argc, const char** argv){
       auto it2 = allParams->createIterator();
       while (auto par = it2->Next()){
 
-  
+
         auto rrv = dynamic_cast<RooRealVar*>(par);
         if (!rrv) continue;
-        
+
         double def = rrv->getVal();
         double low = rrv->getBinning().lowBound();
         double high = rrv->getBinning().highBound();
@@ -178,12 +183,12 @@ int main(int argc, const char** argv){
     }
     histfunc->Write(0,TObject::kWriteDelete);
   }
-  
+
   // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   if (doVars){
 
     fileout->mkdir("vars")->cd();
-    
+
     auto allVars = w->allVars();
     allVars.remove(*data->get());
 
@@ -210,12 +215,10 @@ int main(int argc, const char** argv){
     }
     histvars->Write(0,TObject::kWriteDelete);
   }
-      
+
 
 
   fileout->Write();
   fileout->Close();
   return 1;
 }
-
-

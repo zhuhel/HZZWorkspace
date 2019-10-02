@@ -19,11 +19,23 @@ using namespace std;
 using namespace RooFit;
 using namespace RooStats;
 
+//------------------------------------------------------------------------------
+// Draws PDFs in each category within a workspace on top of data
+// --> Prefit data-MC comparison
+//
+// Takes 6 required arguments:
+// - workspace ROOT file name
+// - ModelConfig name (usually "ModelConfig")
+// - Dataname ("asimovData" "or "obsData")
+// - wsName (default "combined" )
+// - Plotting options: "log" - plot in logarithm scale 
+// *** Currently out of  service! Check back soon OR better yet! Get involved! ***
+//------------------------------------------------------------------------------
 
 int main(int argc, char** argv)
 {
     if (argc < 7){
-        log_err(" Please provide the following 6 args:fileName - mcName - dataName - obsName - wsName - option ");
+        log_err(" Please provide the following 6 args: fileName - mcName - dataName - obsName - wsName - option ");
         return EXIT_FAILURE;
 
     }
@@ -51,7 +63,7 @@ int main(int argc, char** argv)
     TList* dataList = data->split( *cat, true );
 
     for ( int i= 0; i < nCat; i++ ) {
-      
+
         cat->setBin(i);
         RooAbsPdf* pdfi = pdf->getPdf(cat->getLabel());
         RooDataSet* datai = (RooDataSet*)( dataList->At(i) );
@@ -77,7 +89,7 @@ int main(int argc, char** argv)
            pdfi->plotOn(xframe,Components(str.data()),LineColor(icolor),Name(str.data()));
          }
         }
-        
+
         TCanvas *c1 = new TCanvas("c1","c1",800,600);
         if(option.find("log") != std::string::npos) c1->SetLogy();
         string saveName = "Pdf_"+string(pdfi->GetName());

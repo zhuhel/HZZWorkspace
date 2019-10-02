@@ -2,7 +2,11 @@
 #include <iostream>
 
 
-int main(int argc, char **argv) 
+//------------------------------------------------------------------------------
+// Produce systematic uncertainty inputs based on input file
+// eg: runSyst example/example_syst.ini 
+//------------------------------------------------------------------------------
+int main(int argc, char **argv)
 {
     if (argc > 1 && string(argv[1]) == "help"){
         cout << argv[0] << " config_file " << endl;
@@ -15,8 +19,7 @@ int main(int argc, char **argv)
 
     SysProd *s = new SysProd(config_name.c_str());
     s->process();
-  
+
     delete s;
     return 0;
 }
-

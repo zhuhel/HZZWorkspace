@@ -1,5 +1,3 @@
-// produce shape histograms for QCD/PDF uncertainties of ggZZ/qqZZ
-//
 #include <stdlib.h>
 #include <utility>
 #include <string>
@@ -14,6 +12,14 @@
 
 #include "HZZWorkspace/Helper.h"
 using namespace std;
+// ------------------------------------------------------------------------------
+// Accepts a configuration file (eg example/zz_shape.ini)
+//
+// Produces shape histograms for QCD/PDF uncertainties of ggZZ/qqZZ
+//
+// Hardcoded numbers based on a parameterization lost to time.
+// Please go on a treasure hunt, thanks! 
+// ------------------------------------------------------------------------------
 
 map<string, double> pdf_qqZZ(double m4l){
     double var = 0.0035 * sqrt(m4l - 30);
@@ -69,7 +75,7 @@ int main(int argc, char* argv[]){
     int n_bins = atoi(m4l_range.at(0).c_str());
     double min_x = atof(m4l_range.at(1).c_str());
     double max_x = atof(m4l_range.at(2).c_str());
-    cout << "m4l range: [" << min_x << "," << max_x << "] with " 
+    cout << "m4l range: [" << min_x << "," << max_x << "] with "
         << n_bins << " bins " << endl;
 
     double step = (max_x - min_x) / n_bins;

@@ -72,7 +72,7 @@ namespace Helper{
     bool isMathSyntax(const string& str);
     // -1, not a boolean type, 0: false, 1: true
     int isBoolean(const string& str);
-   
+
     // sort string vector by length
     bool sort_str_len(const std::string A, const std::string B);
 }

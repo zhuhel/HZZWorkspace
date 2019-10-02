@@ -14,19 +14,19 @@ using namespace std;
 class ParametrizedSample : public SampleBase
 {
 public:
-    ParametrizedSample(const char* name, const char* para_name = "mH", float low = 118., float hi = 119.);
+    ParametrizedSample( const char* name, const char* para_name = "mH", float low = 118., float hi = 119. );
     virtual ~ParametrizedSample();
 
     // from sample base
-    virtual bool setChannel(const RooArgSet& observable, const char* channelName, bool with_sys);
-    virtual bool addShapeSys(const TString& npName);
+    virtual bool setChannel( const RooArgSet& observable, const char* channelName, bool with_sys );
+    virtual bool addShapeSys( const TString& npName );
     virtual RooAbsPdf* getPDF();
     //virtual RooAbsReal*  getCoeff();
     // virtual RooAbsPdf* get_mc_constraint();
 
-    bool AddSample(SampleBase* signal);
-    void SetParaRange(const string& range_name, double low_value, double hi_value);
-    void SetParaOrder(int order){ order_ = order; }
+    bool AddSample( SampleBase* signal );
+    void SetParaRange( const string& range_name, double low_value, double hi_value );
+    void SetParaOrder( int order ){ order_ = order; }
 private:
     void BuildBases();
 
@@ -35,8 +35,8 @@ private:
     int order_;
 
     RooRealVar* mH_;
-    vector<SampleBase*>* signal_samples_;
-    vector<double>* masses_;
+    vector< SampleBase* >* signal_samples_;
+    vector< double >* masses_;
 
     RooStats::HistFactory::RooBSplineBases* bases_;
 };

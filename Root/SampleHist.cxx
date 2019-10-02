@@ -1,7 +1,7 @@
 // =========================================================================
-// 
-//    Description:  
-// 
+// Histogram shape PDF class
+//    Description:  Derives from SampleBase 
+//
 // ==========================================================================
 #include "HZZWorkspace/SampleHist.h"
 #include <iostream>
@@ -53,7 +53,7 @@ bool SampleHist::setChannel(const RooArgSet& _obs, const char* _ch_name, bool wi
     SampleBase::setChannel(_obs, _ch_name, with_sys);
 
     if (obs_list_.getSize() == 1) obsname = string(obs_list_.at(0)->GetName());
-    else if (obs_list_.getSize() == 2) 
+    else if (obs_list_.getSize() == 2)
         obsname = string(Form("%s_%s", obs_list_.at(0)->GetName(), obs_list_.at(1)->GetName()));
     else {
         cout << "3D is not supported.. " << endl;
@@ -71,7 +71,7 @@ bool SampleHist::setChannel(const RooArgSet& _obs, const char* _ch_name, bool wi
             raw_hist = nom_hist;
         }
     } else { raw_hist = nom_hist; }
-    
+
     if (with_sys) {
         // get shape sys dictionary
         this ->getShapeSys();
@@ -104,9 +104,9 @@ RooAbsPdf* SampleHist::makeHistPdf(TH1* hist, const char* base_name, bool is_nor
         obs->setBinning(*binning, "adaptive");
         delete keyspdf;
         cout << "total bins: " << binning->numBoundaries() << endl;
-        newdatahist = BinningUtil::makeAsimov1D( *histpdf, *obs, 
+        newdatahist = BinningUtil::makeAsimov1D( *histpdf, *obs,
                 *binning,
-                "adaptive", 
+                "adaptive",
                 nom_hist // TODO: use un-smoothed histogram
                 );
         delete datahist; // release old dataHist
@@ -116,13 +116,13 @@ RooAbsPdf* SampleHist::makeHistPdf(TH1* hist, const char* base_name, bool is_nor
 
     if (!use_mcc_ || !is_norm) {
         delete histpdf;
-        RooHistPdf *newhistpdf = new RooHistPdf(pdfname.c_str(), pdfname.c_str(), 
+        RooHistPdf *newhistpdf = new RooHistPdf(pdfname.c_str(), pdfname.c_str(),
                 obs_list_, *newdatahist, m_interp);
         return newhistpdf;
     } else {
-        delete histpdf; // delete old histpdf 
+        delete histpdf; // delete old histpdf
         auto* expandDataHist = new RooExpandedDataHist(*newdatahist, Form("%s_EDH",base_name));
-        auto* newhistpdf = new RooExpandedHistPdf(pdfname.c_str(), pdfname.c_str(), 
+        auto* newhistpdf = new RooExpandedHistPdf(pdfname.c_str(), pdfname.c_str(),
                 obs_list_, *expandDataHist, m_interp);
         return newhistpdf;
     }
@@ -133,17 +133,17 @@ void SampleHist::getShapeSys()
     // call this function every time dealing with new category
     // return a dictionary for all shape nusiance parameter in specific category
     // to avoid visiting the files many times
-    // name convention of histograms are: 
+    // name convention of histograms are:
     // 1. npName-CategoryName-sym, for symmetry error
     // 2. npName-CategoryName-up, for upward error
     // 3. npName-CategoryName-down, for downward error
-    
+
     //prepare for the a new category
     shapes_dic.clear();
     paramNames.clear();
     sysPdfs.clear();
     if(!shape_files_ || shape_files_->IsZombie()) return;
-        
+
     TIter next(shape_files_->GetListOfKeys());
     TKey* key;
     while((key = (TKey*) next())) {
@@ -174,17 +174,17 @@ void SampleHist::getShapeSys()
             // make sure first push_back "up" then "down" !
             TString& downname = keyname.ReplaceAll("-up","-down");
             TH1* h_down = dynamic_cast<TH1*>(shape_files_->Get(downname.Data()));
-            if (Helper::IsGoodTH1(h_down)) { 
+            if (Helper::IsGoodTH1(h_down)) {
                 shape_vary.push_back(h_up);
                 shape_vary.push_back(h_down);
-            } else{ 
+            } else{
                 cout<<" Cannot find down shape: "<< downname.Data()<<endl;
                 continue;
             }
         } else {
             cout << "Don't undertand the histname: " << keyname << endl;
         }
-       
+
         //Systematic effect cutoff
         bool passCutoff=false;
         for (auto& h: shape_vary){
@@ -274,7 +274,7 @@ bool SampleHist::addShapeSys(const TString& npName)
             }
         }
     } else {
-        cout <<"WARNNING: (SampleHist::addShapeSys) Check the size of shape varies: " 
+        cout <<"WARNNING: (SampleHist::addShapeSys) Check the size of shape varies: "
             << shape_varies->size() <<endl;
     }
     paramNames.push_back(string(npName.Data()));
@@ -287,10 +287,10 @@ bool SampleHist::addShapeSys(const TString& npName)
 
 RooAbsPdf* SampleHist::getPDF(){
     nom_pdf = this->makeHistPdf(this->nom_hist, base_name_.Data(), true);
-    if (use_mcc_) 
+    if (use_mcc_)
     {
         string pdfname(Form("%s_normConstraint", nom_pdf->GetName()));
-        mc_constraint = new RooMCHistConstraint(pdfname.c_str(), "constraint", 
+        mc_constraint = new RooMCHistConstraint(pdfname.c_str(), "constraint",
                 *nom_pdf, RooMCHistConstraint::Poisson, thresh_);
     }
     if (paramNames.size() < 1) // no shape systematics
@@ -338,7 +338,7 @@ RooStarMomentMorph* SampleHist::createRooStarMomentMorph(const string& outputNam
             parList, obs_list_, pdfList, nnuispoints, nrefpoints,
             RooStarMomentMorph::Linear);
     tmpmorph->useHorizontalMorphing(false);
-   
+
     // add bin by bin scale factor
     if (use_mcc_) {
         // copied from WorkspaceToolBase, line 911
@@ -392,10 +392,10 @@ bool SampleHist::getNominalHist()
             nom_hist->SetDirectory(0);
             return true;
         }
-    } 
+    }
     // otherwise failed
     log_err("Cannot get nominal files..");
-    return false; 
+    return false;
 }
 
 bool SampleHist::hasNominalHist(const char* hist_name)

@@ -4,6 +4,7 @@
 // It's very useful when one intends to evaluate the results without systematics
 // For documentation see https://twiki.cern.ch/twiki/bin/view/AtlasProtected/HiggsZZRunIIWorkspaces#Doing_statistics_with_your_works
 //
+// Intended for high mass limit setting 
 #include <stdlib.h>
 #include <string>
 #include <iostream>
@@ -157,7 +158,7 @@ int main(int argc, char** argv)
         mu_ZZ->setConstant(false);
     }
 
-    if (options == "" || options.find("pvalue") != string::npos) 
+    if (options == "" || options.find("pvalue") != string::npos)
     {
         std::cout<<"running pvalue code"<<std::endl;
         if (data_opt == "" || data_opt.find("obs") != string::npos) {
@@ -165,7 +166,7 @@ int main(int argc, char** argv)
         }
         if (data_opt == "" || data_opt.find("exp") != string::npos) {
             bool do_profile = false; // hard coded
-            auto asimov_data = (RooDataSet*) ws->data(asimov_data_name.c_str()); 
+            auto asimov_data = (RooDataSet*) ws->data(asimov_data_name.c_str());
             if(!asimov_data) {
                 // set other POIs to other_poi_value and fix
                 RooStatsHelper::setOtherPOIs(pois, muName+fix_variables, other_poi_value, true);
@@ -173,12 +174,12 @@ int main(int argc, char** argv)
                         poi->GetName(), mcName.c_str(), dataName.c_str(), do_profile);
                 RooStatsHelper::setOtherPOIs(pois, muName+fix_variables, other_poi_value, is_other_poi_const);
             }
-            if(asimov_data) 
-                exp_p0 = RooStatsHelper::getPvalue(ws, mc, asimov_data, poi->GetName()); 
+            if(asimov_data)
+                exp_p0 = RooStatsHelper::getPvalue(ws, mc, asimov_data, poi->GetName());
         }
         cout << "expected p0: " << exp_p0 << endl;
         cout << "obs p0: " << obs_p0 << endl;
-    } 
+    }
     out_ss << fix_variables << " " << obs_p0 << " " << exp_p0 << " " ;
 
     if (options.find("limit") != string::npos){

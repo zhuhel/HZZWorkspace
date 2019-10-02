@@ -5,12 +5,16 @@
 #include "TMarker.h"
 #include "TPad.h"
 
+//-----------------------------------------------------------------------------
+// Class for labels!
+//-----------------------------------------------------------------------------
+
 ///********************************************************************************************
 ///********************************************************************************************
 
-void ATLASLabel(Double_t x,Double_t y,const char* text,Color_t color) 
+void ATLASLabel(Double_t x,Double_t y,const char* text,Color_t color)
 {
-  TLatex l; //l.SetTextAlign(12); l.SetTextSize(tsize); 
+  TLatex l; //l.SetTextAlign(12); l.SetTextSize(tsize);
   l.SetNDC();
   l.SetTextFont(72);
   l.SetTextColor(color);
@@ -19,7 +23,7 @@ void ATLASLabel(Double_t x,Double_t y,const char* text,Color_t color)
 
   l.DrawLatex(x,y,"ATLAS");
   if (text) {
-    TLatex p; 
+    TLatex p;
     p.SetNDC();
     p.SetTextFont(42);
     p.SetTextColor(color);
@@ -28,20 +32,20 @@ void ATLASLabel(Double_t x,Double_t y,const char* text,Color_t color)
 }
 void myText(Double_t x,Double_t y,Color_t color, const char *text, float size) {
 
-  TLatex l; 
+  TLatex l;
   //l.SetTextAlign(11);
-  l.SetTextSize(size); 
+  l.SetTextSize(size);
   l.SetTextFont(42);
   l.SetNDC();
   l.SetTextColor(color);
   l.DrawLatex(x,y,text);
 }
- 
 
-void myBoxText(Double_t x, Double_t y,Double_t boxsize,Int_t mcolor, Int_t boxstyle, Int_t lcolor, const char *text, float tsize) 
+
+void myBoxText(Double_t x, Double_t y,Double_t boxsize,Int_t mcolor, Int_t boxstyle, Int_t lcolor, const char *text, float tsize)
 {
 
-  TLatex l; l.SetTextAlign(12); l.SetTextSize(tsize); 
+  TLatex l; l.SetTextAlign(12); l.SetTextSize(tsize);
   l.SetTextFont(42);
   l.SetNDC();
   l.DrawLatex(x,y,text);
@@ -70,10 +74,10 @@ void myBoxText(Double_t x, Double_t y,Double_t boxsize,Int_t mcolor, Int_t boxst
 }
 
 
-void myMarkerText(Double_t x,Double_t y,Int_t color,Int_t mstyle, float msize,  const char *text,Float_t tsize, bool error) 
+void myMarkerText(Double_t x,Double_t y,Int_t color,Int_t mstyle, float msize,  const char *text,Float_t tsize, bool error)
 {
   TMarker *marker = new TMarker(x-1.0*tsize, y, mstyle);
-  marker->SetMarkerColor(color);  
+  marker->SetMarkerColor(color);
   marker->SetNDC(true);
   marker->SetMarkerSize(msize);
   marker->Draw();
@@ -85,14 +89,14 @@ void myMarkerText(Double_t x,Double_t y,Int_t color,Int_t mstyle, float msize,  
   line->SetLineWidth(1);
   if (error) line->Draw();
 
-  TLatex l; l.SetTextAlign(12); 
-  l.SetTextSize(tsize); 
+  TLatex l; l.SetTextAlign(12);
+  l.SetTextSize(tsize);
   l.SetTextFont(42);
   l.SetNDC();
   l.DrawLatex(x,y,text);
 }
 
-void myLineText(Double_t x,Double_t y,Int_t color,Int_t lstyle, float lsize,  const char *text,Float_t tsize) 
+void myLineText(Double_t x,Double_t y,Int_t color,Int_t lstyle, float lsize,  const char *text,Float_t tsize)
 {
   TLine* line = new TLine(x-1.1*tsize,y,x-0.5*tsize,y);
   line->SetLineStyle(lstyle);
@@ -101,10 +105,9 @@ void myLineText(Double_t x,Double_t y,Int_t color,Int_t lstyle, float lsize,  co
   line->SetLineWidth(lsize);
   line->Draw();
 
-  TLatex l; l.SetTextAlign(12); 
-  l.SetTextSize(tsize); 
+  TLatex l; l.SetTextAlign(12);
+  l.SetTextSize(tsize);
   l.SetTextFont(42);
   l.SetNDC();
   l.DrawLatex(x,y,text);
 }
-

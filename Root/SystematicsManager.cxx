@@ -2,6 +2,12 @@
 #include <fstream>
 using namespace std;
 
+//-----------------------------------------------------------------------------
+// Managing class to handle systematics
+// * Assigns which systematics are used based on NPList given in [main] in
+//   the workspace configuration file  
+//-----------------------------------------------------------------------------
+
 SystematicsManager::SystematicsManager(){
     all_nps = new std::vector<TString>();
 }
@@ -21,7 +27,7 @@ void SystematicsManager::readNPs(const char* fileName){
         log_info("SystematicsManager HAVE a set of NPs!");
         return;
     }
-    ifstream ifile(fileName, ifstream::in); 
+    ifstream ifile(fileName, ifstream::in);
     while (ifile.good() && !ifile.eof()) {
         char line[512];
         //         ifile.getline(line, 512);
@@ -53,5 +59,3 @@ vector<TString>* SystematicsManager::add_sys(SampleBase* sample){
     }
     return nps_vec;
 }
-
-

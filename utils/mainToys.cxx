@@ -1,11 +1,14 @@
 /*
  * =====================================================================================
  *
- *    Description:  Master class for obtain toys limits
+ *    Description:  Obtain toy limits
  *
  *         Author:  Xiangyang Ju (), xiangyang.ju@gmail.com
  *
  * =====================================================================================
+Use with caution.
+Legacy: keeping for reference 
+------------------------------------------------------------------------------
  */
 #include <stdlib.h>
 #include <string>
@@ -56,7 +59,7 @@ int main(int argc, char** argv)
     } else if (action == "expected"){
         my_action = EXPECTED;
     } else if (action == "observed"){
-        my_action = OBSERVED; 
+        my_action = OBSERVED;
     } else {
         print_help(argv[0]);
         return 1;
@@ -65,7 +68,7 @@ int main(int argc, char** argv)
     const string input_name(argv[2]);
     double mH_val = atof(argv[3]);
     const string str_poi_val(argv[4]);
-    
+
     // start to loop over options
 
     string wsName("combined");
@@ -74,7 +77,7 @@ int main(int argc, char** argv)
     int ntoys = 20;
     int seed_init = 1;
     // bool debug = false;
-    
+
     for(int i=4; i < argc; i++){
         const char* key = strtok(argv[i],"=") ;
         const char* val = strtok(0," ") ;
@@ -87,13 +90,13 @@ int main(int argc, char** argv)
     }
 
     const string out_dir("./");
-    
+
     // setup output
     string out_name = "test.root";
     double poi = -1;
     if (my_action == TOYS){
         poi = atof(str_poi_val.c_str());
-        out_name = string(Form("toys_mH%.0f_%s%.4f_seed%d.root", 
+        out_name = string(Form("toys_mH%.0f_%s%.4f_seed%d.root",
                     mH_val, muName.c_str(), poi, seed_init)); //don't change!
     } else if(my_action == EXPECTED) {
         out_name = string(Form("expected_mH%d_seed%d.root", (int)mH_val, seed_init));
@@ -109,7 +112,7 @@ int main(int argc, char** argv)
     // seed_init = seed_init+int(mH_val) + int(100*poi_val);
     cout<<"mH: " << mH_val<< endl;
     cout<<"outName " << out_name << endl;
-    
+
 
     auto file_in = TFile::Open(input_name.c_str());
     auto workspace = (RooWorkspace*) file_in->Get(wsName.c_str());
@@ -145,7 +148,7 @@ int main(int argc, char** argv)
         // that depends on the "action"
         // not for "observed"
         if(my_action == EXPECTED) {
-            // profile to background-only 
+            // profile to background-only
             poi_itr.Reset();
             while( (poi_val = (RooRealVar*)poi_itr()) ){
                 poi_val->setVal(0);
@@ -169,7 +172,7 @@ int main(int argc, char** argv)
     timer.Stop();
     double minutes = timer.RealTime()/60.;
     cout << "[Timer] " << minutes << " min for conditional fit" << endl;
-    timer.Reset(); 
+    timer.Reset();
 
     // prepare tree for output
     auto fout = TFile::Open(Form("%s/%s",out_dir.c_str(),out_name.c_str()), "recreate");
@@ -188,7 +191,7 @@ int main(int argc, char** argv)
     res["mH"] = 0;
     res["seed"] = 0;
     for( auto& dic : res){
-        physics->Branch(dic.first.c_str(), 
+        physics->Branch(dic.first.c_str(),
                 &(dic.second), Form("%s/D",dic.first.c_str()));
     }
 

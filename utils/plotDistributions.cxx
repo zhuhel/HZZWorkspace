@@ -15,6 +15,10 @@
 #include <string>
 #include <stdio.h>
 #include <iostream>
+//------------------------------------------------------------------------------
+// Hardcoded for highmass; plots 4l-distribution directly from workspace in
+// data and MC; needs updating or removal 
+//------------------------------------------------------------------------------
 
 //Important flags to change
 float lumi=36.1;
@@ -137,7 +141,7 @@ int main(){
         TFile* file = new TFile(workspace.c_str(),"READ");
         RooWorkspace* w = (RooWorkspace*)file->Get("combined");
 
-        std::vector<std::string> pdfname, normname; 
+        std::vector<std::string> pdfname, normname;
         if (sample=="VVV"||sample=="ZJets") {
           pdfname.push_back(Form("ATLAS_Bkg_%s_%s_m4l",sample.c_str(),cats[c].c_str()));
           normname.push_back(Form("nTotATLAS_Bkg_%s_%s",sample.c_str(),cats[c].c_str()));
@@ -207,12 +211,12 @@ int main(){
     std::map<std::string, TH1F*> inclusivehists;
     TH1F summed("summed","summed",hbins/rebin,hmin,hmax);
     if (c>=cats.size()){
-      for (unsigned int p2(0);p2<types.size();++p2) { 
-        inclusivehists[types[p2]] = new TH1F(Form("incl_%s",types[p2].c_str()), "",hbins,hmin,hmax); 
+      for (unsigned int p2(0);p2<types.size();++p2) {
+        inclusivehists[types[p2]] = new TH1F(Form("incl_%s",types[p2].c_str()), "",hbins,hmin,hmax);
         for (unsigned int c2(0);c2<cats.size();++c2) { if (c==cats.size()+1 && cats[c2]=="VBF_incl_13TeV") continue; inclusivehists[types[p2]]->Add(hists[types[p2]][cats[c2]]); }
         inclusivehists[types[p2]]->SetLineColor(kBlack);
         if (types[p2]=="data") {
-          inclusivehists[types[p2]]->SetMarkerStyle(20); 
+          inclusivehists[types[p2]]->SetMarkerStyle(20);
           inclusivehists[types[p2]]->SetMarkerSize(1.25);
           continue;
         }
@@ -223,7 +227,7 @@ int main(){
       }
     }
     else {
-      for (unsigned int p2(0);p2<types.size();++p2) { 
+      for (unsigned int p2(0);p2<types.size();++p2) {
         if (types[p2]=="data") continue;
         TH1F* hnew = (TH1F*)hists[types[p2]][cats[c]]->Rebin(rebin,Form("%s_rebinned",hists[types[p2]][cats[c]]->GetName()));
         ths.Add(hnew); summed.Add(hnew);

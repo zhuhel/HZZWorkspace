@@ -27,18 +27,24 @@
 using namespace std;
 using namespace RooFit;
 
+// ------------------------------------------------------------------------------
+// Legacy executable from Run 1/early Run 2 for joining qqZZ samples
+//
+// Out of service; here as a reference
+// ------------------------------------------------------------------------------
+
 int main() {
 
   bool linearPlots=true;
-  
+
   string outputNames[3]={"4mu","2mu2e","4e"};
   float rho_lo[3]={0.2, 0.2, 0.2}; // was 0.25 for all for Higgs approval
   float rho_hi[3]={0.6, 0.6, 0.6}; // was 0.35 for all for Higgs approval
-  float rho_highest[3]={0.25, 0.25, 0.25}; 
-  
+  float rho_highest[3]={0.25, 0.25, 0.25};
+
   int m4lLow=140.;
   int m4lHigh=1200.;
-  
+
   float binWidth=5.;
   int m4lBins = (int)((m4lHigh-m4lLow)/binWidth);
 
@@ -49,7 +55,7 @@ int main() {
   int m4lBinsLow=(int)((splitVal+overlap-m4lLow)/binWidth);
   int m4lBinsHigh=(int)((splitValHi+overlapHi-splitVal+overlap)/binWidth);
   int m4lBinsHighest=(int)((m4lHigh-splitValHi+overlapHi)/binWidth);
-  
+
   RooRealVar m4l("m4l","m4l",m4lBins,m4lLow,m4lHigh);
   RooRealVar m4lLowV("m4lLow","m4l",m4lBinsLow,m4lLow,splitVal+overlap);
   RooRealVar m4lHighV("m4lHigh","m4l",m4lBinsHigh,splitVal-overlap,splitValHi+overlapHi);
@@ -65,12 +71,12 @@ int main() {
   tree->SetBranchAddress("m4l_constrained", &tree_m4l);
   tree->SetBranchAddress("weight", &tree_weight);
   tree->SetBranchAddress("event_type", &tree_event_type); //  _4mu, _4e, _2mu2e, _2e2mu
-  
+
   TH1F** hists=new TH1F*[3];
   TH1F** histsLow=new TH1F*[3];
   TH1F** histsHigh=new TH1F*[3];
   TH1F** histsHighest=new TH1F*[3];
-  
+
   for (int ich=0; ich<3; ich++) {
     string histname  ="m4l_ggF_"+outputNames[ich]+"_raw";
     string histnameLo="m4l_ggF_"+outputNames[ich]+"_raw_lo";
@@ -78,16 +84,16 @@ int main() {
     string histnameHighest="m4l_ggF_"+outputNames[ich]+"_raw_highest";
     hists    [ich]=new TH1F(histname  .c_str(),histname  .c_str(),m4lBins    , m4lLow          , m4lHigh);
     histsLow [ich]=new TH1F(histnameLo.c_str(),histnameLo.c_str(),m4lBinsLow , m4lLow          , splitVal+overlap);
-    
+
     histsHigh[ich]=new TH1F(histnameHi.c_str(),histnameHi.c_str(),m4lBinsHigh, splitVal-overlap, splitValHi+overlapHi);
-    
+
     histsHighest[ich]=new TH1F(histnameHighest.c_str(),histnameHighest.c_str(),m4lBinsHighest, splitValHi-overlapHi, m4lHigh);
   }
-  
+
   for (int i = 0; i < tree->GetEntries(); i++) {
     tree->GetEntry(i);
     if (tree_m4l > m4lHigh || tree_m4l < m4lLow) continue;
-    
+
 
     float nnlo_corr = 1.0;
     float weight_nnlo = tree_weight * nnlo_corr;
@@ -98,12 +104,12 @@ int main() {
     else ich=1;
 
     hists[ich]->Fill(tree_m4l, weight_nnlo);
-    if (tree_m4l<(splitVal+overlap)) 
+    if (tree_m4l<(splitVal+overlap))
       histsLow[ich]->Fill(tree_m4l, weight_nnlo);
     if (tree_m4l>(splitVal-overlap) && tree_m4l<(splitValHi+overlapHi))
       histsHigh[ich]->Fill(tree_m4l, weight_nnlo);
     if (tree_m4l>(splitValHi-overlapHi))
-      histsHighest[ich]->Fill(tree_m4l, weight_nnlo);      
+      histsHighest[ich]->Fill(tree_m4l, weight_nnlo);
   }
 
   TH1F** rats=new TH1F*[3];
@@ -113,11 +119,11 @@ int main() {
 
   TFile* outFile=new TFile("qqZZbackground.root","RECREATE");
   RooWorkspace* myws=new RooWorkspace("qqZZbackground");
-  
+
   for (int ich=0; ich<3; ich++) {
 
     string outputName = outputNames[ich];
-    
+
     // Smoothing for high mass
     TH1F* hist=hists[ich];
     TH1F* histLo=histsLow[ich];
@@ -153,12 +159,12 @@ int main() {
 
     TH1F *smoothedhistHighest = (TH1F*) keyspdfhighest->createHistogram((outputName + "_TH1_smoothedHighest").c_str(), m4lHighestV, Binning(m4lBinsHighest));
     smoothedhistHighest->Scale(histHighest->Integral() / smoothedhistHighest->Integral());
-    
+
     string smhistname="m4l_ggF_"+outputName+"_13TeV";
     TH1F *smoothedhist = new TH1F(smhistname.c_str(),smhistname.c_str(), m4lBins, m4lLow, m4lHigh);
     int overlapbins=(int)(overlap/binWidth+.001);
     int overlapbinsHi=(int)(overlapHi/binWidth+.001);
-    
+
     // low
     for (int ibin=0; ibin<m4lBinsLow-overlapbins; ibin++) {
       smoothedhist->SetBinContent(ibin+1,smoothedhistLo->GetBinContent(ibin+1));
@@ -178,12 +184,12 @@ int main() {
 
     smoothedhist->Write();
     hist->Write();
-    
+
     m4l.setRange(m4lLow, m4lHigh);
     m4l.setBins(m4lBins);
 
     rats[ich]=(TH1F*)smoothedhist->Clone("rat");
-    
+
     canv.cd(ich+1);
 
     if (!linearPlots) {
@@ -193,7 +199,7 @@ int main() {
       pad1->Draw();
       pad1->cd()->SetLogy(1);
     }
-    
+
     hist->SetStats(0);
     hist->SetLineColor(kBlack);
     hist->Draw();
@@ -214,23 +220,23 @@ int main() {
       pad2->SetGridx();
       pad2->Draw();
       pad2->cd();
-      
+
       TH1F* rat=rats[ich];
       rat->SetMinimum(0.);
       rat->SetMaximum(2.);
       rat->Sumw2();
       rat->SetStats(0);
-      
+
       rat->Divide(hist);
       rat->SetMarkerStyle(7);
       rat->Draw("ep");
-      
+
       hist->GetYaxis()->SetTitleSize(8);
       hist->GetYaxis()->SetTitleFont(43);
       hist->GetYaxis()->SetTitleOffset(1.55);
-      
+
       rat->SetTitle("");
-      
+
       rat->GetYaxis()->SetTitle("ratio smoothed hist/raw hist");
       rat->GetYaxis()->SetNdivisions(5);
       rat->GetYaxis()->SetTitleSize(8);
@@ -238,9 +244,9 @@ int main() {
       rat->GetYaxis()->SetTitleOffset(1.55);
       rat->GetYaxis()->SetLabelFont(43);
       rat->GetYaxis()->SetLabelSize(8);
-      
+
       rat->GetXaxis()->SetTitleSize(20);
-      rat->GetXaxis()->SetTitleFont(43); 
+      rat->GetXaxis()->SetTitleFont(43);
       rat->GetXaxis()->SetTitleOffset(4.);
       rat->GetXaxis()->SetLabelFont(43);
       rat->GetXaxis()->SetLabelSize(8);
@@ -250,8 +256,8 @@ int main() {
     canv.Print("hists_linear.eps");
   else
     canv.Print("hists.eps");
-    
+
   myws->Write();
   outFile->Close();
-  
+
 }

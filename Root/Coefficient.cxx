@@ -21,6 +21,11 @@
 #include <utility>
 #include <algorithm>
 
+//-----------------------------------------------------------------------------
+// Operational class to build a coefficient
+// GIVE LINK TO WIKI PAGE
+//-----------------------------------------------------------------------------
+
 // =============================
 // Constructor
 // =============================
@@ -41,7 +46,7 @@ void Coefficient::setName(const std::string& name)
 {
     m_fullname=name;
 
-    // m_nickname=m_fullname.substr(m_fullname.find_last_of('_')+1); 
+    // m_nickname=m_fullname.substr(m_fullname.find_last_of('_')+1);
     // Not safe to do so, for example: ATLAS_Background_qqZZ_all,
     // The nick name would be just *all*, which is confusing and dangerous.
 
@@ -55,7 +60,7 @@ void Coefficient::setName(const std::string& name)
 // =============================
 // Set Channel
 // ============================
-// MG: intentionally not using with_sys? 
+// MG: intentionally not using with_sys?
 bool Coefficient::setChannel(const char* channelName, bool with_sys)
 {
     m_global_sys.clear();
@@ -63,9 +68,9 @@ bool Coefficient::setChannel(const char* channelName, bool with_sys)
     m_builtCoef=NULL;
     if(m_arglist->getSize() != 0) {
         //empty out the arg list, we're starting into a new channel
-        m_arglist->removeAll(); 
+        m_arglist->removeAll();
     }
-    for (auto& m: m_sysHandler){ 
+    for (auto& m: m_sysHandler){
         for (auto& s : m.second)
             if(s.second) delete s.second;
         m.second.clear();
@@ -151,7 +156,7 @@ bool Coefficient::setChannel(const char* channelName, bool with_sys)
 // =============================
 Coefficient::~Coefficient(){
     delete m_arglist;
-    for (auto& m : m_sysHandler) 
+    for (auto& m : m_sysHandler)
         for (auto& s : m.second)
             delete s.second;
     for (auto& v : m_base_var)
@@ -165,7 +170,7 @@ Coefficient::~Coefficient(){
 RooAbsReal* Coefficient::getCoefficient(std::string customname){
 
     if (m_builtCoef) {
-        log_warn("If you code crashes soon after this message, you probably called getCoeffient, deleted the result, and called getCoefficient again! The pointer returned is unique, until setChannel is called and the args are reset!"); 
+        log_warn("If you code crashes soon after this message, you probably called getCoeffient, deleted the result, and called getCoefficient again! The pointer returned is unique, until setChannel is called and the args are reset!");
         return m_builtCoef;
     }
 
@@ -183,19 +188,19 @@ RooAbsReal* Coefficient::getCoefficient(std::string customname){
 bool Coefficient::AddSys(const TString& npName){
 
     //arguments to global have systematics added later
-    if (m_args.find("global")!=m_args.end() && 
+    if (m_args.find("global")!=m_args.end() &&
             TString(m_args["global"].c_str()).Contains(npName)){
         m_global_sys.push_back(npName);
         return true;
     }
 
     //arguments to poi have systematics added later
-    if (m_args.find("poi")!=m_args.end() && 
+    if (m_args.find("poi")!=m_args.end() &&
             TString(m_args["poi"].c_str()).Contains(npName)){
         return true;
     }
 
-    //logic returns true if any one of the m_sysHandler maps returns all true 
+    //logic returns true if any one of the m_sysHandler maps returns all true
     bool r1=false;
     for (auto&m : m_sysHandler){
         bool r2 = true;
@@ -217,9 +222,9 @@ bool Coefficient::BuildCoefficient()
 
     // Parameter of interest (keyword 'poi')
     if (m_args.find("poi")!=m_args.end()){
-        // supported syntax looks like: mu_ggF*(mu_offshell - 1 + sqrt(mu_onShell)) 
+        // supported syntax looks like: mu_ggF*(mu_offshell - 1 + sqrt(mu_onShell))
         //
-        string& poi_syntax = m_args["poi"]; 
+        string& poi_syntax = m_args["poi"];
 
         // first find out the POI names
         strvec products;
@@ -230,7 +235,7 @@ bool Coefficient::BuildCoefficient()
         std::sort(products.begin(), products.end(), Helper::sort_str_len);
         // remove the sqrt, cos, tan, etc..
         auto list_end = std::remove_if(products.begin(), products.end(), Helper::isMathSyntax);
-        
+
         poi_names.clear();
 
         unique_ptr<RooArgList> argRooFormular(new RooArgList());
@@ -245,7 +250,7 @@ bool Coefficient::BuildCoefficient()
                 strvec vals;
                 Helper::tokenizeString(p2.Data(),'/',vals);
                 RooArgList listA;
-          
+
                 RooStats::HistFactory::FlexibleInterpVar* fiv_factor=NULL;
                 if (vals.size()>=1) {
                   vector<double> lowValues;
@@ -291,12 +296,12 @@ bool Coefficient::BuildCoefficient()
         for(int iarg = 0; iarg < argRooFormular->getSize(); iarg++){
             final_POI_syntax.ReplaceAll( argRooFormular->at(iarg)->GetName(), Form("@%d", iarg) );
         }
-        
+
         string formulaName(Form("poiFunc_%s", m_fullname.c_str()));
         unique_ptr<RooFormulaVar> poiFormula(
                 new RooFormulaVar(
                     formulaName.c_str(), formulaName.c_str(),
-                    final_POI_syntax.Data(), *(argRooFormular.get()) 
+                    final_POI_syntax.Data(), *(argRooFormular.get())
                     )
                 );
         poiFormula->Print();
@@ -347,7 +352,7 @@ bool Coefficient::BuildCoefficient()
 
                 auto f = GetGenericFactor(p, splitbycomma[1]);
                 if (f) {
-                    if (terms.size()>1) prodlist->add(*f); 
+                    if (terms.size()>1) prodlist->add(*f);
                     AddFactor(f);
                 }
             }
@@ -376,7 +381,7 @@ bool Coefficient::BuildCoefficient()
     }
 
     return true;
-} 
+}
 
 RooAbsReal* Coefficient::GetGlobalFactor(const std::string& p){
 
@@ -404,7 +409,7 @@ RooAbsReal* Coefficient::GetGlobalFactor(const std::string& p){
     if (vals.size()==3) {
         for (auto& s: m_sysHandler[0]) {
             s.second->AddGlobalSys(varname.Data(),
-                    (float) atof(vals.at(1).c_str()), 
+                    (float) atof(vals.at(1).c_str()),
                     (float) atof(vals.at(2).c_str())
                     );
             if(find(m_global_sys.begin(), m_global_sys.end(), varname) != m_global_sys.end()){
@@ -425,7 +430,7 @@ RooAbsReal* Coefficient::GetPOI(const std::string& p){
 
     TString p2(p);
     float lo(0),hi(1e3),nom(1.); //some intelligent guesses at poi range (always default to 1.00)
-    if (p2.Contains("mu_ggF_off")){lo=-30.;hi=30.;nom=1.;} 
+    if (p2.Contains("mu_ggF_off")){lo=-30.;hi=30.;nom=1.;}
     else if (p2.Contains("mu_VBF_off")){lo=-30.;hi=30.;nom=1.;}
     else if (p2.Contains("mu")){lo=-30.;hi=30.;nom=1.;}
     else if (p2.Contains("r_ggF")){lo=0.;hi=30.;nom=1.;}
@@ -553,7 +558,7 @@ RooAbsReal* Coefficient::GetGenericFactorUsingConfigDic(const std::string& p, co
     for (auto& x : allfactors){
         if (depmap.find(x)!=depmap.end()) continue;
 
-        if (std::binary_search(poi_names.begin(), poi_names.end(), x)){ 
+        if (std::binary_search(poi_names.begin(), poi_names.end(), x)){
             // If the variable is in POI, just create a RooRealVar
             depmap[x] = new RooRealVar(x.c_str(), x.c_str(), 0, 100);
             continue;
@@ -593,7 +598,7 @@ RooAbsReal* Coefficient::GetGenericFactorUsingNormDic(const std::string& p, cons
     Helper::readNormTable((Helper::getInputPath()+a).c_str(), dict);
     RooAbsReal* factor(NULL);
     TString p2 =p;
-    //Polynomial 
+    //Polynomial
     if (p2.Contains("pol"))
     { //only special case supported
 
@@ -601,8 +606,8 @@ RooAbsReal* Coefficient::GetGenericFactorUsingNormDic(const std::string& p, cons
             log_err("Received an coefficient factor that looks like a polynomial but with no argument? skipping..");
             return NULL;
         }
-        size_t left_br = p.find_first_of('('); 
-        size_t right_br = p.find_first_of(')'); 
+        size_t left_br = p.find_first_of('(');
+        size_t right_br = p.find_first_of(')');
         TString deplist(p.substr(left_br, right_br-left_br+1).c_str());
         p2.ReplaceAll(deplist,"");
         deplist.ReplaceAll("(",""); deplist.ReplaceAll(")","");
@@ -624,7 +629,7 @@ RooAbsReal* Coefficient::GetGenericFactorUsingNormDic(const std::string& p, cons
                 vars.add(*Helper::getWorkspace()->function(d.c_str()));
             }
             //look for a morphing basis variable in this coefficient
-            for (auto& v: m_base_var) 
+            for (auto& v: m_base_var)
                 if (d == v.second->GetName()) {
                     added=true;
                     vars.add(*v.second);
@@ -649,7 +654,7 @@ RooAbsReal* Coefficient::GetGenericFactorUsingNormDic(const std::string& p, cons
             }
         }
         else if (deps.size()==2){
-            for (int ox(0);ox<10;++ox) for (int oy(0);oy<10;++oy){ 
+            for (int ox(0);ox<10;++ox) for (int oy(0);oy<10;++oy){
                 TString pname =Form("%s_a%d_b%d",p2.Data(),ox,oy);
                 if (dict.find(pname.Data())!=dict.end())
                     formula += Form(" + (%e)*(@0)^%d*(@1)^%d",dict[pname.Data()][m_channel],ox,oy);
@@ -675,11 +680,11 @@ RooAbsReal* Coefficient::GetGenericFactorUsingNormDic(const std::string& p, cons
         }
         for (const int i : {0,1,2,3})
             formula.ReplaceAll(Form("*(@%d)^0",i),"");
-        if (formula!="0.0") 
+        if (formula!="0.0")
             formula.ReplaceAll("0.0 + ","");
 
         log_info("Created a formula for %s_%s: %s",p2.Data(),m_channel.c_str(),formula.Data());
-        // Add support of option: INT 
+        // Add support of option: INT
         if( m_args.find("INT") != m_args.end()) // As long as INT is defined, don't care the value.
         {
             log_info("Found INT, consider it's with interference");
@@ -775,7 +780,7 @@ RooAbsReal* Coefficient::GetGenericFactorUsingNormDic(const std::string& p, cons
                       Helper::getWorkspace()->import(*intb2);
                       Helper::getWorkspace()->import(*intb3);
                       Helper::getWorkspace()->import(*intb4);
-                      */        
+                      */
             factor = new RooFormulaVar(Form("%s_%s",p2.Data(),m_channel.c_str()),"(@0)*(@1/@2)",RooArgList(*factor_raw,*total_integral,*signal_integral));
             factor->Print();
         } else {
@@ -812,10 +817,10 @@ RooAbsReal* Coefficient::GetMCStatFactor(const std::string& p)
         log_info("in %s adding sysfile (%lu/%lu) %s ",__func__,i,sysfiles.size(),sysfiles[i].c_str());
 
         //Form a single set of systematics
-        if (!TString(sysfiles[i].c_str()).MaybeWildcard()){ 
+        if (!TString(sysfiles[i].c_str()).MaybeWildcard()){
             // MC stat
             const char* mcstat_name = Form("gamma_stat%lu_%s_%s",i,m_nickname.c_str(),m_channel.c_str());
-            auto mcstat = m_sysHandler[i][0]->GetSys(mcstat_name); 
+            auto mcstat = m_sysHandler[i][0]->GetSys(mcstat_name);
             if (!mcstat){
                 log_err("unable to get mc stat for this file: %s", sysfiles[i].c_str());
                 continue;
@@ -826,7 +831,7 @@ RooAbsReal* Coefficient::GetMCStatFactor(const std::string& p)
      }
     if (prodset.getSize()==0) return NULL;
 
-    const char* fivname = Form("gamma_stat_%s_%s",m_nickname.c_str(),m_channel.c_str());  
+    const char* fivname = Form("gamma_stat_%s_%s",m_nickname.c_str(),m_channel.c_str());
     return new RooProduct(fivname,fivname,prodset);
 }
 
@@ -843,10 +848,10 @@ RooAbsReal* Coefficient::GetSystematicFactor(const std::string& p)
         log_info("in %s adding sysfile (%lu/%lu) %s ",__func__,i,sysfiles.size(),sysfiles[i].c_str());
 
         //Form a single set of systematics
-        if (!TString(sysfiles[i].c_str()).MaybeWildcard()){ 
+        if (!TString(sysfiles[i].c_str()).MaybeWildcard()){
             const char* fivname = Form("fiv%lu_%s_%s",i,m_nickname.c_str(),m_channel.c_str());
             m_sysHandler[i][0]->Print();
-            auto fiv = m_sysHandler[i][0]->GetSys(fivname); 
+            auto fiv = m_sysHandler[i][0]->GetSys(fivname);
             if (!fiv){
                 log_err("unable to create FIV for this file: %s", sysfiles[i].c_str());
                 continue;
@@ -886,7 +891,7 @@ RooAbsReal* Coefficient::GetSystematicFactor(const std::string& p)
      }
     if (prodset.getSize()==0) return NULL;
 
-    const char* fivname = Form("fiv_%s_%s",m_nickname.c_str(),m_channel.c_str());  
+    const char* fivname = Form("fiv_%s_%s",m_nickname.c_str(),m_channel.c_str());
     return new RooProduct(fivname,fivname,prodset);
 }
 
@@ -894,13 +899,12 @@ bool Coefficient::AddFactor(RooAbsReal* f){
   if (!f) return false;
   log_info("adding %s into factors", f->GetName());
   // use addClone, take the ownership of the objects
-  // and release it when starting a new channel, 
+  // and release it when starting a new channel,
   // this can avoid potential memory leakage.
   return (m_arglist->addClone(*f) != NULL);
 }
 
 
-void Coefficient::SetCutoff (float in) { 
+void Coefficient::SetCutoff (float in) {
     m_customCutoff.first=true; m_customCutoff.second=in;
 }
-

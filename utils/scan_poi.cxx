@@ -11,6 +11,12 @@
 
 #include "HZZWorkspace/RooStatsHelper.h"
 #include "HZZWorkspace/Helper.h"
+//------------------------------------------------------------------------------
+// Scan parameters of interest (POI)
+//
+// Get NLL for POI provided as an argument 
+// - Assumes ModelConfig name
+//------------------------------------------------------------------------------
 
 using namespace std;
 int main(int argc, char** argv)
@@ -42,7 +48,7 @@ int main(int argc, char** argv)
     if (argc > opt_id) wsName = string(argv[opt_id++]);
     if (argc > opt_id) muName = string(argv[opt_id++]);
     if (argc > opt_id) dataName = string(argv[opt_id++]);
-    
+
     // set binning and range for POI
     int nbins = 100;
     double low = 0, hi = 3;

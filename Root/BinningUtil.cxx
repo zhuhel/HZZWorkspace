@@ -23,7 +23,13 @@
 
 using namespace std;
 
-void 
+//-----------------------------------------------------------------------------
+// Operational class, adapted from Run 1
+//
+// Adaptive binning enabled via this class (eg in SampleHist)
+//-----------------------------------------------------------------------------
+
+void
 BinningUtil::getBinning( RooBinning& binning, RooRealVar& x, RooAbsReal& wfunc )
 {
   double xbegin = x.getMin();
@@ -60,11 +66,11 @@ BinningUtil::getBinning( RooBinning& binning, RooRealVar& x, RooAbsReal& wfunc )
 
     // for next iteration:
     wstep = wf->Eval(x0);
-  } 
+  }
 }
 
 
-Double_t 
+Double_t
 BinningUtil::nextstep(TF1* wf, Double_t x0, Double_t x1)
 {
   //double w0 = wf->Eval(x0);
@@ -76,14 +82,14 @@ BinningUtil::nextstep(TF1* wf, Double_t x0, Double_t x1)
   // so the code goes into an infinite loop
   // the second condition here is to avoid that
   // Seems a bit odd as the epsilon is 2e-16
-  if (wmin>=(x1-x0) || fabs(wmin-(x1-x0))<1e-10) { 
+  if (wmin>=(x1-x0) || fabs(wmin-(x1-x0))<1e-10) {
      //cout << "Returning x1-x0 : " << x1 << " " << x0 << endl;
-     return (x1-x0); } 
+     return (x1-x0); }
 
   // If distance between start and point at which width is minimised
   // is less than minimum width, use that
   Double_t xmin = wf->GetMinimumX(x0, x1);
-  if (((xmin-x0)<=wmin) || fabs((xmin-x0)-wmin)<1e-10) { 
+  if (((xmin-x0)<=wmin) || fabs((xmin-x0)-wmin)<1e-10) {
      //cout << "Returning wmin " << wmin << endl;
      return wmin; }
 
@@ -91,7 +97,7 @@ BinningUtil::nextstep(TF1* wf, Double_t x0, Double_t x1)
   // Update guess to the maximum of (xmin-wmin) [ x position of wmin - wmin]
   // and (x0+wmin) [start + wmin]
   if (xmin-wmin>x0+wmin) { xend=xmin-wmin; }
-  else { xend= x0+wmin; }  
+  else { xend= x0+wmin; }
   //cout << "xend: " << xend << " xmin " << xmin << " wmin " << wmin << endl;
 
   return nextstep(wf,x0,xend);
@@ -115,7 +121,7 @@ BinningUtil::randomizeBinned( RooDataHist& myCopy )
 }
 
 
-std::vector<RooDataHist> 
+std::vector<RooDataHist>
 BinningUtil::dataVariations(RooArgList& parList, const RooDataHist& input, const double& scale, const double& cutoff)
 {
   RooDataHist myCopy(input);
@@ -145,14 +151,14 @@ BinningUtil::dataVariations(RooArgList& parList, const RooDataHist& input, const
     myCopy.set( w );
   }
 
-  upDownVec.push_back( input );  
+  upDownVec.push_back( input );
 
   return upDownVec;
 }
 
 
-std::vector<RooDataHist> 
-BinningUtil::histVariations(RooRealVar& x, const std::vector<RooDataHist>& inputVec, const double& rho, const TString& options, const Int_t& nSigma, 
+std::vector<RooDataHist>
+BinningUtil::histVariations(RooRealVar& x, const std::vector<RooDataHist>& inputVec, const double& rho, const TString& options, const Int_t& nSigma,
                             const Bool_t& rotation, const Bool_t& sortInput )
 {
   std::vector<RooDataHist> histVec;
@@ -168,7 +174,7 @@ BinningUtil::histVariations(RooRealVar& x, const std::vector<RooDataHist>& input
 
     delete keyshist;
     delete keys;
-  } 
+  }
 
   return histVec;
 }
@@ -180,12 +186,12 @@ BinningUtil::pdfVariations(RooArgList& pdfList, RooRealVar& x, const std::vector
   for (unsigned int i=0; i<inputVec.size(); ++i) {
     RooHistPdf histPdf( Form("histpdf%d",i), Form("histpdf%d",i), x, inputVec[i], 1 );
     pdfList.add( histPdf );
-  } 
+  }
 }
 
 
-void 
-BinningUtil::createPdf( RooArgList& parList, RooArgList& pdfList, RooRealVar& x, const RooDataHist& input, 
+void
+BinningUtil::createPdf( RooArgList& parList, RooArgList& pdfList, RooRealVar& x, const RooDataHist& input,
                         const TString& options, const double& rho, const Int_t& nSigma, const Bool_t& rotation, const Bool_t& sortInput,
                         const double& scale, const double& cutoff )
 {
@@ -195,14 +201,14 @@ BinningUtil::createPdf( RooArgList& parList, RooArgList& pdfList, RooRealVar& x,
   std::vector<RooDataHist> histVec = BinningUtil::histVariations(x, dataVec, rho, options, nSigma, rotation, sortInput);
   // histpdf variations
   pdfVariations( pdfList, x, histVec );
-   
+
 }
 
 
-// MG: To-do - intentional that binning is not used? 
+// MG: To-do - intentional that binning is not used?
 RooCurve*
-BinningUtil::plotOnWithErrorBand( RooPlot* frame, Double_t Z, RooAbsPdf& pdf, RooArgSet& obs, const int& nCurves, const int& nEvents, 
-			       const char* , RooDataHist* dataHist ) 
+BinningUtil::plotOnWithErrorBand( RooPlot* frame, Double_t Z, RooAbsPdf& pdf, RooArgSet& obs, const int& nCurves, const int& nEvents,
+			       const char* , RooDataHist* dataHist )
 {
   RooCurve* cenCurve = frame->getCurve() ;
   frame->remove(0,kFALSE) ;
@@ -212,12 +218,12 @@ BinningUtil::plotOnWithErrorBand( RooPlot* frame, Double_t Z, RooAbsPdf& pdf, Ro
   // *** Interval method ***
   //
   // Make N variations of parameters samples from V and visualize N% central interval where N% is defined from Z
-  
+
   // Generate 100 random parameter points distributed according to fit result covariance matrix
   Int_t n = Int_t(100./TMath::Erfc(Z/sqrt(2.))) ;
   if (n<100) n=100 ;
   if (nCurves>0) n=nCurves;
-  
+
   // Generate variation curves with above set of parameter values
   Double_t ymin = frame->GetMinimum() ;
   Double_t ymax = frame->GetMaximum() ;
@@ -228,14 +234,14 @@ BinningUtil::plotOnWithErrorBand( RooPlot* frame, Double_t Z, RooAbsPdf& pdf, Ro
     //std::cout << "toyset: " << i << std::endl;
 
     RooDataHist* binned(0);
-    RooDataSet* unbinned(0); 
+    RooDataSet* unbinned(0);
 
     if (dataHist!=0) {
       binned = new RooDataHist(*dataHist);
       BinningUtil::randomizeBinned(*binned);
     } else {
       unbinned = pdf.generate( obs, nEvents );//, RooFit::Binning(binning) );
-      binned = new RooDataHist("binnedData", "binned data", obs, "adaptive");  
+      binned = new RooDataHist("binnedData", "binned data", obs, "adaptive");
       binned->add( *unbinned );
     }
     RooNDKeysPdf* tmpkeys = new RooNDKeysPdf("tmpkeys","tmpkeys", obs, *binned, "3am", 0.2, 3, false, false);
@@ -251,27 +257,27 @@ BinningUtil::plotOnWithErrorBand( RooPlot* frame, Double_t Z, RooAbsPdf& pdf, Ro
 
   frame->SetMinimum(ymin) ;
   frame->SetMaximum(ymax) ;
-  
+
   // Generate upper and lower curve points from 68% interval around each point of central curve
   band = cenCurve->makeErrorBand(cvec,Z) ;
-  
-  // Cleanup 
+
+  // Cleanup
   for (vector<RooCurve*>::iterator i=cvec.begin() ; i!=cvec.end() ; i++) {
     delete (*i) ;
   }
 
   delete cenCurve ;
 
-  //if (!band) return frame;  
+  //if (!band) return frame;
   return band;
 }
 
 
 
-RooDataHist* 
+RooDataHist*
 BinningUtil::makeAsimov1D( const RooAbsPdf& pdf, RooRealVar& obs, const RooBinning& binning, const char* binningName, TH1* ehist )
 {
-  RooDataHist* binnedAsimov = new RooDataHist("binnedAsimov", "adaptive binned data Asimov", obs, binningName );    
+  RooDataHist* binnedAsimov = new RooDataHist("binnedAsimov", "adaptive binned data Asimov", obs, binningName );
 
   RooMsgService::instance().setGlobalKillBelow(RooFit::WARNING);
   //double obsmin = obs.getMin();
@@ -286,7 +292,7 @@ BinningUtil::makeAsimov1D( const RooAbsPdf& pdf, RooRealVar& obs, const RooBinni
 
     double xlo = binning.binLow(bin);
     double xhi = binning.binHigh(bin);
-    //double width = binning.binWidth(bin); 
+    //double width = binning.binWidth(bin);
     //double center = binning.binCenter(bin);
 
     TString rangeName = Form("%s%d",binningName,bin);
@@ -319,15 +325,15 @@ BinningUtil::makeAsimov1D( const RooAbsPdf& pdf, RooRealVar& obs, const RooBinni
 
 
 
-RooDataHist* 
+RooDataHist*
 BinningUtil::makeAsimov1DScale( const RooAbsPdf& pdf, RooRealVar& obs, const RooBinning& binning, const char* binningName,
 				const double& scale, const Bool_t& overwrite, RooRealVar& overwriteObs )
 {
   RooDataHist* binnedAsimov(0);
   if (!overwrite) {
-    binnedAsimov = new RooDataHist("binnedAsimov", "adaptive binned data Asimov", obs, binningName );    
+    binnedAsimov = new RooDataHist("binnedAsimov", "adaptive binned data Asimov", obs, binningName );
   } else {
-    binnedAsimov = new RooDataHist("binnedAsimov", "adaptive binned data Asimov", overwriteObs, binningName ); 
+    binnedAsimov = new RooDataHist("binnedAsimov", "adaptive binned data Asimov", overwriteObs, binningName );
   }
 
   //double obsmin = obs.getMin();
@@ -341,7 +347,7 @@ BinningUtil::makeAsimov1DScale( const RooAbsPdf& pdf, RooRealVar& obs, const Roo
 
     double xlo = binning.binLow(bin);
     double xhi = binning.binHigh(bin);
-    //double width = binning.binWidth(bin); 
+    //double width = binning.binWidth(bin);
     //double center = binning.binCenter(bin);
 
     //cout << "bin = " << bin << " xlo = " << xlo << " xhi = " << xhi << endl;
@@ -362,7 +368,7 @@ BinningUtil::makeAsimov1DScale( const RooAbsPdf& pdf, RooRealVar& obs, const Roo
 }
 
 
-void 
+void
 BinningUtil::setAverageErrors( RooDataHist& data, const RooDataHist& input1, const RooDataHist& input2)
 {
    //cout << "BinningUtil::setAverageErrors "<< data.GetName() << " " << input1.GetName() << " " << input2.GetName() << endl;
@@ -377,7 +383,7 @@ for (int bin=0; bin<data.numEntries(); ++bin) {
  double ew2 = input2.weightError(RooAbsData::SumW2);
  double w2 = input2.weight();
  //double few2 = (w2==0) ? 0 : ew2/w2;
- 
+
  data.get(bin);
  double w = data.weight();
  // Assume each input pdf contributes equally (an assumption) so average sq weights
@@ -402,7 +408,7 @@ for (int bin=0; bin<data.numEntries(); ++bin) {
 }
 
 
-void 
+void
 BinningUtil::copyScaleAndErrors( RooDataHist& data, const RooDataHist& input)
 {
   double scale = input.sumEntries();
@@ -418,10 +424,10 @@ BinningUtil::copyScaleAndErrors( RooDataHist& data, const RooDataHist& input)
 }
 
 
-RooDataHist* 
+RooDataHist*
 BinningUtil::makeAsimov1DError( const RooAbsPdf& pdf, RooRealVar& obs, const RooBinning& binning, const char* binningName, const RooFitResult& result )
 {
-  RooDataHist* binnedAsimov = new RooDataHist("binnedAsimov", "adaptive binned data Asimov", obs, binningName );    
+  RooDataHist* binnedAsimov = new RooDataHist("binnedAsimov", "adaptive binned data Asimov", obs, binningName );
 
   //double obsmin = obs.getMin();
   //double obsmax = obs.getMax();
@@ -434,7 +440,7 @@ BinningUtil::makeAsimov1DError( const RooAbsPdf& pdf, RooRealVar& obs, const Roo
 
     double xlo = binning.binLow(bin);
     double xhi = binning.binHigh(bin);
-    //double width = binning.binWidth(bin); 
+    //double width = binning.binWidth(bin);
     //double center = binning.binCenter(bin);
 
     //cout << "bin = " << bin << " xlo = " << xlo << " xhi = " << xhi << endl;

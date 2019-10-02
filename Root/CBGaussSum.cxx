@@ -15,6 +15,13 @@
 #include "HZZWorkspace/SampleFactory.h"
 #include "HZZWorkspace/Coefficient.h"
 #include "HZZWorkspace/CoefficientFactory.h"
+//-----------------------------------------------------------------------------
+// Crystal-Ball + Gaussian (CBG) PDF for high mass analysis in VBF category
+// * NWA, VBF ONLY
+//
+// No LWA, no interference handling
+//-----------------------------------------------------------------------------
+
 
 CBGaussSum::CBGaussSum(
         const char* _name,
@@ -27,7 +34,7 @@ CBGaussSum::CBGaussSum(
     Helper::printDic<string>(all_dic);
     for(const auto& cat_info : all_dic) {
 
-      //PDF 
+      //PDF
       std::cout<<"reading CBGauss pdf info for subchan "<<cat_info.first<<" under field 'para'"<<std::endl;
       const string& para = (cat_info.second).at("para");
       strvec args;
@@ -38,9 +45,9 @@ CBGaussSum::CBGaussSum(
       std::cout<<"reading CBGauss fraction info for subchan "<<cat_info.first<<" under field 'frac' (will be renormalized)"<<std::endl;
       const string& arg = (cat_info.second).at("frac");
       auto frac = CoefficientFactory::CreateCoefficient(arg);
-      
+
       cb_gauss->addCoefficient(frac);
-      
+
       //store them
       signalContainer_[cat_info.first] = cb_gauss;
     }
@@ -106,6 +113,6 @@ RooAbsPdf* CBGaussSum::getPDF()
 
 
     string pdf_name(Form("%s_cbga_sum", base_name_.Data()));
-    auto final_pdf = new RooAddPdf(pdf_name.c_str(), pdf_name.c_str(), pdfList_, fracList_);  
+    auto final_pdf = new RooAddPdf(pdf_name.c_str(), pdf_name.c_str(), pdfList_, fracList_);
     return final_pdf;
 }

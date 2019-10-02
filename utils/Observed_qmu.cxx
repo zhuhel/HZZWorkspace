@@ -3,13 +3,25 @@
  *
  *       Filename:  Observed_qmu.cxx
  *
- *    Description:  Get NLL value for observed data 
+ *    Description:  Get NLL value for observed data
  *
  *        Version:  1.0
  *
  *         Author:  Xiangyang Ju (), xiangyang.ju@gmail.com
  *
  * =====================================================================================
+   Requires 7 arguments
+   - Input workspace ROOT file
+   - Output ROOT file name for nll
+   - muName: POI name
+   - poi_input: value of POI
+   - Mass: mass point
+   - Combined: assumed name of workspace
+   - obsData: assumed data name (could swap for eg. asimovData)
+
+Assumes all POI are associated with signal.
+Tests background-only, signal+background hypotheses.
+------------------------------------------------------------------------------
  */
 #include <stdlib.h>
 #include <string>
@@ -96,7 +108,7 @@ int main(int argc, char** argv)
   res["mH"] = 0;
   res["mu"] = 0;
   for( auto& dic : res){
-    physics->Branch(dic.first.c_str(), 
+    physics->Branch(dic.first.c_str(),
         &(dic.second), Form("%s/D",dic.first.c_str()));
   }
 
