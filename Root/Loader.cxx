@@ -1,43 +1,9 @@
-#ifndef __loader_c__
-#define __loader_c__
-
-#include <TString.h>
-#include <exception>
-#include <TH1F.h>
-#include <TVector2.h>
-#include <TFile.h>
-#include <TLegend.h>
-#include <THStack.h>
-#include <TF1.h>
-#include <TH2.h>
-#include <TStyle.h>
-#include <TChain.h>
-#include <TCut.h>
-#include <TPad.h>
-#include <TCanvas.h>
-#include <TMath.h>
-#include <TAxis.h>
-#include <TGaxis.h>
-#include <TColor.h>
-
-#include <RooAbsPdf.h>
-#include <RooRealVar.h>
-#include <RooTFnPdfBinding.h>
-#include <RooBinning.h>
-
-#include <iostream>
-#include <fstream>
-#include <stdio.h>
-#include <string>
+#include "HZZWorkspace/Loader.h"
 
 using namespace std;
 using namespace RooFit;
 
-#include "AtlasStyle.C"
-#include "AtlasUtils.C"
-
-
-TChain* loader(const char* inFile_name, const char* chain_name = "physics")
+TChain* Loader::loader(const char* inFile_name, const char* chain_name)
 {
     TChain* chain = new TChain(chain_name);
     TString in_name(inFile_name);
@@ -59,20 +25,7 @@ TChain* loader(const char* inFile_name, const char* chain_name = "physics")
     return chain;
 }
 
-typedef struct BranchInfo {
-    string name_;
-    int n_;
-    float low_;
-    float high_;
-    BranchInfo(){
-        name_ = "";
-        n_ = 100;
-        low_ = 0;
-        high_ = 1000;
-    }
-} BranchInfo;
-
-TH1F* draw_hist_from_chain(TChain* chain, const char* branch_name, 
+TH1F* Loader::draw_hist_from_chain(TChain* chain, const char* branch_name, 
         const TCut& cut, const char* hist_name, 
         int n_bins, float low_value, float high_value)
 {
@@ -82,21 +35,21 @@ TH1F* draw_hist_from_chain(TChain* chain, const char* branch_name,
     return h1;
 }
 
-TH1F* draw_hist_from_chain(TChain* chain, const TCut& cut, 
+TH1F* Loader::draw_hist_from_chain(TChain* chain, const TCut& cut, 
         const char* hist_name, const BranchInfo& br)
 {
     return draw_hist_from_chain(chain, br.name_.c_str(), cut, hist_name, 
             br.n_, br.low_, br.high_);
 }
 
-TH1F* draw_hist_from_file(const char* file_name, const char* chain_name, 
+TH1F* Loader::draw_hist_from_file(const char* file_name, const char* chain_name, 
         const TCut& cut, const char* hist_name, const BranchInfo& br){
     TChain* chain = loader(file_name, chain_name);
     return draw_hist_from_chain(chain, br.name_.c_str(), cut, hist_name, 
             br.n_, br.low_, br.high_);
 }
 
-TH1F* create_hist(const char* file_name, const char* chain_name,
+TH1F* Loader::create_hist(const char* file_name, const char* chain_name,
         const char* branch_name, const TCut& cut, const char* hist_name,
         int n_bins, float low_value, float high_value, int color)
 {
@@ -112,8 +65,8 @@ TH1F* create_hist(const char* file_name, const char* chain_name,
     return h1;
 }
 
-void save_hist(TH1F* h1, const char* out_file_name, 
-        const char* hist_name = "met_all")
+void Loader::save_hist(TH1F* h1, const char* out_file_name, 
+        const char* hist_name)
 {
     TFile* file = TFile::Open(out_file_name, "UPDATE");
     TString oldName(h1->GetName());
@@ -123,7 +76,7 @@ void save_hist(TH1F* h1, const char* out_file_name,
     h1->SetName(oldName.Data());
 }
 
-TPad* add_ratio_pad(TH1* h_signal, const TList& h_bkgs)
+TPad* Loader::add_ratio_pad(TH1* h_signal, const TList& h_bkgs)
 {
     TPad* pad1 = new TPad("pad1","pad1",0, 0.15,1.00,1.00);
     pad1->SetBottomMargin(0.161);
@@ -162,14 +115,14 @@ TPad* add_ratio_pad(TH1* h_signal, const TList& h_bkgs)
         }
     }
 
-    AddLine(h_signal, 1, h_signal->GetLineColor(), h_signal->GetLineStyle());
+    AtlasUtils::AddLine(h_signal, 1, h_signal->GetLineColor(), h_signal->GetLineStyle());
 
     // plot the comparison
     pad1->cd();
     return pad1;
 }
 
-TPad* add_ratio_pad(TH1* h_signal, TH1* h_bkg)
+TPad* Loader::add_ratio_pad(TH1* h_signal, TH1* h_bkg)
 {
     TList* list = new TList();
     list->Add(h_bkg);
@@ -178,18 +131,18 @@ TPad* add_ratio_pad(TH1* h_signal, TH1* h_bkg)
     return res;
 }
 
-void norm_hist(TH1* h1){
+void Loader::norm_hist(TH1* h1){
     h1->Scale(1./h1->Integral());
 }
 
-void CheckNull(TObject* obj)
+void Loader::CheckNull(TObject* obj)
 {
     if(obj == NULL) {
         throw invalid_argument(Form("%s does not exist", obj->GetName()));
     }
 }
 
-void SetAtlasStyleCanvas(TCanvas* canvas, bool for_2d = false)
+void Loader::SetAtlasStyleCanvas(TCanvas* canvas, bool for_2d)
 {
     if(!canvas) return;
     canvas->SetTopMargin(0.05);
@@ -214,7 +167,7 @@ void SetAtlasStyleCanvas(TCanvas* canvas, bool for_2d = false)
     canvas->SetTicky(1);
 }
 
-void SetAtlasStyleHist(TH1* h1){
+void Loader::SetAtlasStyleHist(TH1* h1){
     if(!h1) return;
     TString className(h1->ClassName());
     int font = 42;
@@ -232,13 +185,13 @@ void SetAtlasStyleHist(TH1* h1){
     }
 }
 
-void SetAtlasOpt(){
+void Loader::SetAtlasOpt(){
     gStyle->SetOptTitle(0);
     gStyle->SetOptStat(0);
     gStyle->SetOptFit(0);
 }
 
-void add_hist(TList* objarray, TH1F* h1)
+void Loader::add_hist(TList* objarray, TH1F* h1)
 {
     //cout << "adding: " << h1->GetName() << endl;
     // items in TList are sorted by their area
@@ -265,7 +218,7 @@ void add_hist(TList* objarray, TH1F* h1)
     }
 }
 
-TH1* SumHistsWithSysUncertainties(const TList& hists, 
+TH1* Loader::SumHistsWithSysUncertainties(const TList& hists, 
         const vector<double>& systematics, bool only_sys) 
 {
     TH1* h_all = NULL;
@@ -304,7 +257,7 @@ TH1* SumHistsWithSysUncertainties(const TList& hists,
     return h_all;
 }
 
-void add_hist(TList* objarray, const string& hist_name)
+void Loader::add_hist(TList* objarray, const string& hist_name)
 {
     TH1F* h1 = (TH1F*) gDirectory->Get(hist_name.c_str());
     if(!h1){
@@ -314,7 +267,7 @@ void add_hist(TList* objarray, const string& hist_name)
     add_hist(objarray, h1);
 }
 
-double get_significance(double s, double b)
+double Loader::get_significance(double s, double b)
 {
     if(s < 0 || b < 0){ 
         return -1;
@@ -325,7 +278,7 @@ double get_significance(double s, double b)
     return TMath::Sqrt(2*((s+b)*TMath::Log(1+s/b)-s));
 }
 
-double get_significance_with_sysB(double s, double b, double sigmaB){
+double Loader::get_significance_with_sysB(double s, double b, double sigmaB){
     if(s < 0 || b < 0 || sigmaB < 0){ 
         return -1;
     }
@@ -337,7 +290,7 @@ double get_significance_with_sysB(double s, double b, double sigmaB){
                 - b*b/sqB*TMath::Log(1 + sqB*s/b/(b+sqB)))); 
 }
 
-int get_roc(TH1F* sig, TH1F* bkg, bool reverse = false)
+int Loader::get_roc(TH1F* sig, TH1F* bkg, bool reverse )
 {
     int n_bins = 100;
     if(sig->GetNbinsX() != bkg->GetNbinsX())
@@ -413,29 +366,29 @@ int get_roc(TH1F* sig, TH1F* bkg, bool reverse = false)
     axis->Draw();
     float x_offset = 0.6;
     float y_offset = 0.9, t_size = 0.04;
-    myLineText(x_offset, y_offset, *eff_sig, "signal");
-    myLineText(x_offset, y_offset-t_size, *eff_bkg, "background");
-    myLineText(x_offset, y_offset-t_size*2, *roc, "significance");
-    myText(0.2, 0.85, 1, "#bf{#it{ATLAS}} Internal");
+    AtlasUtils::myLineText(x_offset, y_offset, *eff_sig, "signal");
+    AtlasUtils::myLineText(x_offset, y_offset-t_size, *eff_bkg, "background");
+    AtlasUtils::myLineText(x_offset, y_offset-t_size*2, *roc, "significance");
+    AtlasUtils::myText(0.2, 0.85, 1, "#bf{#it{ATLAS}} Internal");
     canvas_eff->SaveAs(Form("%s.pdf", roc->GetName()));
     return max_index;
 }
 
-void print_after_cut(const string& name, TH1F* h1, int cutbin)
+void Loader::print_after_cut(const string& name, TH1F* h1, int cutbin)
 {
     int tbins = h1->GetNbinsX();
     printf("%s: %.3f (%.1f%%)\n", name.c_str(), 
             h1->Integral(cutbin, tbins), h1->Integral(cutbin, tbins)*100/h1->Integral());
 }
 
-void get_ratio_and_error(float a, float b, float& f, float& error)
+void Loader::get_ratio_and_error(float a, float b, float& f, float& error)
 {
     f = a/b;
     error = f*sqrt((a+b)/(a*b));
     return;
 }
 
-TH1F* generate_th(TH1F* h_s1, const char* hist_name, float low_, float hi_ = 0)
+TH1F* Loader::generate_th(TH1F* h_s1, const char* hist_name, float low_, float hi_)
 {
     TCanvas* canvas = new TCanvas("canvas_new", "canvas", 600, 600);
     h_s1->Draw();
@@ -489,20 +442,20 @@ TH1F* generate_th(TH1F* h_s1, const char* hist_name, float low_, float hi_ = 0)
     return h1;
 }
 
-void print_correlation(TH2* h2)
+void Loader::print_correlation(TH2* h2)
 {
     if(h2 == NULL) return;
     printf("%s: correlation factor: %.2f\n", h2->GetName(), h2->GetCorrelationFactor());
 }
 
-double get_mT(double v1_x, double v1_y,  double v2_x, double v2_y)
+double Loader::get_mT(double v1_x, double v1_y,  double v2_x, double v2_y)
 {
     TVector2 v1_vec(v1_x, v1_y);
     TVector2 v2_vec(v2_x, v2_y);
     return sqrt(2*v1_vec.Mod()*v2_vec.Mod()*(1-TMath::Cos(v1_vec.DeltaPhi(v2_vec))));
 }
 
-void compare_two_hists(TH1* h1, TH1* h2,
+void Loader::compare_two_hists(TH1* h1, TH1* h2,
         const char* x_title, const char* h1_name, const char* h2_name, bool is_log)
 {
     if(!h1 || !h2) return ;
@@ -529,7 +482,7 @@ void compare_two_hists(TH1* h1, TH1* h2,
     h1->Draw();
     h2->Draw("same");
 
-    TLegend* legend = myLegend(0.7, 0.8, 0.9, 0.9);
+    TLegend* legend = AtlasUtils::myLegend(0.7, 0.8, 0.9, 0.9);
     legend->AddEntry(h1, h1_name, "L");
     legend->AddEntry(h2, h2_name, "L");
     legend->Draw();
@@ -541,7 +494,7 @@ void compare_two_hists(TH1* h1, TH1* h2,
     delete canvas;
 }
 
-double GetMinOfHist(TH1* h1){
+double Loader::GetMinOfHist(TH1* h1){
     int total_bins = h1->GetNbinsX();
     double min_value = 9E9;
     for(int ibin = 1; ibin <= total_bins; ibin++){
@@ -553,7 +506,7 @@ double GetMinOfHist(TH1* h1){
     return min_value;
 }
 
-void GetMaxMin(const TList& hists, double& max, double& min)
+void Loader::GetMaxMin(const TList& hists, double& max, double& min)
 {
     max = -999999;
     min = 999999;
@@ -568,7 +521,7 @@ void GetMaxMin(const TList& hists, double& max, double& min)
     return ;
 }
 
-void compare_hists(const TList& histograms, const vector<string>& tags, 
+void Loader::compare_hists(const TList& histograms, const vector<string>& tags, 
         const char* x_title, bool shape_only, bool is_log, bool color_me) 
 {
     int my_color_list[] = {kRed, kBlue, kGreen+1, kAzure+2, kViolet-3, kAzure+5, kOrange+6, kViolet-9, kAzure+6, kViolet-4};
@@ -591,7 +544,7 @@ void compare_hists(const TList& histograms, const vector<string>& tags,
     }
     cout <<"total histograms: " << num_hists << endl;
     float leg_x = 0.65, leg_y = 0.7;
-    TLegend* legend = myLegend(leg_x, leg_y, leg_x+0.2, leg_y+0.045*num_hists);
+    TLegend* legend = AtlasUtils::myLegend(leg_x, leg_y, leg_x+0.2, leg_y+0.045*num_hists);
 
     TIter next(histograms.MakeIterator());
     TH1* hist = NULL;
@@ -627,7 +580,7 @@ void compare_hists(const TList& histograms, const vector<string>& tags,
     delete canvas;
 }
 
-TH1* merge_hist_list(const TList& hists)
+TH1* Loader::merge_hist_list(const TList& hists)
 {
     TIter next(hists.MakeIterator());
     TH1* hist = NULL;
@@ -643,12 +596,12 @@ TH1* merge_hist_list(const TList& hists)
     return res;
 }
 
-TH1* merge_stack(const THStack& stack){
+TH1* Loader::merge_stack(const THStack& stack){
     TList* hists = stack.GetHists();
     return merge_hist_list(*hists);
 }
 
-TH1F * DrawOverflow(TH1F *h)
+TH1F * Loader::DrawOverflow(TH1F *h)
 {
     // This function paint the histogram h with an extra bin for overflows
     UInt_t nx    = h->GetNbinsX()+1;
@@ -673,7 +626,7 @@ TH1F * DrawOverflow(TH1F *h)
     return htmp;
 }
 
-void clean_TList(TList& list){
+void Loader::clean_TList(TList& list){
     TIter next(list.MakeIterator());
     TObject* obj;
     while ((obj = next())){
@@ -681,7 +634,7 @@ void clean_TList(TList& list){
     }
 }
 
-void compare_hists_from_files(const vector<string>& file_names, 
+void Loader::compare_hists_from_files(const vector<string>& file_names, 
         const vector<string>& tag_name)
 {
     if(file_names.size() < 2) return;
@@ -728,7 +681,7 @@ void compare_hists_from_files(const vector<string>& file_names,
     delete hist_names;
 }
 
-void print_graph(TGraph* gr){
+void Loader::print_graph(TGraph* gr){
     if (!gr) return;
     int n_points = gr->GetN();
     cout << "N points: " << n_points << endl;
@@ -754,7 +707,7 @@ void print_graph(TGraph* gr){
     return;
 }
 
-double sum_graph_entries(RooCurve* gr, double low, double hi, int nbins)
+double Loader::sum_graph_entries(RooCurve* gr, double low, double hi, int nbins)
 {
     // cout << "In summation of graph" << endl;
     double sum = 0;
@@ -769,4 +722,4 @@ double sum_graph_entries(RooCurve* gr, double low, double hi, int nbins)
     }
     return sum;
 }
-#endif
+

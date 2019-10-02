@@ -5,8 +5,6 @@ import math
 import re
 import os
 from array import array
-if not hasattr(ROOT, "myText"):
-    ROOT.gROOT.LoadMacro("$HZZWSCODEDIR/scripts/loader.c") 
 
 def create_TGraphAsymmErrors(x_, nominal_, up_, down_):
     zero_ = array('f', [0]*len(x_))

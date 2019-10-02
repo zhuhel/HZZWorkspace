@@ -13,7 +13,7 @@ atlas_depends_on_subdirs(
 # Declare external dependencies ... default here is to include ROOT
 find_package( ROOT COMPONENTS MathCore RIO Core Tree Hist
 			      RooFitCore RooFit RooStats HistFactory
-			      Graf Graf2d Gpad
+			      Graf Graf2d Gpad Physics
 			      Minuit MathMore Matrix REQUIRE )
 
 # Declare dictionary
@@ -31,6 +31,11 @@ atlas_add_library( HZZWorkspaceLib Root/*.cxx HZZWorkspace/*.h ${HZZWorkspaceLib
                    PRIVATE_LINK_LIBRARIES ${ROOT_LIBRARIES}
                    LINK_LIBRARIES RooFitExtensions
 )
+
+atlas_add_dictionary( HZZWorkspaceDict
+       HZZWorkspace/HZZWorkspaceDict.h
+       HZZWorkspace/selection.xml
+       LINK_LIBRARIES HZZWorkspaceLib )
 
 
 # if you add an application (exe) to this package
@@ -74,7 +79,7 @@ endforeach()
 
 
 # Install python modules, joboptions, and share content
-#atlas_install_python_modules( python/*.py )
+atlas_install_python_modules( scripts/*.py )
 #atlas_install_joboptions( share/*.py )
 #atlas_install_data( data/* )
 # You can access your data from code using path resolver, e.g.
