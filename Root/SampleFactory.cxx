@@ -466,7 +466,7 @@ bool SampleFactory::AddKeysSample(SampleBase* samplebase, strvec& args){
     Helper::tokenizeString(all_samples, ',', *sample_list);
     if(sample_list->size() < 2) {
         cout  <<  "Only one sample is provided in "  <<  config_file  <<  endl;
-        cout  <<  "I don' know parametrization"  <<  endl;
+        cout  <<  "I don't know parametrization"  <<  endl;
         delete sample_list;
         exit(1);
     }

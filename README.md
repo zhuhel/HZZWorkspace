@@ -36,15 +36,6 @@ cd HZZWorkspace
 # CMake version is default on master
 git clone --recursive https://:@gitlab.cern.ch:8443/HZZ/HZZSoftware/HZZWorkspace.git
 
-
-# To check out an alternate branch directly, with submodules, a bit more stuff is needed:
-git checkout -b {branchname} origin/{branchname}
-cd RooFitExtensions
-git submodule init
-git submodule update
-cd ../..
-
-# Should now be in <workDir>/source
 # Link the top level CMakeLists
 ln -s HZZWorkspace/CMakeLists.topLevel.txt CMakeLists.txt
 
