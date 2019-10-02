@@ -8,6 +8,7 @@
 #include "HZZWorkspace/SampleHistParam.h"
 #include "HZZWorkspace/SampleKeys.h"
 #include "HZZWorkspace/CBGauss.h"
+#include "HZZWorkspace/Gauss.h"
 #include "HZZWorkspace/CBGaussSum.h"
 #include "HZZWorkspace/ParametrizedSample.h"
 #include "HZZWorkspace/ExpLandau.h"
@@ -30,6 +31,7 @@ namespace SampleFactory{
   SampleBase* FactorySampleHistParam( strvec& args );
   SampleBase* FactorySampleKeys( strvec& args );
   SampleBase* FactoryCBGauss( strvec& args );
+  SampleBase* FactoryGauss( strvec& args );
   SampleBase* FactoryCBGaussSum( strvec& args );
   SampleBase* FactoryParametrizedSample( strvec& args );
   SampleBase* FactoryExpLandau( strvec& args );
