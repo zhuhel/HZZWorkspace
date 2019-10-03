@@ -62,6 +62,9 @@ class Combiner{
         string findCategoryConfig(const string& cat_name, const string& name);
         Coefficient* getCoefficient(string& name);
         void getObservables(const string& obs_str, RooArgSet& obs_ws, RooArgSet& obs_minitree, bool& adaptive);
+        // get a [variable] list of bin edges from a string using 
+        // c-style syntax {1,2,3,4...} 
+        std::vector<double> getBinningFromObsListStr(const std::string & ListStr);
         SampleBase* createSample(const string& name, const string& sampleargs);
         void addCutVariables(RooArgSet& ch_obs_minitree, const string& cut);
         void addDataChan(map<string, RooDataSet*>& map, TChain* chain, RooArgSet& obs, const std::string& catname, bool weighted);
