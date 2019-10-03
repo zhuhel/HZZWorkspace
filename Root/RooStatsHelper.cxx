@@ -455,8 +455,11 @@ RooDataSet* RooStatsHelper::makeUnconditionalAsimov(RooWorkspace* combined, RooS
             if (X) X->setVal(hist->GetXaxis()->GetBinCenter(ix));
             if (Y) Y->setVal(hist->GetYaxis()->GetBinCenter(iy));
             if (Z) Z->setVal(hist->GetZaxis()->GetBinCenter(iz));
+            double cellWidth = (X ? hist->GetXaxis()->GetBinWidth(ix) : 1) * 
+                               (Y ? hist->GetYaxis()->GetBinWidth(iy) : 1) * 
+                               (Z ? hist->GetZaxis()->GetBinWidth(iz) : 1);
 
-            obsDataUnbinned->add(*obstmp, hist->GetBinContent(ix,iy,iz));
+            obsDataUnbinned->add(*obstmp, hist->GetBinContent(ix,iy,iz) * cellWidth);
           }
         }
       }
