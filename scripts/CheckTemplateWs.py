@@ -2,7 +2,7 @@ import ROOT
 from numpy import linspace 
 
 # Access ROOT file 
-f = ROOT.TFile( '/home/goblirsc/Code/H4l/Workspaces_CI/build/combined.root' ) 
+f = ROOT.TFile( '/afs/cern.ch/user/x/xju/work/code/HZZWorkspace/run_asimov/combined.root' )
 
 # Access the RooWorkspace 
 w = f.Get( 'combined' )
