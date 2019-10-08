@@ -447,8 +447,7 @@ RooDataSet* RooStatsHelper::makeUnconditionalAsimov(RooWorkspace* combined, RooS
 
       // TH1* hist = pdftmp->createHistogram("htemp", *X, RooFit::IntrinsicBinning(false), argY, argZ);
       unique_ptr<TH1> hist( pdftmp->createHistogram("htemp", *X, RooFit::IntrinsicBinning(false), argY, argZ));
-
-      hist->Scale(expectedEvents/hist->Integral()); //scale histogram to expectation
+      hist->Scale(expectedEvents/hist->Integral("width")); //scale histogram to expectation
       for (int ix(1);ix<=hist->GetNbinsX(); ++ix){
         for (int iy(1);iy<=hist->GetNbinsY(); ++iy){
           for (int iz(1);iz<=hist->GetNbinsZ(); ++iz){
