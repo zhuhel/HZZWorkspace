@@ -81,7 +81,9 @@ bool SampleHist::setChannel(const RooArgSet& _obs, const char* _ch_name, bool wi
 
 RooAbsPdf* SampleHist::makeHistPdf(TH1* hist, const char* base_name, bool is_norm)
 {
-    TH1* h_local = Helper::prepareHistoInputForPdf(hist);
+    bool correctBinWidth = true;
+    bool normalizeToUnit = true;
+    TH1* h_local = Helper::prepareHistoInputForPdf(hist, correctBinWidth, normalizeToUnit);
     h_local->Print();
     RooDataHist *datahist = new RooDataHist(Form("%s_RooDataHist", base_name), "datahist",
             this->obs_list_, h_local);
