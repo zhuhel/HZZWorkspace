@@ -98,8 +98,11 @@ int main (){
 
 	// also fit a gaussian - should reproduce mean, sigma, norm
   	RooRealVar muGauss("muGauss","mean",0,100) ;
-    RooRealVar sigmaGauss("sigmaGauss","sigma",0.1,100) ;
+  	muGauss.setVal(3);
+    RooRealVar sigmaGauss("sigmaGauss","sigma",0.1,500) ;
+    sigmaGauss.setVal(3);
     RooRealVar normGauss("normGauss","norm",0.1,1000) ;
+    normGauss.setVal(5);
 
     RooAbsPdf* gaussPdf =new RooGaussian( "Gauss", "Gaussian", *obs_x, muGauss, sigmaGauss );
     RooExtendPdf gaussWithNorm("GaussWithNorm","Gauss",*gaussPdf, normGauss);
@@ -150,7 +153,7 @@ int main (){
 	t1.SetTextSize(15);
 	t1.SetTextFont(43);
 	t1.SetTextColor(kRed);
-	t1.DrawLatex(0.7,0.85,Form("Input norm: %.0f",in_nEvt));
+	t1.DrawLatex(0.7,0.85,Form("Input norm: %i",in_nEvt));
 	t1.DrawLatex(0.7,0.8,Form("Input mean: %.2f",in_mean));
 	t1.DrawLatex(0.7,0.75,Form("Input sigma: %.2f",in_sigma));
 	t1.SetTextColor(kBlack);

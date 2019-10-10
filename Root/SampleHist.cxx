@@ -81,13 +81,18 @@ bool SampleHist::setChannel(const RooArgSet& _obs, const char* _ch_name, bool wi
 
 RooAbsPdf* SampleHist::makeHistPdf(TH1* hist, const char* base_name, bool is_norm)
 {
+    TH1* h_local = Helper::prepareHistoInputForPdf(hist);
+    h_local->Print();
     RooDataHist *datahist = new RooDataHist(Form("%s_RooDataHist", base_name), "datahist",
-            this->obs_list_, hist);
+            this->obs_list_, h_local);
+    datahist->Print();
     string pdfname(Form("%s_%s", base_name, obsname.c_str()));
     RooHistPdf *histpdf = new RooHistPdf(pdfname.c_str(), pdfname.c_str(),
             this->obs_list_, *datahist, m_interp);
+    histpdf->setUnitNorm(true);
     RooDataHist* newdatahist = nullptr;
     if (use_adpt_bin_) {
+        std::cout << " ADAPTIVE" << std::endl;
         log_info("use adaptive binning");
         // create a dataHist with statistic error from un-smoothed histogram
         // to determine the binning
@@ -111,6 +116,7 @@ RooAbsPdf* SampleHist::makeHistPdf(TH1* hist, const char* base_name, bool is_nor
                 );
         delete datahist; // release old dataHist
     } else {
+        std::cout << "NOT ADAPTIVE" << std::endl;
         newdatahist = datahist;
     }
 
@@ -118,12 +124,14 @@ RooAbsPdf* SampleHist::makeHistPdf(TH1* hist, const char* base_name, bool is_nor
         delete histpdf;
         RooHistPdf *newhistpdf = new RooHistPdf(pdfname.c_str(), pdfname.c_str(),
                 obs_list_, *newdatahist, m_interp);
+        newhistpdf->setUnitNorm(true);
         return newhistpdf;
     } else {
         delete histpdf; // delete old histpdf
         auto* expandDataHist = new RooExpandedDataHist(*newdatahist, Form("%s_EDH",base_name));
         auto* newhistpdf = new RooExpandedHistPdf(pdfname.c_str(), pdfname.c_str(),
                 obs_list_, *expandDataHist, m_interp);
+        newhistpdf->setUnitNorm(true);
         return newhistpdf;
     }
 }

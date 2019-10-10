@@ -11,6 +11,7 @@
  *  Katharina Ecker (kecker@cern.ch): Copied (3rd May 2017 ) SVN VERSION  645*
  *****************************************************************************/
 #include "HZZWorkspace/RooLagrangianMorphFunc.h"
+#include "HZZWorkspace/Helper.h"
 
 #include "Riostream.h"
 
@@ -667,6 +668,8 @@ namespace {
         }
         ERROR(errstr.str());
       }
+
+      auto h_local = Helper::prepareHistoInputForPdf(hist);
       
       TString histname(sample);
       TString constraintname(sample);
@@ -696,7 +699,7 @@ namespace {
       if(hf){
         hf->setValueDirty(); 
         RooDataHist* dh = &(hf->dataHist());
-        RooLagrangianMorphFunc::setDataHistogram(hist,&var,dh);
+        RooLagrangianMorphFunc::setDataHistogram(h_local,&var,dh);
       } else {
         if(!binningOK){
 //          binningOK=true;
@@ -705,26 +708,26 @@ namespace {
 //          hist->Draw();
 //          delete c;
 //          gPad=oldPad;
-          int n = hist->GetNbinsX();
+          int n = h_local->GetNbinsX();
 //           double max = hist->GetXaxis()->GetXmax();
 //           double min = hist->GetXaxis()->GetXmin();
 //           var.setBinning(RooUniformBinning(min,max,n));
 	  std::vector<double> bins;
 	  for(int i =1 ; i < n+1 ; ++i){
-	    bins.push_back(hist->GetBinLowEdge(i));
+	    bins.push_back(h_local->GetBinLowEdge(i));
 	  }
-	  bins.push_back(hist->GetBinLowEdge(n)+hist->GetBinWidth(n));
+	  bins.push_back(h_local->GetBinLowEdge(n)+h_local->GetBinWidth(n));
 	  var.setBinning(RooBinning(n,&(bins[0])));
           //	  var.getBinning().Print();
         }
 
         // generate the mean value
-        RooDataHist* dh = RooLagrangianMorphFunc::makeDataHistogram(hist,&var,histname.Data());
+        RooDataHist* dh = RooLagrangianMorphFunc::makeDataHistogram(h_local,&var,histname.Data());
         hf = new RooHistFunc(funcname,funcname,var,*dh);
         // add it to the list
         list_hf.add(*hf);
       }
-      DEBUG("found histogram " << hist->GetName() << " with integral " << hist->Integral());
+      DEBUG("found histogram " << h_local->GetName() << " with integral " << h_local->Integral());
     }
   }
 

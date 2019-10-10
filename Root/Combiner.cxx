@@ -618,7 +618,6 @@ void Combiner::getObservables(
         int nbins = 100;
         double low_val=9999, hi_val=9999;
         // catch variable binning
-        std::cout << "OBSNAMES"<< obs_input << std::endl;
 
         std::vector<double> variableBinsList = getBinningFromObsListStr(obs_input);
         if (variableBinsList.size() ==0) {
@@ -657,15 +656,16 @@ void Combiner::getObservables(
             auto var_ws = new RooRealVar( ws_name.c_str(), ws_name.c_str(),
                     value, low_val, hi_val
                     );
+            RooBinning theBinning(variableBinsList.size()-1, &(variableBinsList.at(0)));
+            var_ws->setBinning(theBinning);
             var_ws->Print();
-            var_ws->setBinning(RooBinning(variableBinsList.size()-1, &(variableBinsList.at(0))));
             obs_ws.add(*var_ws);
             auto var_minitree = new RooRealVar( minitree_name.c_str(), minitree_name.c_str(),
                         value, low_val, hi_val
                     );
-            var_minitree->setBinning(RooBinning(variableBinsList.size()-1, &(variableBinsList.at(0))));
-            obs_minitree.add(*var_minitree);
+            var_minitree->setBinning(theBinning);
             var_minitree->Print();
+            obs_minitree.add(*var_minitree);
         }
     }
 }
@@ -686,17 +686,17 @@ Combiner::getBinningFromObsListStr(const std::string &ListStr) {
   size_t current, previous = 0;
   do {
     current = myStr.find(",", previous);
-    std::cout << " Trying to stod "
-              << myStr.substr(previous, current - previous) << std::endl;
+    // std::cout << " Trying to stod "
+              // << myStr.substr(previous, current - previous) << std::endl;
     binEdges.push_back(std::stod(myStr.substr(previous, current - previous)));
     previous = current + 1;
 
   } while (current != std::string::npos);
-  std::cout << " BIN EDGES ";
-  for (auto p : binEdges) {
-    std::cout << p << ", ";
-  }
-  std::cout << std::endl;
+  // std::cout << " BIN EDGES ";
+  // for (auto p : binEdges) {
+  //   std::cout << p << ", ";
+  // }
+  // std::cout << std::endl;
   return binEdges;
 }
 

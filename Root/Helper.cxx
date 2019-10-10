@@ -9,6 +9,8 @@
 #include "TSystem.h"
 #include <TString.h>
 #include <TRegexp.h>
+#include <TH2.h>
+#include <TH3.h>
 #include <TMath.h>
 #include <RooFitExtensions/RooBSplineBases.h>
 #include <RooFitExtensions/RooBSpline.h>
@@ -536,6 +538,30 @@ int isBoolean(const string& str){
 
     bool sort_str_len(const std::string A, const std::string B){
        return A.size() > B.size();
+    }
+
+
+    TH1* prepareHistoInputForPdf(TH1* input, bool binWidthCorr, bool normalise){
+
+      TH1* theClone = dynamic_cast<TH1*>(input->Clone(Form("cloneForPDF_%s",input->GetName())));
+      if (binWidthCorr){
+        for (int k = 1; k < theClone->GetNbinsX()+1; ++k){
+          for (int l = 1; l < theClone->GetNbinsY()+1; ++l){
+            for (int m = 1; m < theClone->GetNbinsZ()+1; ++m){
+              double CellWidth = theClone->GetXaxis()->GetBinWidth(k);
+              if (dynamic_cast<TH2*>(theClone)) CellWidth *= theClone->GetYaxis()->GetBinWidth(l);
+              if (dynamic_cast<TH3*>(theClone)) CellWidth *= theClone->GetYaxis()->GetBinWidth(m);
+              theClone->SetBinContent(k, l, m, theClone->GetBinContent(k,l,m) * 1./CellWidth);
+              theClone->SetBinError(k, l, m, theClone->GetBinError(k,l,m) * 1./CellWidth);
+
+            }
+          }
+        }
+      }
+      if (normalise){
+        theClone->Scale(1./theClone->Integral("width"));
+      }
+      return theClone;
     }
 
 // END OF NAMESPACE
