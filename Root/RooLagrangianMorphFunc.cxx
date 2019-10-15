@@ -1684,7 +1684,10 @@ void RooLagrangianMorphFunc::addFolders(const RooArgList& folders){
       if(!f) continue;
       std::string name(f->GetName());
       if(name.size() == 0) continue;
-      if(this->_baseFolder.size() == 0) this->_baseFolder == name;
+      // was 
+      //if(this->_baseFolder.size() == 0) this->_baseFolder == name;
+      // GB I presume this was intented ?
+      if(this->_baseFolder.size() == 0) this->_baseFolder = name;
       if(this->_baseFolder == name){
         this->_folders.insert(this->_folders.begin(),name);
       } else {
@@ -1777,8 +1780,9 @@ RooLagrangianMorphFunc::RooLagrangianMorphFunc(const char *name, const char *tit
   this->setup(operators,vertices, false);
 }
 
-template RooLagrangianMorphFunc::RooLagrangianMorphFunc<RooArgList>(const char *, const char *, const char*, const char*, const std::vector<RooArgList>&, const char*, const RooArgList&);
-template RooLagrangianMorphFunc::RooLagrangianMorphFunc<RooArgSet> (const char *, const char *, const char*, const char*, const std::vector<RooArgSet> &, const char*, const RooArgList&);
+// Are the lines below needed ? 
+//template RooLagrangianMorphFunc::RooLagrangianMorphFunc<RooArgList>(const char *, const char *, const char*, const char*, const std::vector<RooArgList>&, const char*, const RooArgList&){};
+//template RooLagrangianMorphFunc::RooLagrangianMorphFunc<RooArgSet> (const char *, const char *, const char*, const char*, const std::vector<RooArgSet> &, const char*, const RooArgList&){};
 
 //_____________________________________________________________________________
 template<class T>
@@ -1793,8 +1797,9 @@ RooLagrangianMorphFunc::RooLagrangianMorphFunc(const char *name, const char *tit
   this->setup(operators,vertices, false);
 }
 
-template RooLagrangianMorphFunc::RooLagrangianMorphFunc<RooArgList>(const char *, const char *, const char*, const char*, const std::vector<RooArgList>&, const RooArgList&);
-template RooLagrangianMorphFunc::RooLagrangianMorphFunc<RooArgSet> (const char *, const char *, const char*, const char*, const std::vector<RooArgSet> &, const RooArgList&);
+// Are the lines below needed ? 
+//template RooLagrangianMorphFunc::RooLagrangianMorphFunc<RooArgList>(const char *, const char *, const char*, const char*, const std::vector<RooArgList>&, const RooArgList&){}
+//template RooLagrangianMorphFunc::RooLagrangianMorphFunc<RooArgSet> (const char *, const char *, const char*, const char*, const std::vector<RooArgSet> &, const RooArgList&){}
 
 //_____________________________________________________________________________
 template<class T>
@@ -1809,8 +1814,9 @@ RooLagrangianMorphFunc::RooLagrangianMorphFunc(const char *name, const char *tit
   this->setup(operators,vertices, false);
 }
 
-template RooLagrangianMorphFunc::RooLagrangianMorphFunc<RooArgList>(const char *, const char *, const char*, const char*, const std::vector<RooArgList>&);
-template RooLagrangianMorphFunc::RooLagrangianMorphFunc<RooArgSet> (const char *, const char *, const char*, const char*, const std::vector<RooArgSet> &);
+// Are the lines below needed ? 
+//template RooLagrangianMorphFunc::RooLagrangianMorphFunc<RooArgList>(const char *, const char *, const char*, const char*, const std::vector<RooArgList>&){};
+//template RooLagrangianMorphFunc::RooLagrangianMorphFunc<RooArgSet> (const char *, const char *, const char*, const char*, const std::vector<RooArgSet> &){};
 
 //_____________________________________________________________________________
 
