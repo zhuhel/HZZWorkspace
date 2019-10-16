@@ -14,7 +14,7 @@ atlas_depends_on_subdirs(
 find_package( ROOT COMPONENTS MathCore RIO Core Tree Hist
 			      RooFitCore RooFit RooStats HistFactory
 			      Graf Graf2d Gpad Physics
-			      Minuit MathMore Matrix REQUIRE )
+          Minuit MathMore Matrix XMLIO REQUIRE )
 
 # Declare dictionary
 atlas_add_root_dictionary( HZZWorkspaceLib HZZWorkspaceLibCintDict
@@ -65,7 +65,7 @@ foreach(_exeFile ${files})
     LINK_LIBRARIES ${ROOT_LIBRARIES} HZZWorkspaceLib RooFitExtensions )
 endforeach()
 
-# Add "test" directory applications 
+# Add "test" directory applications
 file(GLOB_RECURSE files "test/*.cxx")
 foreach(_exeFile ${files})
     get_filename_component(_theExec ${_exeFile} NAME_WE)
@@ -73,7 +73,7 @@ foreach(_exeFile ${files})
     # we specify a folder for programs we do not want to compile. Useful during r21 transition...
     atlas_add_executable( ${_theExec}
     ${_exeFile}
-    INCLUDE_DIRS ${ROOT_INCLUDE_DIRS} 
+    INCLUDE_DIRS ${ROOT_INCLUDE_DIRS}
     LINK_LIBRARIES ${ROOT_LIBRARIES} HZZWorkspaceLib RooFitExtensions )
 endforeach()
 
