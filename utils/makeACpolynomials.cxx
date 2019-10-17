@@ -25,15 +25,16 @@
 //------------------------------------------------------------------------------
 // Building acceptance polynomial for given minitree input and configuration (xml format)
 //
-// Heavily hard coded! Use with care!
+// Hardcoded configurations commented out at bottom of the file (temporary!)
 //------------------------------------------------------------------------------
 int main( int argc, char *argv[] ){
 
   // Get the name of the configuration file (in xml format) from the arguments
   if( argc < 1 || std::string( argv[ 1 ] ).find( ".xml" ) != std::string::npos ){
+    std::cout << "Configuration file missing. Please see examples/Tools/ac_massmeasurement_config.xml for an example" << std::endl;
+    std::cout << "More information available here: https://gitlab.cern.ch/HZZ/HZZSoftware/HZZWorkspace/wikis/Executables/makeACpolynomials" << std::endl;
     std::cerr << "Please provide a configuration in xml format" << std::endl;
   }
-
   std::string config = argv[ 1 ];
 
   if( argc > 2 ){ std::cout << "I don't know what to do with more than 1 passed argument" << std::endl; }
@@ -108,6 +109,9 @@ int main( int argc, char *argv[] ){
     // Populate the minitree directory
     if( nodename.find( "minitreedir" ) != std::string::npos ){
       minitreeDir = std::string( xml.GetNodeContent( childnode ) );
+      // Add the last directory / if it's missing
+      if( minitreeDir.back() != '/' ) minitreeDir += "/";
+      // Report minitree directory to  commandline  
       std::cout << "Looking for files in " << minitreeDir << std::endl;
     }
 
@@ -152,7 +156,6 @@ int main( int argc, char *argv[] ){
 
   // Release the XML from memory
   xml.FreeDoc( xmldoc );
-
 
   // Convert strings to floats where necessary
   float minMH = mH[ "min" ];
