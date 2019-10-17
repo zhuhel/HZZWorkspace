@@ -30,9 +30,13 @@
 int main( int argc, char *argv[] ){
 
   // Get the name of the configuration file (in xml format) from the arguments
+  if( argc < 1 || std::string( argv[ 1 ] ).find( ".xml" ) != std::string::npos ){
+    std::cerr << "Please provide a configuration in xml format" << std::endl;
+  }
+
   std::string config = argv[ 1 ];
 
-  if( argc > 1 ){ std::cout << "I don't know what to do with more than 1 passed argument" << std::endl; }
+  if( argc > 2 ){ std::cout << "I don't know what to do with more than 1 passed argument" << std::endl; }
 
   // Declare string for minitree directory
   std::string minitreeDir;
@@ -50,6 +54,9 @@ int main( int argc, char *argv[] ){
     { "minY", 0.05 }, // Set to -1 to use auto
     { "maxY", 0.2 } // Set to -1 to use auto
   };
+
+  // Establish the output plot images extension
+  std::string imgExt = "eps";
 
   // Declare a vector of strings to store the width information
   std::vector< std::string > widths;
@@ -175,8 +182,11 @@ int main( int argc, char *argv[] ){
   std::string outFileSIName = "polyNormSI.txt";
   std::string outFileSysName = "polySys.txt";
 
+  // Create a directory for the plots directory
+  gSystem->Exec( "mkdir -p $PWD/plots/" );
+
   // Create and open output ROOT file
-  TFile* file = new TFile( Form( "plots/%s", outTFileName.c_str() ), "RECREATE" );
+  TFile* outTfile = new TFile( Form( "plots/%s", outTFileName.c_str() ), "RECREATE" );
 
   // Create output text files
   std::ofstream outfile;
@@ -191,17 +201,17 @@ int main( int argc, char *argv[] ){
   //
   // LOOP OVER PRODUCTION MODES AND WIDTHS77
   //
+  // Create a canvas for the acceptance plot
   TCanvas can( "can", "", 600, 600 );
   can.SetGrid( 2,2 );
   can.SetLeftMargin( 0.15 );
-  std::cout << prod->size() << "  " << widths.size() << std::endl;
 
   // Loop on production mode
   for( unsigned int p( 0 ); p < prod->size(); ++p ){
     // Loop on width
     for( unsigned int w( 0 ); w < widths.size(); ++w ){
 
-      // Production mode and  width assigned
+      // Production mode and width assigned
       std::cout << "\nprod: " << prod->at( p ) << " width: " << widths[ w ] << std::endl;
 
       // Based on the width keyword, decide whether taus are included
@@ -231,7 +241,7 @@ int main( int argc, char *argv[] ){
 
           // Identify the masspoint
           std::string massString = "";
-          while( !isdigit( str[ ++pos])){}
+          while( !isdigit( str[ ++pos ] ) ){}
           while( isdigit( str[ pos ] ) ){ massString += str[ pos++ ]; }
           if( str.substr( pos, 2 ) == "p5" ) massString += ".5";
           if( str.substr( pos, 3 ) == "p25" ) massString += ".25";
@@ -239,7 +249,9 @@ int main( int argc, char *argv[] ){
 
           // Mass point lies outside the range of interest
           if( mass < minMH || mass > maxMH ) continue;
-            std::cout<<"from file:"<<str<<" extracted mass="<<mass<<std::endl;
+
+          // Report file and masspoint to the command line
+          std::cout << "From file: " << str << " --> extracted mass = " << mass << std::endl;
 
           // Check against the tau condition
           if( hasTau && str.find( "noTau" ) != std::string::npos ) continue;
@@ -248,11 +260,10 @@ int main( int argc, char *argv[] ){
           // Store the minitree in the file map
           fileMap[ mass ] = minitreeDir + str;
         }
-        //else
-          //std::cout<<"on file "<<str<<" found pos="<<pos<<" and pos2="<<pos2<<std::endl;
       }
       // Report map built and give the number of entries
       std::cout << "Built a map of file names vs mass. Size = " << fileMap.size() << std::endl;
+
       // No files found? Exit loop
       if( fileMap.size() == 0 ) continue;
 
@@ -263,10 +274,11 @@ int main( int argc, char *argv[] ){
       // Loop on the selected minitrees
       for (std::map< float, std::string >::iterator it = fileMap.begin(); it != fileMap.end(); ++it ){
 
-        std::cout << "for mass = " << it->first << ", using file " << it->second << std::endl;
+        std::cout << "For mass = " << it->first << ", using file " << it->second << std::endl;
 
-        // Open the ROOT file
+        // Open a new ROOT file
         TFile* file = new TFile( it->second.c_str(), "READ" );
+
         // Access the minitree
         TTree* tree = ( TTree* )file->Get( "tree_incl_all" );
 
@@ -275,149 +287,203 @@ int main( int argc, char *argv[] ){
 
         // Loop on the categories
         for( unsigned int c( 0 ); c < categories->size(); ++c ){
+          // Createa a string for the current category
           std::string cat = categories->at( c );
-          // Create a histogram
-          TH1F* h = new TH1F( "h","h",1,-9999,9999);
-          // Populate it using TTree::Draw
-          tree->Draw("m4l_constrained_HM>>h", Form( "%s*(9./4.)*(weight/(w_lumi*w_xs*w_br))", cuts->at( c ).c_str() ) );
+          // Create a histogram with a single bin to serve as a counter
+          TH1F* h = new TH1F( "h", "h", 1, -9999, 9999 );
+          // Populate it using TTree::Draw(). Select events matching this category
+          tree->Draw( "m4l_constrained_HM>>h", Form( "%s*(9./4.)*(weight/(w_lumi*w_xs*w_br))", cuts->at( c ).c_str() ) );
+          // Store the count and uncertainty
           norm[ cat ].push_back( h->GetBinContent( 1 ) );
           norm_error[ cat ].push_back( h->GetBinError( 1 ) );
+          // Remove the histogram
           delete h;
         }
-
       }
 
-      std::cout<<"built a map of acceptance vs mass. size="<<masses.size()<<std::endl;
+      // Report that the acceptance map is complete
+      std::cout << "Built a map of acceptance vs mass. Size = " << masses.size() << std::endl;
 
-      std::cout<<"MC acceptances for "<< prod->at( p )<<":"<<std::endl;
-      for (unsigned int c(0);c<categories->size();++c){
-        std::cout<<"\t"<<categories->at( c )<<std::endl;
-        for (unsigned int m(0);m<masses.size();++m){
-          std::cout<<"\t\t"<<masses[m]<<":\t"<<norm[categories->at( c )][m]<<"\t+-\t"<<norm_error[categories->at( c )][m]<<std::endl;
+      //::: Report the acceptances to the commandline
+      std::cout << "MC acceptances for " << prod->at( p ) << ":" << std::endl;
+      // Loop on  the categories
+      for( unsigned int c( 0 ); c < categories->size(); ++c ){
+        // Name the category
+        std::cout << "\t" << categories->at( c ) << std::endl;
+        // Loop on the mass points
+        for( unsigned int m( 0 ); m < masses.size(); ++m ){
+          // Print the acceptance and its uncertainty
+          std::cout << "\t\t" << masses[ m ] << ":\t" << norm[ categories->at( c ) ][ m ] << "\t+-\t" << norm_error[ categories->at( c ) ][ m ] << std::endl;
         }
       }
 
+      // Create a character string to identify the polynomial order
       const char* pol="pol0";
-      if (masses.size()>1) pol="pol1";
-      if (masses.size()>2) pol="pol2";
+      if( masses.size() > 1 ) pol = "pol1";
+      if( masses.size() > 2 ) pol = "pol2";
       //if (masses.size()>3) pol="pol3";//FIXME
       //if (masses.size()>4) pol="pol4";
       //if (masses.size()>5) pol="pol5";
       //if (masses.size()>5) pol="pol6";
 
-      //BUILD A GRAPH OF MASS POINT VS NORMS
+      //:::: BUILD A GRAPH OF MASS POINT VS NORMS
+      // Create a new multigraph
       TMultiGraph* mg = new TMultiGraph();
+      // Access the canvas' draw space
       can.cd();
-      for (unsigned int c(0);c<categories->size();++c){
+      // Loop on the categories
+      for( unsigned int c( 0 ); c < categories->size(); ++c ){
+        // Identify the current category
         std::string cat = categories->at( c );
 
-        TGraphErrors* graph = new TGraphErrors(masses.size(), &(masses[0]), &(norm[cat][0]), &(zero[0]), &(norm_error[cat][0]));
-        TFitResultPtr fit = graph->Fit(pol,"qs");
-        mg->Add(graph);
-        file->cd();
-        std::string graphName = Form("AC_%s_%s_%s", prod->at( p ).c_str(),widths[w].c_str(),cat.c_str());
-        //std::cout<<"going to save graph as "<<graphName<<std::endl;
-        graph->Clone(graphName.c_str())->Write();
+        // Create a new graph with uncertainties where x is the mass point and y is the acceptance wit uncertainty
+        TGraphErrors* graph = new TGraphErrors( masses.size(), &( masses[ 0 ] ), &( norm[ cat ][ 0 ] ), &( zero[ 0 ] ), &( norm_error[ cat ][ 0 ] ) );
+        // Fit the graph with the polynomial. Perform a quiet fit with minimum printing and return the result
+        TFitResultPtr fit = graph->Fit( pol, "qs" );
+        // Add this category's graph to the multi-graph
+        mg->Add( graph );
 
+        // Enter the output ROOT file
+        outTfile->cd();
+        // Give a name to the graph so that it is uniquely written
+        std::string graphName = Form( "AC_%s_%s_%s", prod->at( p ).c_str(), widths[ w ].c_str(), cat.c_str() );
+        // Save the graph in the ROOT file
+        graph->Clone( graphName.c_str() )->Write();
 
-        //ESTIMATE SYSTEMATIC
-        TF1* polfit = graph->GetFunction(pol);
-        std::vector<float> dev;
-        for (unsigned int m(0);m<masses.size();++m){
-          dev.push_back(polfit->Eval(masses[m]) - norm[cat][m]);
-          //std::cout<<"actual dev "<<masses[m]<<"\t = "<<norm[cat][m] / polfit->Eval(masses[m])<<std::endl;
+        //::: ESTIMATE SYSTEMATICS
+        // Extract the fitted TF1 from the graph
+        TF1* polfit = graph->GetFunction( pol );
+
+        // Create a vector to hold the deviations
+        std::vector< float > dev;
+        // Loop on the mass points
+        for( unsigned int m( 0 ); m < masses.size(); ++m ){
+          // Calculate the difference between the fitted function at the masspoint and its value from Monte Carlo
+          dev.push_back( polfit->Eval( masses[ m ] ) - norm[ cat ][ m ] );
         }
-        float rms = TMath::RMS(dev.size(),&(dev[0]))/sqrt(masses.size()-1);
+        // Calculate the RMS, standardized with respect to the number of mass points, of the deviations
+        float rms = TMath::RMS( dev.size(), &( dev[ 0 ] ) )/sqrt( masses.size()-1 );
+
+        // Clear out the vector
         dev.clear();
-        for (unsigned int m(0);m<masses.size();++m){
-          float nom = polfit->Eval(masses[m]);
-          outfileSys<<&prod->at( p )<<"  "<<cat<<"  "<<masses[m]<<"  "<<Form("%.8f",(nom-rms)/nom)<<"   "<<Form("%.8f",(nom+rms)/nom)<<std::endl;
+
+        //  Save the deviation to the systematics file
+        for( unsigned int m( 0 ); m < masses.size(); ++m ){
+          float nom = polfit->Eval( masses[ m ] );
+          outfileSys << prod->at( p ) << "  " << cat << "  " << masses[ m ] << "  " << Form( "%.8f", ( nom-rms )/ nom ) << "   " << Form( "%.8f", ( nom+rms )/nom ) << std::endl;
         }
 
-        //Printout for conf note table
-        std::cout<<"prod "<<&prod->at( p )<<" in category "<<cat<<" acceptance @125GeV = "<<100*polfit->Eval(125)<<"%,    @126GeV = "<<100*polfit->Eval(126)<<"%"<<std::endl;
+        // Printout for conf note table
+        std::cout << "prod " << prod->at( p ) << " in category " << cat << " acceptance @125GeV = " << 100*polfit->Eval( 125 ) << "%,    @126GeV = " << 100*polfit->Eval( 126 ) << "%" << std::endl;
 
+        // Save the graph as an image
+        // Enter the canvas
         can.cd();
-        graph->SetMinimum(0);
-        graph->GetFunction(pol)->SetLineColor(color[c]);
-        //graph->SetTitle(Form("%s %s",prod->at( p ).c_str(), cat.c_str()));
-        graph->SetTitle("");
-        graph->GetXaxis()->SetTitle("m_{H} [GeV]");
-        graph->GetXaxis()->SetRangeUser(masses[0],masses[masses.size()-1]);
+        // graph's general properties
+        graph->SetMinimum( 0 );
+        graph->SetTitle( "" );
+        // Function properties
+        graph->GetFunction( pol )->SetLineColor( color[ c ] );
+        // x axis
+        graph->GetXaxis()->SetTitle( "m_{H} [GeV]" );
+        graph->GetXaxis()->SetRangeUser( masses[ 0 ], masses[ masses.size()-1 ] );
         graph->GetXaxis()->CenterTitle();
-        graph->GetXaxis()->SetTitleFont(42);
-        graph->GetXaxis()->SetTitleSize(0.04);
-        graph->GetXaxis()->SetLabelSize(0.035);
-        graph->GetXaxis()->SetRangeUser(minPlot,maxPlot);
-        graph->GetYaxis()->SetTitle(Form("%s  acceptance",prodlabel->at( p ).c_str()));
-        graph->GetYaxis()->SetTitleFont(42);
-        graph->GetYaxis()->SetTitleOffset(1.4);
-        graph->GetYaxis()->SetTitleSize(0.04);
-        graph->GetYaxis()->SetLabelSize(0.035);
-        if (minPlotY!=-1) graph->SetMinimum(minPlotY);
-        if (maxPlotY!=-1) graph->SetMaximum(maxPlotY);
-        graph->SetMarkerStyle(marker[c]);
-        graph->SetMarkerSize(0.75);
-        graph->SetMarkerColor(color[c]);
-        graph->SetLineColor(color[c]);
-        graph->Draw("ap");
+        graph->GetXaxis()->SetTitleFont( 42 );
+        graph->GetXaxis()->SetTitleSize( 0.04 );
+        graph->GetXaxis()->SetLabelSize( 0.035 );
+        graph->GetXaxis()->SetRangeUser( minPlot, maxPlot );
+        //  y axis
+        graph->GetYaxis()->SetTitle( Form( "%s  acceptance", prodlabel->at( p ).c_str() ) );
+        graph->GetYaxis()->SetTitleFont( 42 );
+        graph->GetYaxis()->SetTitleOffset( 1.4 );
+        graph->GetYaxis()->SetTitleSize( 0.04 );
+        graph->GetYaxis()->SetLabelSize( 0.035 );
+        if( minPlotY != -1 ) graph->SetMinimum( minPlotY );
+        if( maxPlotY != -1 ) graph->SetMaximum( maxPlotY );
+        // marker style
+        graph->SetMarkerStyle( marker[ c ] );
+        graph->SetMarkerSize( 0.75 );
+        graph->SetMarkerColor( color[ c ] );
+        // line style
+        graph->SetLineColor( color[ c ] );
+        // Draw the graph with axes and points
+        graph->Draw( "ap" );
 
-        TLine* line = new TLine(0.65,0.75,0.68,0.75);
-        line->SetNDC(true);
-        line->SetLineColor(color[c]);
-        line->SetLineWidth(3);
-        line->Draw("same");
-        myText(0.57,0.74,kBlack,catlabels->at( c ).c_str(),0.04);
-        //ATLASLabel(0.18,0.84,"Internal",kBlack);
+        // Create a legend manually
+        //    Create a line matched to the category's TGraph
+        TLine* line = new TLine( 0.65, 0.75, 0.68, 0.75 );
+        line->SetNDC( true );
+        line->SetLineColor( color[ c ] );
+        line->SetLineWidth( 3 );
+        line->Draw( "same" );
+        //    Label the line with the category label
+        myText( 0.57, 0.74, kBlack, catlabels->at( c ).c_str(), 0.04 );
+        // Add the ATLAS designation
+        //ATLASLabel( 0.18, 0.84, "Internal", kBlack );
 
-        gSystem->Exec(Form("mkdir -p $PWD/plots/acceptance/%s/%s/",prod->at( p ).c_str(),widths[w].c_str()));
-        //can.Print(Form("$PWD/plots/acceptance/%s/%s/acceptance_%s_%s_%s_%s.png",prod->at( p ).c_str(),widths[w].c_str(),prod->at( p ).c_str(),widths[w].c_str(),cat.c_str(),pol));
-        can.Print(Form("$PWD/plots/acceptance/%s/%s/acceptance_%s_%s_%s_%s.eps",prod->at( p ).c_str(),widths[w].c_str(),prod->at( p ).c_str(),widths[w].c_str(),cat.c_str(),pol));
+        // Create a directory for the plots output
+        gSystem->Exec( Form( "mkdir -p $PWD/plots/acceptance/%s/%s/", prod->at( p ).c_str(), widths[ w ].c_str() ) );
+        // Save the canvas as an image
+        can.Print( Form( "$PWD/plots/acceptance/%s/%s/acceptance_%s_%s_%s_%s.%s", prod->at( p ).c_str(), widths[ w ].c_str(), prod->at( p ).c_str(), widths[ w ].c_str(), cat.c_str(), pol, imgExt.c_str() ) );
 
-        //STORE POLY PARAMS
-        std::vector<double> polyParameters = fit->Parameters();
-        outfile << Form("[%s %s %s]\n",prod->at( p ).c_str(),widths[w].c_str(),cat.c_str());
-        outfileSI << Form("[%s %s %s]\n",prod->at( p ).c_str(),widths[w].c_str(),cat.c_str());
+        //::: STORE POLY PARAMS
+        std::vector< double > polyParameters = fit->Parameters();
+        // Create header lines within the output text files
+        outfile << Form( "[%s %s %s]\n", prod->at( p ).c_str(), widths[ w ].c_str(), cat.c_str() );
+        outfileSI << Form( "[%s %s %s]\n", prod->at( p ).c_str(), widths[ w ].c_str(), cat.c_str() );
+        // Create the separators
         std::string outline = "";
         std::string outlineSI = "& ";
-        for (unsigned int r(0);r<polyParameters.size();++r) {
-          outline=outline+" "+Form("%.20f",polyParameters[r]);
-          outlineSI=outlineSI+Form("%.3e",polyParameters[r])+" & ";
+        // Add the parameters to the line
+        for( unsigned int r( 0 ); r < polyParameters.size(); ++r ){
+          outline = outline + " " + Form( "%.20f", polyParameters[ r ] );
+          outlineSI = outlineSI + Form( "%.3e", polyParameters[ r ] ) + " & ";
         }
-        outlineSI+="\n";
-        outline+="\n";
+        // Add new line characters
+        outlineSI += "\n";
+        outline += "\n";
+        // Record the lines
         outfile << outline;
-        outfileSI<<outlineSI;
+        outfileSI << outlineSI;
       }
-
+      // Draw the multigraph  plot
       mg->Draw("ap");
-      if (minPlotY!=-1) mg->SetMinimum(minPlotY);
-      if (maxPlotY!=-1) mg->SetMaximum(maxPlotY);
-      mg->GetXaxis()->SetRangeUser(masses[0],masses[masses.size()-1]);
-      mg->GetXaxis()->SetTitle("m_{H} [GeV]"); //m_S for high mass //FIXME
+      // x axis
+      mg->GetXaxis()->SetRangeUser( masses[ 0 ], masses[ masses.size()-1 ] );
+      mg->GetXaxis()->SetTitle( "m_{H} [GeV]" ); //m_S for high mass //FIXME
       mg->GetXaxis()->CenterTitle();
-      mg->GetXaxis()->SetTitleFont(42);
-      mg->GetXaxis()->SetTitleSize(0.04);
-      mg->GetXaxis()->SetLabelSize(0.035);
-      mg->GetXaxis()->SetRangeUser(minPlot,maxPlot);
-      mg->GetYaxis()->SetTitle(Form("%s  acceptance",prodlabel->at( p ).c_str()));
-      mg->GetYaxis()->SetTitleFont(42);
-      mg->GetYaxis()->SetTitleOffset(1.4);
-      mg->GetYaxis()->SetTitleSize(0.04);
-      mg->GetYaxis()->SetLabelSize(0.035);
+      mg->GetXaxis()->SetTitleFont( 42 );
+      mg->GetXaxis()->SetTitleSize( 0.04 );
+      mg->GetXaxis()->SetLabelSize( 0.035 );
+      mg->GetXaxis()->SetRangeUser( minPlot, maxPlot );
+      // y axis
+      if( minPlotY != -1 ) mg->SetMinimum( minPlotY );
+      if( maxPlotY != -1 ) mg->SetMaximum( maxPlotY );
+      mg->GetYaxis()->SetTitle(Form( "%s  acceptance", prodlabel->at( p ).c_str() ) );
+      mg->GetYaxis()->SetTitleFont( 42 );
+      mg->GetYaxis()->SetTitleOffset( 1.4 );
+      mg->GetYaxis()->SetTitleSize( 0.04 );
+      mg->GetYaxis()->SetLabelSize( 0.035 );
 
-      float x(0.25),y(0.85);
-      ATLASLabel(x,y,"Internal",kBlack);
-      for (unsigned int c(0);c<categories->size();++c)
-          myLineText(x,y-0.05-0.04*c,color[c],kSolid,2,catlabels->at( c ).c_str(),0.035);
+      // Add labels
+      float x( 0.25 ), y( 0.85 );
+      //   ATLAS
+      ATLASLabel( x, y, "Internal", kBlack );
+      //   Categories with their lines
+      for (unsigned int c( 0 ); c < categories->size(); ++c )
+          myLineText( x, y-0.05-0.04*c, color[ c ], kSolid, 2, catlabels->at( c ).c_str(), 0.035 );
 
+      // Update the canvas so that changes take effect
       can.Update();
-      can.Print(Form("$PWD/plots/acceptance/%s/%s/acceptance_%s_%s_%s.eps",prod->at( p ).c_str(),widths[w].c_str(),prod->at( p ).c_str(),widths[w].c_str(),pol));
+      // Save the canvas as an image
+      can.Print( Form( "$PWD/plots/acceptance/%s/%s/acceptance_%s_%s_%s.%s", prod->at( p ).c_str(), widths[ w ].c_str(), prod->at( p ).c_str(), widths[ w ].c_str(), pol, imgExt.c_str() ) );
 
     } //end loop over widths
 
   } //end loop over prods
 
+  // Close all output files
+  outTfile->Close();
   outfile.close();
   outfileSI.close();
   outfileSys.close();
