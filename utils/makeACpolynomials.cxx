@@ -50,10 +50,10 @@ int main( int argc, char *argv[] ){
 
   // Declare a map for the plotting boundaries
   std::map< std::string, float > plotBoundaries{
-    { "min", 0 },
-    { "max", 0 },
-    { "minY", 0.05 }, // Set to -1 to use auto
-    { "maxY", 0.2 } // Set to -1 to use auto
+    { "xmin", 0 },
+    { "xmax", 0 },
+    { "ymin", 0.05 }, // Set to -1 to use auto
+    { "ymax", 0.2 } // Set to -1 to use auto
   };
 
   // Establish the output plot images extension
@@ -111,7 +111,7 @@ int main( int argc, char *argv[] ){
       minitreeDir = std::string( xml.GetNodeContent( childnode ) );
       // Add the last directory / if it's missing
       if( minitreeDir.back() != '/' ) minitreeDir += "/";
-      // Report minitree directory to  commandline  
+      // Report minitree directory to  commandline
       std::cout << "Looking for files in " << minitreeDir << std::endl;
     }
 
@@ -160,12 +160,10 @@ int main( int argc, char *argv[] ){
   // Convert strings to floats where necessary
   float minMH = mH[ "min" ];
   float maxMH = mH[ "max" ];
-  float minPlot = plotBoundaries[ "min" ];
-  float maxPlot = plotBoundaries[ "max" ];
-  float minPlotY = plotBoundaries[ "minY" ];
-  float maxPlotY = plotBoundaries[ "maxY" ];
-
-  std::cout << minMH << std::endl;
+  float minPlot = plotBoundaries[ "xmin" ];
+  float maxPlot = plotBoundaries[ "xmax" ];
+  float minPlotY = plotBoundaries[ "ymin" ];
+  float maxPlotY = plotBoundaries[ "ymax" ];
   std::vector< int > color;
   for( auto i : *colors ){
     color.push_back( atoi( i.c_str() ) );

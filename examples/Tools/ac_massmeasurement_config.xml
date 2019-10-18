@@ -1,23 +1,27 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <main>
 	<minitreedir>/eos/atlas/atlascerngroupdisk/phys-higgs/HSG2/H4l/2018/MiniTrees/Prod_v20Fix/mc16a/Nominal/</minitreedir>
+
 	<mH>
 		<min>120</min>
 		<max>130</max>
 	</mH>
-	
+
 	<plotproperties>
-		<min>122</min>
-		<max>128</max>
+		<xmin>122</xmin>
+		<xmax>128</xmax>
+		<ymin>-1</ymin>
+		<ymax>-1</ymax>
 	</plotproperties>
-	
+
+	<width>ZZ4lep</width>
 	<width>NNLOPS</width>
-	
+
 	<productionmode>
 		<name>ggH</name>
 		<label>ggH</label>
 	</productionmode>
-	
+
 	<category>
 		<name>ggH_4mu</name>
 		<label>4\mu</label>
@@ -25,7 +29,7 @@
 		<color>880</color>
 		<marker>24</marker>
 	</category>
-	
+
 	<category>
 		<name>ggH_4e</name>
 		<label>4e</label>
@@ -33,7 +37,7 @@
 		<color>800</color>
 		<marker>25</marker>
 	</category>
-	
+
 	<category>
 		<name>ggH_2mu2e</name>
 		<label>2\mu2e</label>
@@ -41,7 +45,7 @@
 		<color>418</color>
 		<marker>26</marker>
 	</category>
-	
+
 	<category>
 		<name>ggH_2e2mu</name>
 		<label>2e2\mu</label>
@@ -49,5 +53,5 @@
 		<color>432</color>
 		<marker>27</marker>
 	</category>
-	
+
 </main>
