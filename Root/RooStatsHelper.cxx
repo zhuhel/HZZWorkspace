@@ -447,16 +447,18 @@ RooDataSet* RooStatsHelper::makeUnconditionalAsimov(RooWorkspace* combined, RooS
 
       // TH1* hist = pdftmp->createHistogram("htemp", *X, RooFit::IntrinsicBinning(false), argY, argZ);
       unique_ptr<TH1> hist( pdftmp->createHistogram("htemp", *X, RooFit::IntrinsicBinning(false), argY, argZ));
-
-      hist->Scale(expectedEvents/hist->Integral()); //scale histogram to expectation
+      hist->Scale(expectedEvents/hist->Integral("width")); //scale histogram to expectation
       for (int ix(1);ix<=hist->GetNbinsX(); ++ix){
         for (int iy(1);iy<=hist->GetNbinsY(); ++iy){
           for (int iz(1);iz<=hist->GetNbinsZ(); ++iz){
             if (X) X->setVal(hist->GetXaxis()->GetBinCenter(ix));
             if (Y) Y->setVal(hist->GetYaxis()->GetBinCenter(iy));
             if (Z) Z->setVal(hist->GetZaxis()->GetBinCenter(iz));
+            double cellWidth = (X ? hist->GetXaxis()->GetBinWidth(ix) : 1) * 
+                               (Y ? hist->GetYaxis()->GetBinWidth(iy) : 1) * 
+                               (Z ? hist->GetZaxis()->GetBinWidth(iz) : 1);
 
-            obsDataUnbinned->add(*obstmp, hist->GetBinContent(ix,iy,iz));
+            obsDataUnbinned->add(*obstmp, hist->GetBinContent(ix,iy,iz) * cellWidth);
           }
         }
       }

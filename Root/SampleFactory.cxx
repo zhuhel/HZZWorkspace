@@ -19,6 +19,7 @@ SampleBase* SampleFactory::CreateSample( const std::string& type, strvec& args )
     if ( type == "SampleHist" ) return FactorySampleHist( args );
     if ( type == "SampleHistParam" ) return FactorySampleHistParam( args );
     if ( type == "SampleKeys" ) return FactorySampleKeys( args );
+    if ( type == "Gauss" ) return FactoryGauss( args );
     if ( type == "CBGauss" ) return FactoryCBGauss( args );
     if ( type == "CBGaussSum" ) return FactoryCBGaussSum( args );
     if ( type == "ParametrizedSample" ) return FactoryParametrizedSample( args );
@@ -338,6 +339,24 @@ SampleBase* SampleFactory::FactoryCBGauss(strvec& args){
 
     return new CBGauss(name.c_str(),input.c_str(),shape_sys.c_str(),
             doConv, doSys, doInt);
+}
+
+SampleBase* SampleFactory::FactoryGauss(strvec& args){
+
+    std::string name = args[0];
+    std::string input = args[1];
+
+    if  ( name == "" ){
+        std::cout << "CBGauss missing mandatory argument 'name'" << std::endl;
+        return NULL;
+    }
+    if  ( input == "" ){
+        std::cout << "CBGauss missing mandatory argument 'input'" << std::endl;
+        return NULL;
+    }
+
+    return new Gauss(name.c_str(),input.c_str(),"",
+            false, false, false);
 }
 
 SampleBase* SampleFactory::FactoryCBGaussSum(strvec& args)
