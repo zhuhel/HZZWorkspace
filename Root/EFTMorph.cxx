@@ -128,13 +128,10 @@ bool EFTMorph::setChannel(const RooArgSet& _obs, const char* _ch_name, bool with
         *decMorphPara,
         *samples);
   // fix obsname automatically created by RooLagrangianMorphFunc to name provided in top level config file
-    std::cout <<  m_eftfunc << std::endl; 
-    std::cout <<  m_eftfunc->getVariables() << std::endl; 
-    std::cout <<  m_eftfunc->getObservable() << std::endl; 
-    std::cout <<  m_eftfunc->getObservable()->GetName() << std::endl; 
-    std::cout <<  m_eftfunc->getVariables()->find(m_eftfunc->getObservable()->GetName()) << std::endl; 
-    std::cout <<  m_eftfunc->getVariables() << std::endl; 
-  m_eftfunc->getVariables()->find(m_eftfunc->getObservable()->GetName())->SetName(obs_list_.first()->GetName());
+    // Weird bug introduced moving from 21.2.68 -> 21.2.92: seems like a cache issue with observable,
+    // Now needs to call first the GetName() method (while it was in the ->find(...) before.
+    auto obsName = m_eftfunc->getObservable()->GetName();
+  m_eftfunc->getVariables()->find(obsName)->SetName(obs_list_.first()->GetName());
 
 //   information for cross section morphing
   m_eftfunc->writeMatrixToFile(m_eftfunc->getInvertedMatrix(),Form("coeffsInvMatrix_%s.txt",m_eftfunc->GetName()));
