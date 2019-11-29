@@ -56,7 +56,7 @@ namespace Helper{
     bool IsGoodTH1(TH1* h1);
     bool TH1FHasEmptyBin(TH1F* h);
     void printStopwatch(TStopwatch& timer);
-    const std::string& getInputPath(std::string i=std::string("."));
+    const std::string& getInputPath(std::string i=std::string("./"));
     const std::string& addPoiName(std::string i=std::string(""));
     RooWorkspace* getWorkspace(RooWorkspace* i=NULL);
     float getSysCutoff(std::string type, float setValue=-1);
