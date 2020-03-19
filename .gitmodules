@@ -8,3 +8,6 @@
 	url = ../../hherde/mass-measurement-workspaces-for-h4l.git
 	#url = ssh://git@gitlab.cern.ch:7999/hherde/mass-measurement-workspaces-for-h4l.git
   ignore = dirty 
+[submodule "RooLagrangianMorphing"]
+	path = RooLagrangianMorphing
+	url = https://gitlab.cern.ch/cburgard/RooLagrangianMorphing.git
