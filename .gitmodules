@@ -1,15 +1,15 @@
 [submodule "RooFitExtensions"]
 	path = RooFitExtensions
-	url = ../../cburgard/RooFitExtensions.git
+	url = ../../../cburgard/RooFitExtensions.git
 	#url = https://:@gitlab.cern.ch:8443/cburgard/RooFitExtensions.git
   ignore = dirty
 [submodule "examples/WorkspaceConfiguration/MassMeasurement"]
 	path = examples/WorkspaceConfiguration/MassMeasurement
-	url = ../../hherde/mass-measurement-workspaces-for-h4l.git
+	url = ../../../hherde/mass-measurement-workspaces-for-h4l.git
 	#url = ssh://git@gitlab.cern.ch:7999/hherde/mass-measurement-workspaces-for-h4l.git
   ignore = dirty
 [submodule "RooLagrangianMorphing"]
 	path = RooLagrangianMorphing
-	url = ../../RooLagrangianMorphing.git
+	url = ../../../RooLagrangianMorphing.git
 	#url = https://gitlab.cern.ch/cburgard/RooLagrangianMorphing.git
 	ignore = dirty
