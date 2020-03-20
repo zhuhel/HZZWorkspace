@@ -43,7 +43,7 @@ class EFTMorph : public SampleBase {
 
         std::map<std::string, std::map<std::string, std::string> > morph_dic;
         std::map<std::string, Coefficient*> m_sampleCoefMap;
-        RooLagrangianMorphFunc* m_eftfunc;
+        RooLagrangianMorphPdf* m_eftfunc;
 
         RooArgList *m_morphcoefs, *m_morphfuncs;
 

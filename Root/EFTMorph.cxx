@@ -119,8 +119,8 @@ bool EFTMorph::setChannel(const RooArgSet& _obs, const char* _ch_name, bool with
   Helper::tokenizeString(morph_dic[_ch_name]["samples"],',',samplesvec);
   for (auto& s: samplesvec) samples->add(*(new RooStringVar(s.c_str(),s.c_str(),s.c_str())));
 
-  RooLagrangianMorphFunc * m_eftfunc =
-    new RooLagrangianMorphFunc(Form("%s_mf",base_name_.Data()),
+  m_eftfunc =
+    new RooLagrangianMorphPdf(Form("%s_mf",base_name_.Data()),
         Form("%s_mf",base_name_.Data()),
         (Helper::getInputPath()+morph_dic[_ch_name]["file"]).c_str(),
         (morph_dic[_ch_name]["folder"] + _obs.first()->GetName()).c_str() ,
