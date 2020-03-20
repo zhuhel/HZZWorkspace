@@ -18,13 +18,13 @@
 #pragma link C++ class RelativisticBWInt+;
 #pragma link C++ class AnalyticHMBkg+;
 #pragma link C++ class RooHistParamPdf+;
-#pragma link C++ class RooLagrangianMorphFunc+;
-#pragma link C++ class RooLagrangianMorphOptimizer+;
-#pragma link C++ class RooHCggfWWMorphFunc+;
-#pragma link C++ class RooHCvbfWWMorphFunc+;
-#pragma link C++ class RooHCggfZZMorphFunc+;
-#pragma link C++ class RooHCvbfZZMorphFunc+;
-#pragma link C++ class RooHCvbfMuMuMorphFunc+;
+// #pragma link C++ class RooLagrangianMorphFunc+;
+// #pragma link C++ class RooLagrangianMorphOptimizer+;
+// #pragma link C++ class RooHCggfWWMorphFunc+;
+// #pragma link C++ class RooHCvbfWWMorphFunc+;
+// #pragma link C++ class RooHCggfZZMorphFunc+;
+// #pragma link C++ class RooHCvbfZZMorphFunc+;
+// #pragma link C++ class RooHCvbfMuMuMorphFunc+;
 
 #endif
 
