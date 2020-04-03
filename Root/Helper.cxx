@@ -9,6 +9,8 @@
 #include "TSystem.h"
 #include <TString.h>
 #include <TRegexp.h>
+#include <TH2.h>
+#include <TH3.h>
 #include <TMath.h>
 #include <RooFitExtensions/RooBSplineBases.h>
 #include <RooFitExtensions/RooBSpline.h>
@@ -536,6 +538,19 @@ int isBoolean(const string& str){
 
     bool sort_str_len(const std::string A, const std::string B){
        return A.size() > B.size();
+    }
+
+
+    TH1* prepareHistoInputForPdf(TH1* input, bool binWidthCorr, bool normalise){
+
+      TH1* theClone = dynamic_cast<TH1*>(input->Clone(Form("cloneForPDF_%s",input->GetName())));
+      if (binWidthCorr){
+   theClone->Scale(1., "width");
+      }
+      if (normalise){
+        theClone->Scale(1./theClone->Integral("width"));
+      }
+      return theClone;
     }
 
 // END OF NAMESPACE

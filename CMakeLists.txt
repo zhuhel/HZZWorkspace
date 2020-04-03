@@ -1,5 +1,6 @@
 ## automatically generated CMakeLists.txt file
 
+set(CMAKE_MACOSX_RPATH 1)
 # Declare the package
 atlas_subdir( HZZWorkspace )
 
@@ -29,7 +30,7 @@ atlas_add_library( HZZWorkspaceLib Root/*.cxx HZZWorkspace/*.h ${HZZWorkspaceLib
                    PUBLIC_HEADERS HZZWorkspace
                    PRIVATE_INCLUDE_DIRS ${ROOT_INCLUDE_DIRS}
                    PRIVATE_LINK_LIBRARIES ${ROOT_LIBRARIES}
-                   LINK_LIBRARIES RooFitExtensions
+                   LINK_LIBRARIES RooFitExtensionsLib
 )
 
 atlas_add_dictionary( HZZWorkspaceDict
@@ -51,7 +52,7 @@ foreach(_exeFile ${files})
     atlas_add_executable( ${_theExec}
     ${_exeFile}
     INCLUDE_DIRS ${ROOT_INCLUDE_DIRS}
-    LINK_LIBRARIES ${ROOT_LIBRARIES} HZZWorkspaceLib RooFitExtensions )
+    LINK_LIBRARIES ${ROOT_LIBRARIES} HZZWorkspaceLib RooFitExtensionsLib )
 endforeach()
 
 file(GLOB_RECURSE files "test/*.cxx")
@@ -62,7 +63,7 @@ foreach(_exeFile ${files})
     atlas_add_executable( ${_theExec}
     ${_exeFile}
     INCLUDE_DIRS ${ROOT_INCLUDE_DIRS}
-    LINK_LIBRARIES ${ROOT_LIBRARIES} HZZWorkspaceLib RooFitExtensions )
+    LINK_LIBRARIES ${ROOT_LIBRARIES} HZZWorkspaceLib RooFitExtensionsLib )
 endforeach()
 
 # Add "test" directory applications
@@ -73,8 +74,8 @@ foreach(_exeFile ${files})
     # we specify a folder for programs we do not want to compile. Useful during r21 transition...
     atlas_add_executable( ${_theExec}
     ${_exeFile}
-    INCLUDE_DIRS ${ROOT_INCLUDE_DIRS}
-    LINK_LIBRARIES ${ROOT_LIBRARIES} HZZWorkspaceLib RooFitExtensions )
+    INCLUDE_DIRS ${ROOT_INCLUDE_DIRS} 
+    LINK_LIBRARIES ${ROOT_LIBRARIES} HZZWorkspaceLib RooFitExtensionsLib )
 endforeach()
 
 

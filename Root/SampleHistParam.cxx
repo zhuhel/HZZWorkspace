@@ -101,10 +101,10 @@ bool SampleHistParam::getHistograms()
     // string name_(Form("%s_%s", obsname.c_str(), category_name_.c_str()));
     string name_(Form("%s_%s", obsname.c_str(), reduced_channel_name.Data()));
     log_info("SampleHistParam searches: %s", name_.c_str());
-    h_sig_   = (TH1*)sig_file_->Get(Form("%s_signal", name_.c_str()));
-    h_hb_    = (TH1*)sig_file_->Get(Form("%s_HB", name_.c_str()));
-    h_hH_    = (TH1*)sig_file_->Get(Form("%s_hH", name_.c_str()));
-    h_bonly_ = (TH1*)bkg_file_->Get(Form("%s-Nominal-%s", obsname.c_str(), reduced_channel_name.Data()));
+    h_sig_   = Helper::prepareHistoInputForPdf((TH1*)sig_file_->Get(Form("%s_signal", name_.c_str())));
+    h_hb_    = Helper::prepareHistoInputForPdf((TH1*)sig_file_->Get(Form("%s_HB", name_.c_str())));
+    h_hH_    = Helper::prepareHistoInputForPdf((TH1*)sig_file_->Get(Form("%s_hH", name_.c_str())));
+    h_bonly_ = Helper::prepareHistoInputForPdf((TH1*)bkg_file_->Get(Form("%s-Nominal-%s", obsname.c_str(), reduced_channel_name.Data())));
 
     return (h_sig_ && h_hb_ && h_hH_ && h_bonly_);
 }

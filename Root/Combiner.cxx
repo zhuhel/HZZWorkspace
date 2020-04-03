@@ -617,33 +617,87 @@ void Combiner::getObservables(
         }
         int nbins = 100;
         double low_val=9999, hi_val=9999;
-        if(obs_parameters.size() == 3){
-            low_val = (double) atof(obs_parameters.at(1).c_str());
-            hi_val = (double) atof(obs_parameters.at(2).c_str());
-            adaptive = true;
-        } else if(obs_parameters.size() == 4) {
-            nbins = atoi(obs_parameters.at(1).c_str());
-            low_val = (double) atof(obs_parameters.at(2).c_str());
-            hi_val = (double) atof(obs_parameters.at(3).c_str());
-        } else {
-            log_err("I don't understand: %s", obs_input.c_str());
-            continue;
-        }
-        cout<<"Low: "<< low_val << ", High: " << hi_val << " bins:" << nbins << endl;
-        float value = (low_val+hi_val)/2.;
-        auto var_ws = new RooRealVar( ws_name.c_str(), ws_name.c_str(),
-                value, low_val, hi_val
-                );
-        var_ws->Print();
-        if(!adaptive) var_ws->setBins(nbins);
-        obs_ws.add(*var_ws);
-        auto var_minitree = new RooRealVar( minitree_name.c_str(), minitree_name.c_str(),
+        // catch variable binning
+
+        std::vector<double> variableBinsList = getBinningFromObsListStr(obs_input);
+        if (variableBinsList.size() ==0) {
+            if(obs_parameters.size() == 3){
+                low_val = (double) atof(obs_parameters.at(1).c_str());
+                hi_val = (double) atof(obs_parameters.at(2).c_str());
+                adaptive = true;
+            } else if(obs_parameters.size() == 4) {
+                nbins = atoi(obs_parameters.at(1).c_str());
+                low_val = (double) atof(obs_parameters.at(2).c_str());
+                hi_val = (double) atof(obs_parameters.at(3).c_str());
+            } else {
+                log_err("I don't understand: %s", obs_input.c_str());
+                continue;
+            }
+            cout<<"Low: "<< low_val << ", High: " << hi_val << " bins:" << nbins << endl;
+            float value = (low_val+hi_val)/2.;
+            auto var_ws = new RooRealVar( ws_name.c_str(), ws_name.c_str(),
                     value, low_val, hi_val
-                );
-        if(!adaptive) var_minitree->setBins(nbins);
-        obs_minitree.add(*var_minitree);
-        var_minitree->Print();
+                    );
+            var_ws->Print();
+            if(!adaptive) var_ws->setBins(nbins);
+            obs_ws.add(*var_ws);
+            auto var_minitree = new RooRealVar( minitree_name.c_str(), minitree_name.c_str(),
+                        value, low_val, hi_val
+                    );
+            if(!adaptive) var_minitree->setBins(nbins);
+            obs_minitree.add(*var_minitree);
+            var_minitree->Print();
+        }
+        else {
+            low_val = variableBinsList.front();
+            hi_val = variableBinsList.back();
+            float value = (low_val+hi_val)/2.;
+            std::cout << "Detected var binning" << std::endl;
+            auto var_ws = new RooRealVar( ws_name.c_str(), ws_name.c_str(),
+                    value, low_val, hi_val
+                    );
+            RooBinning theBinning(variableBinsList.size()-1, &(variableBinsList.at(0)));
+            var_ws->setBinning(theBinning);
+            var_ws->Print();
+            obs_ws.add(*var_ws);
+            auto var_minitree = new RooRealVar( minitree_name.c_str(), minitree_name.c_str(),
+                        value, low_val, hi_val
+                    );
+            var_minitree->setBinning(theBinning);
+            var_minitree->Print();
+            obs_minitree.add(*var_minitree);
+        }
     }
+}
+
+std::vector<double>
+Combiner::getBinningFromObsListStr(const std::string &ListStr) {
+
+    std::vector<double> binEdges;
+    auto found_opening_brace = ListStr.find("{"); 
+    auto found_closing_brace = ListStr.find("}"); 
+    if(found_opening_brace  == std::string::npos ||
+    found_closing_brace == std::string::npos){
+        return binEdges;
+    } 
+    // if we are here, this is a var binning
+  // Build the list of categories
+    std::string myStr = ListStr.substr(found_opening_brace+1, found_closing_brace - found_opening_brace - 1);
+  size_t current, previous = 0;
+  do {
+    current = myStr.find(",", previous);
+    // std::cout << " Trying to stod "
+              // << myStr.substr(previous, current - previous) << std::endl;
+    binEdges.push_back(std::stod(myStr.substr(previous, current - previous)));
+    previous = current + 1;
+
+  } while (current != std::string::npos);
+  // std::cout << " BIN EDGES ";
+  // for (auto p : binEdges) {
+  //   std::cout << p << ", ";
+  // }
+  // std::cout << std::endl;
+  return binEdges;
 }
 
 SampleBase* Combiner::createSample(const string& name, const string& sample_input)

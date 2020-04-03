@@ -31,10 +31,9 @@ asetup AnalysisBase,{latest release here},here
 # Confirmed numpy import working with 21.2.89 (does not work in 21.2.68)
 
 cd ../source
-git clone https://:@gitlab.cern.ch:8443/HZZ/HZZSoftware/HZZWorkspace.git
-cd HZZWorkspace
 # CMake version is default on master
 git clone --recursive https://:@gitlab.cern.ch:8443/HZZ/HZZSoftware/HZZWorkspace.git
+cd HZZWorkspace
 
 # Link the top level CMakeLists
 ln -s HZZWorkspace/CMakeLists.topLevel.txt CMakeLists.txt

@@ -62,6 +62,11 @@ namespace Helper{
     float getSysCutoff(std::string type, float setValue=-1);
     RooArgSet& getDisconnectedArgs();
 
+    // convert a raw histogram to a format useful for building a RooHistPdf.
+    // binWidthCorr tells the function whether or not to normalise each bin to unit width
+    // normalise tells the function to subsequently normalise the entire thing to unit integral.
+    TH1* prepareHistoInputForPdf(TH1* input, bool binWidthCorr=true, bool normalise=false);
+
     void getListOfNames(const string& cut, strvec& name_list, strmap& name_map = DEFAULT_STRMAP);
 
     void readObservable(const string& str, vector<string>& obs_str, string& branch_name);
