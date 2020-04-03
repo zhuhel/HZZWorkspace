@@ -52,7 +52,7 @@ foreach(_exeFile ${files})
     atlas_add_executable( ${_theExec}
     ${_exeFile}
     INCLUDE_DIRS ${ROOT_INCLUDE_DIRS}
-    LINK_LIBRARIES ${ROOT_LIBRARIES} HZZWorkspaceLib RooFitExtensions )
+    LINK_LIBRARIES ${ROOT_LIBRARIES} HZZWorkspaceLib RooFitExtensionsLib )
 endforeach()
 
 # Install python modules, joboptions, and share content
