@@ -113,7 +113,7 @@ int main (){
 
 	// now plot the data on top of canvas
 	// all histograms should be on top of each other
-	auto canvas = TCanvas("canvas", "canvas", 600, 600);
+	TCanvas canvas("canvas", "canvas", 600, 600);
 
 	h1->GetYaxis()->SetRangeUser(0, 0.25);
 	h1->SetLineColor(kRed);
