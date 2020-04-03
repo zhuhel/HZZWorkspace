@@ -15,7 +15,7 @@ atlas_depends_on_subdirs(
 find_package( ROOT COMPONENTS MathCore RIO Core Tree Hist
 			      RooFitCore RooFit RooStats HistFactory
 			      Graf Graf2d Gpad Physics
-			      Minuit MathMore Matrix REQUIRE )
+          Minuit MathMore Matrix XMLIO REQUIRE )
 
 # Declare dictionary
 atlas_add_root_dictionary( HZZWorkspaceLib HZZWorkspaceLibCintDict
