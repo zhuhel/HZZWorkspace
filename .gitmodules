@@ -12,6 +12,6 @@
   ignore = dirty
 [submodule "RooLagrangianMorphing"]
 	path = RooLagrangianMorphing
-	url = ../../../RooLagrangianMorphing.git
+	url = ../../../cburgard/RooLagrangianMorphing.git
 	#url = https://gitlab.cern.ch/cburgard/RooLagrangianMorphing.git
 	ignore = dirty
