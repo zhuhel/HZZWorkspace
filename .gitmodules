@@ -10,3 +10,8 @@
   #FORMER: url = ssh://git@gitlab.cern.ch:7999/hherde/mass-measurement-workspaces-for-h4l.git
   # url = ssh://git@gitlab.cern.ch:7999/atlas-physics/higgs/hzz/h4lmass/workspaces/mass-measurement-workspaces-for-h4l.git
   ignore = dirty
+[submodule "RooLagrangianMorphing"]
+	path = RooLagrangianMorphing
+	url = ../../../RooLagrangianMorphing.git
+	#url = https://gitlab.cern.ch/cburgard/RooLagrangianMorphing.git
+	ignore = dirty

@@ -120,26 +120,26 @@ bool EFTMorph::setChannel(const RooArgSet& _obs, const char* _ch_name, bool with
   for (auto& s: samplesvec) samples->add(*(new RooStringVar(s.c_str(),s.c_str(),s.c_str())));
 
   m_eftfunc =
-    new RooLagrangianMorphFunc(Form("%s_mf",base_name_.Data()),
+    new RooLagrangianMorphPdf(Form("%s_mf",base_name_.Data()),
         Form("%s_mf",base_name_.Data()),
         (Helper::getInputPath()+morph_dic[_ch_name]["file"]).c_str(),
         (morph_dic[_ch_name]["folder"] + _obs.first()->GetName()).c_str() ,
         *prodMorphPara,
         *decMorphPara,
         *samples);
-  // fix obsname automatically created by RooLagrangianMorphFunc to name provided in top level config file
-    std::cout <<  m_eftfunc << std::endl; 
-    std::cout <<  m_eftfunc->getVariables() << std::endl; 
-    std::cout <<  m_eftfunc->getObservable() << std::endl; 
-    std::cout <<  m_eftfunc->getObservable()->GetName() << std::endl; 
-    std::cout <<  m_eftfunc->getVariables()->find(m_eftfunc->getObservable()->GetName()) << std::endl; 
-    std::cout <<  m_eftfunc->getVariables() << std::endl; 
+  // fix obsname automatically created by RooLagrangianMorphing to name provided in top level config file
+    std::cout <<  m_eftfunc << std::endl;
+    std::cout <<  m_eftfunc->getVariables() << std::endl;
+    std::cout <<  m_eftfunc->getObservable() << std::endl;
+    std::cout <<  m_eftfunc->getObservable()->GetName() << std::endl;
+    std::cout <<  m_eftfunc->getVariables()->find(m_eftfunc->getObservable()->GetName()) << std::endl;
+    std::cout <<  m_eftfunc->getVariables() << std::endl;
   m_eftfunc->getVariables()->find(m_eftfunc->getObservable()->GetName())->SetName(obs_list_.first()->GetName());
 
 //   information for cross section morphing
-  m_eftfunc->writeMatrixToFile(m_eftfunc->getInvertedMatrix(),Form("coeffsInvMatrix_%s.txt",m_eftfunc->GetName()));
-  m_eftfunc->writeFormulas(Form("formulas_%s.txt",m_eftfunc->GetName()));
-  m_eftfunc->writePhysics(Form("phys_%s.txt",m_eftfunc->GetName()));
+  // m_eftfunc->writeMatrixToFile(m_eftfunc->getInvertedMatrix(),Form("coeffsInvMatrix_%s.txt",m_eftfunc->GetName()));
+  // m_eftfunc->writeFormulas(Form("formulas_%s.txt",m_eftfunc->GetName()));
+  // m_eftfunc->writePhysics(Form("phys_%s.txt",m_eftfunc->GetName()));
   return true;
 }
 

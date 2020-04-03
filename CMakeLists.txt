@@ -9,6 +9,7 @@ atlas_depends_on_subdirs(
   PRIVATE
   PUBLIC
   RooFitExtensions
+  RooLagrangianMorphing
   ${extra_dep} )
 
 # Declare external dependencies ... default here is to include ROOT
@@ -30,7 +31,9 @@ atlas_add_library( HZZWorkspaceLib Root/*.cxx HZZWorkspace/*.h ${HZZWorkspaceLib
                    PUBLIC_HEADERS HZZWorkspace
                    PRIVATE_INCLUDE_DIRS ${ROOT_INCLUDE_DIRS}
                    PRIVATE_LINK_LIBRARIES ${ROOT_LIBRARIES}
-                   LINK_LIBRARIES RooFitExtensionsLib
+                   LINK_LIBRARIES
+                   RooFitExtensionsLib
+                   RooLagrangianMorphing
 )
 
 atlas_add_dictionary( HZZWorkspaceDict
@@ -52,7 +55,7 @@ foreach(_exeFile ${files})
     atlas_add_executable( ${_theExec}
     ${_exeFile}
     INCLUDE_DIRS ${ROOT_INCLUDE_DIRS}
-    LINK_LIBRARIES ${ROOT_LIBRARIES} HZZWorkspaceLib RooFitExtensionsLib )
+    LINK_LIBRARIES ${ROOT_LIBRARIES} HZZWorkspaceLib RooFitExtensionsLib RooLagrangianMorphing )
 endforeach()
 
 file(GLOB_RECURSE files "test/*.cxx")
@@ -63,10 +66,10 @@ foreach(_exeFile ${files})
     atlas_add_executable( ${_theExec}
     ${_exeFile}
     INCLUDE_DIRS ${ROOT_INCLUDE_DIRS}
-    LINK_LIBRARIES ${ROOT_LIBRARIES} HZZWorkspaceLib RooFitExtensionsLib )
+    LINK_LIBRARIES ${ROOT_LIBRARIES} HZZWorkspaceLib RooFitExtensionsLib RooLagrangianMorphing )
 endforeach()
 
-# Add "test" directory applications 
+# Add "test" directory applications
 file(GLOB_RECURSE files "test/*.cxx")
 foreach(_exeFile ${files})
     get_filename_component(_theExec ${_exeFile} NAME_WE)
@@ -74,8 +77,8 @@ foreach(_exeFile ${files})
     # we specify a folder for programs we do not want to compile. Useful during r21 transition...
     atlas_add_executable( ${_theExec}
     ${_exeFile}
-    INCLUDE_DIRS ${ROOT_INCLUDE_DIRS} 
-    LINK_LIBRARIES ${ROOT_LIBRARIES} HZZWorkspaceLib RooFitExtensionsLib )
+    INCLUDE_DIRS ${ROOT_INCLUDE_DIRS}
+    LINK_LIBRARIES ${ROOT_LIBRARIES} HZZWorkspaceLib RooFitExtensionsLib RooLagrangianMorphing )
 endforeach()
 
 
