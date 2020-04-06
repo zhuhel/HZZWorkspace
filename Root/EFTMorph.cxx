@@ -120,7 +120,7 @@ bool EFTMorph::setChannel(const RooArgSet& _obs, const char* _ch_name, bool with
   for (auto& s: samplesvec) samples->add(*(new RooStringVar(s.c_str(),s.c_str(),s.c_str())));
 
   m_eftfunc =
-    new RooLagrangianMorphFunc(Form("%s_mf",base_name_.Data()),
+    new RooLagrangianMorphPdf(Form("%s_mf",base_name_.Data()),
         Form("%s_mf",base_name_.Data()),
         (Helper::getInputPath()+morph_dic[_ch_name]["file"]).c_str(),
         (morph_dic[_ch_name]["folder"] + _obs.first()->GetName()).c_str() ,
@@ -134,9 +134,9 @@ bool EFTMorph::setChannel(const RooArgSet& _obs, const char* _ch_name, bool with
   m_eftfunc->getVariables()->find(obsName)->SetName(obs_list_.first()->GetName());
 
 //   information for cross section morphing
-  m_eftfunc->writeMatrixToFile(m_eftfunc->getInvertedMatrix(),Form("coeffsInvMatrix_%s.txt",m_eftfunc->GetName()));
-  m_eftfunc->writeFormulas(Form("formulas_%s.txt",m_eftfunc->GetName()));
-  m_eftfunc->writePhysics(Form("phys_%s.txt",m_eftfunc->GetName()));
+  // m_eftfunc->writeMatrixToFile(m_eftfunc->getInvertedMatrix(),Form("coeffsInvMatrix_%s.txt",m_eftfunc->GetName()));
+  // m_eftfunc->writeFormulas(Form("formulas_%s.txt",m_eftfunc->GetName()));
+  // m_eftfunc->writePhysics(Form("phys_%s.txt",m_eftfunc->GetName()));
   return true;
 }
 

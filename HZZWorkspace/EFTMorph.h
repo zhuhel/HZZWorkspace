@@ -11,7 +11,8 @@
 
 #include "RooAbsPdf.h"
 #include "RooArgList.h"
-#include "RooLagrangianMorphFunc.h"
+#include <RooLagrangianMorphing/RooLagrangianMorphing.h>
+// #include "RooLagrangianMorphFunc.h"
 
 using namespace std;
 class EFTMorph : public SampleBase {
@@ -23,7 +24,7 @@ class EFTMorph : public SampleBase {
         virtual ~EFTMorph();
 
         virtual bool setChannel(const RooArgSet&, const char* channelName, bool with_sys);
-	
+
         virtual RooAbsPdf* getPDF();
 
         virtual RooAbsReal* getCoefficient(const char* customname="");
@@ -31,18 +32,18 @@ class EFTMorph : public SampleBase {
 
     private:
 
-        RooArgSet createHCMorphParaSet(std::string parlist); 
+        RooArgSet createHCMorphParaSet(std::string parlist);
         RooArgSet createGeneralMorphParaSet(std::string parlist);
         RooArgSet couplingsDatabase;
         RooArgSet formulaDatabase;
         RooAbsReal* getOverallNormalization();
 
-    
+
     protected:
-      
+
         std::map<std::string, std::map<std::string, std::string> > morph_dic;
         std::map<std::string, Coefficient*> m_sampleCoefMap;
-        RooLagrangianMorphFunc* m_eftfunc;
+        RooLagrangianMorphPdf* m_eftfunc;
 
         RooArgList *m_morphcoefs, *m_morphfuncs;
 
