@@ -156,8 +156,8 @@ void Loader::SetAtlasStyleCanvas(TCanvas* canvas, bool for_2d)
 
     // use large fonts
     //Int_t font=72; // Helvetica italics
-    Int_t font=42; // Helvetica
-    Double_t tsize=0.05;
+    // Int_t font=42; // Helvetica
+    // Double_t tsize=0.05;
     Int_t icol = 0;
     canvas->SetFrameBorderMode(icol);
     canvas->SetFrameFillColor(icol);
@@ -201,7 +201,7 @@ void Loader::add_hist(TList* objarray, TH1F* h1)
         return;
     } else{
         int index = total-1;
-        int pos = 0;
+        // int pos = 0;
         while(index >= 0){
             TH1F* h2 = (TH1F*) objarray->At(index);
             if(h2->Integral() < h1->Integral()){
@@ -290,7 +290,7 @@ double Loader::get_significance_with_sysB(double s, double b, double sigmaB){
                 - b*b/sqB*TMath::Log(1 + sqB*s/b/(b+sqB)))); 
 }
 
-int Loader::get_roc(TH1F* sig, TH1F* bkg, bool reverse )
+int Loader::get_roc(TH1F* sig, TH1F* bkg, bool /*reverse*/ )
 {
     int n_bins = 100;
     if(sig->GetNbinsX() != bkg->GetNbinsX())
@@ -651,19 +651,19 @@ void Loader::compare_hists_from_files(const vector<string>& file_names,
     f1->Close();
 
     vector<TFile*> file_handles;
-    for(int i = 0; i < file_names.size(); i++){
+    for(int i = 0; i < (int)file_names.size(); i++){
         file_handles.push_back(TFile::Open(file_names.at(i).c_str(), "read"));
     }
     
     bool shape_only = true;
     bool is_log = false;
     bool color_me = true;
-    for(int ihist = 0; ihist < hist_names->size(); ihist++){ 
+    for(int ihist = 0; ihist < (int)hist_names->size(); ihist++){ 
         const char* hist_name = hist_names->at(ihist).c_str();
         if(!hist_name) continue;
         
         TList* list = new TList();
-        for(int i=0; i < file_handles.size(); i++){
+        for(int i=0; i < (int)file_handles.size(); i++){
             TH1* h_tmp = (TH1*)(file_handles.at(i)->Get(hist_name));
             if(!h_tmp) {
                 cout << hist_name << "does not exist in " << i << endl;

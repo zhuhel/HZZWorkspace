@@ -342,7 +342,7 @@ void AtlasUtils::myLineText(Double_t x, Double_t y, Int_t color, Int_t mstyle, c
     l.DrawLatex(x,y,text);
 }
 
-void AtlasUtils::myLineText(Double_t x, Double_t y, const TAttLine& line, const char* text, float textsize)
+void AtlasUtils::myLineText(Double_t x, Double_t y, const TAttLine& line, const char* text, float /* textsize */)
 {
     myLineText(x, y, line.GetLineColor(), line.GetLineStyle(), text, 0.04);
 }

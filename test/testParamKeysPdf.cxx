@@ -27,7 +27,7 @@ const char* ws_file_name = "combined_para_test.root";
 const char* ch_name = "all";
 
 using namespace std;
-int main(int argc, char** argv){
+int main(int /*argc*/, char** /*argv*/){
     generate_para_ws();
     // plot_para_norm();
     return 1;

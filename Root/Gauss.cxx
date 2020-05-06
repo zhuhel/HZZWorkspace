@@ -292,7 +292,7 @@ RooAbsReal* Gauss::variable(const string& parname)
     bool found = readTextInputFile(parname.c_str(), pars);
     if (!found) return NULL;
 
-    double ratio = pars.first == 0? 0:fabs(pars.second/pars.first);
+    // double ratio = pars.first == 0? 0:fabs(pars.second/pars.first);
 
     string name(Form("%s_%s", base_name_.Data(),parname.c_str()));
 

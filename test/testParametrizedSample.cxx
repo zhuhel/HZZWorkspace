@@ -20,7 +20,7 @@ void plot_para_norm();
 const char* ws_file_name = "combined_para_test.root";
 const char* ch_name = "ggF_4e_13TeV";
 const char* obs_name = "m4l";
-int main(int argc, char** argv){
+int main(int /*argc*/, char** /*argv*/){
     generate_keys_ws();
     // generate_para_ws();
     plot_para_norm();
