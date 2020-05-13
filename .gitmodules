@@ -1,7 +1,7 @@
 [submodule "RooFitExtensions"]
   path = RooFitExtensions
   #url = ../../../atlas_higgs_combination/software/RooFitExtensions.git
-  utl = ssh://git@gitlab.cern.ch:7999/atlas_higgs_combination/software/RooFitExtensions.git
+  url = ssh://git@gitlab.cern.ch:7999/atlas_higgs_combination/software/RooFitExtensions.git
   #url = https://gitlab.cern.ch/atlas_higgs_combination/software/RooFitExtensions.git
   #FORMER: url = https://:@gitlab.cern.ch:8443/cburgard/RooFitExtensions.git
   ignore = dirty
