@@ -92,6 +92,7 @@ RooHistParamPdf::~RooHistParamPdf(){
    // Double_t res = kappa * _w_sig[bin] + TMath::Sqrt(kappa) * _w_int_HB[bin] + TMath::Sqrt(kappa) * _w_int_hH[bin] + _w_Bonly[bin];
    Double_t res = kappa * _w_sig[bin] + TMath::Sqrt(kappa) * _w_int_HB[bin] + TMath::Sqrt(kappa) * _w_int_hH[bin];
    // cout << "bin: " << bin << " " << res << endl;
+   if (kappa == 0.) {res = _w_sig[bin]; }
    if (res < 0) return 0;
    return res;
  }

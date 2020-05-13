@@ -6,6 +6,7 @@
 #include "HZZWorkspace/Gauss.h"
 #include "HZZWorkspace/RelativisticBW.h"
 #include "HZZWorkspace/RelativisticBWInt.h"
+#include "HZZWorkspace/RooGravitonRBWPdf.h"
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
@@ -44,7 +45,7 @@ using namespace HistFactory;
 Gauss::Gauss(const char* _name,
         const char* _input,
         const char* _shape_sys,
-        bool _doConv, // Large width
+        int _doConv, // Large width
         bool _doSys,
         bool _add_int // Add interference given large width scenario
         ) : SampleBase(_name),

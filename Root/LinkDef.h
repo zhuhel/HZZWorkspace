@@ -16,6 +16,7 @@
 
 #pragma link C++ class RelativisticBW+;
 #pragma link C++ class RelativisticBWInt+;
+#pragma link C++ class RooGravitonRBWPdf+;
 #pragma link C++ class AnalyticHMBkg+;
 #pragma link C++ class RooHistParamPdf+;
 // #pragma link C++ class RooLagrangianMorphFunc+;

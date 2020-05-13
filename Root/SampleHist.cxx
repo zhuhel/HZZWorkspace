@@ -81,8 +81,8 @@ bool SampleHist::setChannel(const RooArgSet& _obs, const char* _ch_name, bool wi
 
 RooAbsPdf* SampleHist::makeHistPdf(TH1* hist, const char* base_name, bool is_norm)
 {
-    bool correctBinWidth = true;
-    bool normalizeToUnit = true;
+    bool correctBinWidth = false;
+    bool normalizeToUnit = false;
     TH1* h_local = Helper::prepareHistoInputForPdf(hist, correctBinWidth, normalizeToUnit);
     h_local->Print();
     RooDataHist *datahist = new RooDataHist(Form("%s_RooDataHist", base_name), "datahist",
@@ -91,7 +91,7 @@ RooAbsPdf* SampleHist::makeHistPdf(TH1* hist, const char* base_name, bool is_nor
     string pdfname(Form("%s_%s", base_name, obsname.c_str()));
     RooHistPdf *histpdf = new RooHistPdf(pdfname.c_str(), pdfname.c_str(),
             this->obs_list_, *datahist, m_interp);
-    histpdf->setUnitNorm(true);
+    histpdf->setUnitNorm(normalizeToUnit);
     RooDataHist* newdatahist = nullptr;
     if (use_adpt_bin_) {
         std::cout << " ADAPTIVE" << std::endl;
@@ -126,14 +126,14 @@ RooAbsPdf* SampleHist::makeHistPdf(TH1* hist, const char* base_name, bool is_nor
         delete histpdf;
         RooHistPdf *newhistpdf = new RooHistPdf(pdfname.c_str(), pdfname.c_str(),
                 obs_list_, *newdatahist, m_interp);
-        newhistpdf->setUnitNorm(true);
+        newhistpdf->setUnitNorm(normalizeToUnit);
         return newhistpdf;
     } else {
         delete histpdf; // delete old histpdf
         auto* expandDataHist = new RooExpandedDataHist(*newdatahist, Form("%s_EDH",base_name));
         auto* newhistpdf = new RooExpandedHistPdf(pdfname.c_str(), pdfname.c_str(),
                 obs_list_, *expandDataHist, m_interp);
-        newhistpdf->setUnitNorm(true);
+        newhistpdf->setUnitNorm(normalizeToUnit);
         return newhistpdf;
     }
 }

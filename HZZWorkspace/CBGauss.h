@@ -42,7 +42,7 @@ class CBGauss : public SampleBase
     CBGauss(const char* name, // used to construct PDF
         const char* input,        // input text file contains parameters
         const char* shape_sys,    // input text file contains shape variations
-        bool _doConv, //bool to do convolution (LWA) or not (NWA)
+        int _doConv, //bool to do convolution (LWA) or not (NWA)
         bool _doSys,
         bool _add_int=false
         );
@@ -94,7 +94,7 @@ class CBGauss : public SampleBase
   private:
     RooWorkspace* workspace;
     RooRealVar* mH;
-    bool doConv;
+    int doConv;
     bool doSys;
     bool addInt;
 

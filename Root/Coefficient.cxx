@@ -224,7 +224,12 @@ bool Coefficient::BuildCoefficient()
     if (m_args.find("poi")!=m_args.end()){
         // supported syntax looks like: mu_ggF*(mu_offshell - 1 + sqrt(mu_onShell))
         //
-        string& poi_syntax = m_args["poi"];
+        string& poi_syntax = m_args["poi"]; 
+        if( poi_syntax.find("muZZ") != string::npos ){
+          if(m_channel.find("rest") != string::npos || m_channel.find("bkg") != string::npos) poi_syntax = "muZZ_rest";
+          else if(m_channel.find("ggF") != string::npos) poi_syntax = "muZZ_ggF";
+          else if(m_channel.find("VBF") != string::npos) poi_syntax = "muZZ_VBF";
+        }
 
         // first find out the POI names
         strvec products;
@@ -298,6 +303,11 @@ bool Coefficient::BuildCoefficient()
         }
 
         string formulaName(Form("poiFunc_%s", m_fullname.c_str()));
+        if(m_fullname.find("ZZ") != string::npos){
+           if(m_channel.find("rest") != string::npos || m_channel.find("bkg") != string::npos) formulaName += "_rest";
+           else if(m_channel.find("ggF") != string::npos) formulaName += "_ggF";
+           else if(m_channel.find("VBF") != string::npos) formulaName += "_VBF";
+        }
         unique_ptr<RooFormulaVar> poiFormula(
                 new RooFormulaVar(
                     formulaName.c_str(), formulaName.c_str(),

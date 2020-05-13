@@ -315,8 +315,8 @@ SampleBase* SampleFactory::FactoryCBGauss(strvec& args){
     if  ( shape_sys == "" ){
         std::cout << "CBGauss WARNING: no shape_sys provided!" << std::endl;
     }
-    if (!(width=="NWA" || width=="LWA")){
-        std::cout << "CBGauss argument: width must be 'NWA' or 'LWA'" << std::endl;
+    if (!(width=="NWA" || width=="LWA" || width=="GB")){
+        std::cout << "CBGauss argument: width must be 'NWA', 'LWA' or 'GB'" << std::endl;
         return NULL;
     }
     int res_doSys = Helper::isBoolean(s_doSys);
@@ -335,7 +335,12 @@ SampleBase* SampleFactory::FactoryCBGauss(strvec& args){
         }
         doInt = (bool) res_doInt;
     }
-    bool doConv = (width=="LWA");
+    //bool doConv = (width=="LWA");
+    int doConv = 0;
+    if(width=="NWA") doConv = 0;
+    else if(width=="LWA") doConv = 1;
+    else if(width=="GB") doConv = 2;
+    cout << "++++ width = " << width << "doConv = " << doConv << endl;
 
     return new CBGauss(name.c_str(),input.c_str(),shape_sys.c_str(),
             doConv, doSys, doInt);

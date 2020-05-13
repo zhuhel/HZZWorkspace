@@ -6,6 +6,7 @@
 #include "HZZWorkspace/CBGauss.h"
 #include "HZZWorkspace/RelativisticBW.h"
 #include "HZZWorkspace/RelativisticBWInt.h"
+#include "HZZWorkspace/RooGravitonRBWPdf.h"
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
@@ -44,13 +45,13 @@ using namespace HistFactory;
 CBGauss::CBGauss(const char* _name,
         const char* _input,
         const char* _shape_sys,
-        bool _doConv, // Large width
+        int _doConv, // Large width
         bool _doSys,
         bool _add_int // Add interference given large width scenario
         ) : SampleBase(_name),
     inputParameterFile(_input),
     workspace(new RooWorkspace(Form("CBGauss_%s", _name))),
-    mH(new RooRealVar("mH","mH",200.,1500.)),
+    mH(new RooRealVar("mH","mH",180.,2000.)),
     doConv(_doConv),
     doSys(_doSys),
     addInt(_add_int),
@@ -136,7 +137,7 @@ void CBGauss::makeCBGParameterization()
     RooAbsReal* a4cb = variable("CB_mu_p4");
 
     //If we are doing a convolution, then the mH is included as parameter in the truth shape, not here
-    if (doConv){
+    if (doConv==1){
       log_info("doing convolution of CBGA with truth.. shifting CB_mu_p1 by 1.00!");
       a1cb = new RooFormulaVar(Form("%s_CB_mu_p1_nomH",base_name_.Data()),"@0-1",RooArgList(*a1cb));
     }
@@ -190,7 +191,7 @@ void CBGauss::makeCBGParameterization()
     workspace->import(sCB);
 
     // acceptance in truth level
-    if(doConv){
+    if(doConv==1){
         RooAbsReal* a0acc = variable("ACC_p0");
         RooAbsReal* a1acc = variable("ACC_p1");
         RooAbsReal* a2acc = variable("ACC_p2");
@@ -224,6 +225,17 @@ void CBGauss::makeCBGParameterization()
             workspace->import(*b3int);
             workspace->import(*b4int);
         }
+    }
+    if(doConv==2){
+        RooAbsReal* mp0 = variable("m_RBW_p0");
+        RooAbsReal* mp1 = variable("m_RBW_p1");
+        RooPolyVar mGB( ( base_name_ + "_m_RBW" ).Data(), "GB m", *mH, RooArgList( *mp0, *mp1 ) );
+        workspace->import(mGB);
+
+        RooAbsReal* gp0 = variable("G_RBW_p0");
+        RooAbsReal* gp1 = variable("G_RBW_p1");
+        RooPolyVar gGB( ( base_name_ + "_G_RBW" ).Data(), "GB g", *mH, RooArgList( *gp0, *gp1 ) );
+        workspace->import(gGB);
     }
 }
 
@@ -314,8 +326,9 @@ RooAbsPdf* CBGauss::getPDF()
     RooCBShape* tmpcb=new RooCBShape( ( base_name_ + "_cb" ).Data(), "Crystal Ball", m, *mean, *sCB, *alphaCB, *nCB );
     RooGaussian* tmpga=new RooGaussian( ( base_name_ + "_ga" ).Data(), "Gaussian", m, *mean, *sGA );
     RooAbsPdf* finalPdf=new RooAddPdf( (base_name_  + "_cbga" ).Data(), "Crystal Ball + Gaussian", *tmpcb , *tmpga , *fCB );
-
-    if (doConv){
+   
+    //LWA 
+    if (doConv==1){
         // get the coefficiency for acceptance
         RooAbsReal* a0acc =   (RooAbsReal*)workspace->obj((base_name_+"_ACC_p0").Data());
         RooAbsReal* a1acc =   (RooAbsReal*)workspace->obj((base_name_+"_ACC_p1").Data());
@@ -353,11 +366,30 @@ RooAbsPdf* CBGauss::getPDF()
 
         //Create the convolution
         // m.setRange("cache",m.getMin()-1000.,m.getMax()+1000.);
-        m.setRange("cache", 130, 1500);
+        m.setRange("cache", 180, 2000);
         m.setBins(40000,"cache");
         finalPdf = new RooFFTConvPdf( (base_name_+"_conv").Data(), "CBG x RBW", m, *truthPdf, *finalPdf, 3);
     }
+    
+    // Graviton
+    if (doConv==2){
+        // get the coefficiency for acceptance
+        RooAbsReal* mGB =   (RooAbsReal*)workspace->obj((base_name_+"_m_RBW").Data());
+        RooAbsReal* gGB =   (RooAbsReal*)workspace->obj((base_name_+"_G_RBW").Data());
+        if (!mGB || !gGB){
+            std::cerr<<"ERROR! in "<<__func__<<" missing Graviton parameters"<<std::endl;
+            return NULL;
+        }
 
+        RooAbsPdf* truthPdf = NULL;
+        truthPdf = new RooGravitonRBWPdf( (base_name_+"_rbwG").Data()," Graviton BW", m, *mGB, *gGB);
+
+        //Create the convolution
+        // m.setRange("cache",m.getMin()-1000.,m.getMax()+1000.);
+        m.setRange("cache", 180, 2000);
+        m.setBins(40000,"cache");
+        finalPdf = new RooFFTConvPdf( (base_name_+"_convG").Data(), "Graviton CBG x RBW", m, *truthPdf, *finalPdf);
+    }
 
     workspace->import(*finalPdf,RooFit::RecycleConflictNodes());
     workspace->pdf(finalPdf->GetName())->getVal();//triggers caching
