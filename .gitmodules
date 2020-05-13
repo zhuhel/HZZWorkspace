@@ -1,17 +1,19 @@
 [submodule "RooFitExtensions"]
   path = RooFitExtensions
-  url = ../../../atlas_higgs_combination/software/RooFitExtensions.git
-  # url = https://gitlab.cern.ch/atlas_higgs_combination/software/RooFitExtensions.git
+  #url = ../../../atlas_higgs_combination/software/RooFitExtensions.git
+  utl = ssh://git@gitlab.cern.ch:7999/atlas_higgs_combination/software/RooFitExtensions.git
+  #url = https://gitlab.cern.ch/atlas_higgs_combination/software/RooFitExtensions.git
   #FORMER: url = https://:@gitlab.cern.ch:8443/cburgard/RooFitExtensions.git
   ignore = dirty
 [submodule "examples/WorkspaceConfiguration/MassMeasurement"]
   path = examples/WorkspaceConfiguration/MassMeasurement
-  url = ../../../atlas-physics/higgs/hzz/h4lmass/workspaces/mass-measurement-workspaces-for-h4l.git
+  #url = ../../../atlas-physics/higgs/hzz/h4lmass/workspaces/mass-measurement-workspaces-for-h4l.git
   #FORMER: url = ssh://git@gitlab.cern.ch:7999/hherde/mass-measurement-workspaces-for-h4l.git
-  # url = ssh://git@gitlab.cern.ch:7999/atlas-physics/higgs/hzz/h4lmass/workspaces/mass-measurement-workspaces-for-h4l.git
+  url = ssh://git@gitlab.cern.ch:7999/atlas-physics/higgs/hzz/h4lmass/workspaces/mass-measurement-workspaces-for-h4l.git
   ignore = dirty
 [submodule "RooLagrangianMorphing"]
 	path = RooLagrangianMorphing
-	url = ../../../cburgard/RooLagrangianMorphing.git
+	#url = ../../../cburgard/RooLagrangianMorphing.git
+	url = ssh://git@gitlab.cern.ch:7999/cburgard/RooLagrangianMorphing.git
 	#url = https://gitlab.cern.ch/cburgard/RooLagrangianMorphing.git
 	ignore = dirty
