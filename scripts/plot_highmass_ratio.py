@@ -5,8 +5,9 @@ import math
 import re
 import os
 from array import array
+from ROOT import gStyle,gDirectory,TCanvas,TPad,TFile,TH1D,TF1,TLegend,TPaveText,TGaxis,TLine
 if not hasattr(ROOT, "myText"):
-    ROOT.gROOT.LoadMacro("$HZZWSCODEDIR/scripts/loader.c") 
+    ROOT.gROOT.LoadMacro("$HZZWSCODEDIR/scripts/loader.c")
 
 def create_TGraphAsymmErrors(x_, nominal_, up_, down_):
     zero_ = array('f', [0]*len(x_))
@@ -87,45 +88,64 @@ def make_limit_graph(file1):
                                up_1sig_list, up_2sig_list,
                                down_1sig_list, down_2sig_list)
 
-def plot_limit(path, file_name, xslabel, typelabel, minx=200,maxx=2000):
+def plot_limit(path, file_name, xslabel, typelabel, minx=200, maxx=2000):
 
-    low_y = 0.01
+    low_y = 0.001
     hi_y = 5
+    #low_y = 0.5
+    #hi_y = 50
     sigma = "#sigma_{"+xslabel+"}"
-    unit = "95% CL limits on "+sigma+" #times BR(S#rightarrow ZZ #rightarrow 4l) [fb]"
+    unit = "95% CL limits on "+sigma+" #times BR(S#rightarrow ZZ) [pb]"
+    #unit = "95% CL limits on "+sigma+" #times BR(S#rightarrow ZZ #rightarrow 4l) [fb]"
     x_axis_title = "m_{S} [GeV]"
 
-    dummy=ROOT.TH2F("dummy",";"+x_axis_title+";"+unit,
+    dummy=ROOT.TH2F("dummy",";"+";"+unit,
                     160, float(minx),float(maxx),3000,low_y,hi_y);
-    dummy.GetXaxis().SetNdivisions(8);
+    #dummy.GetXaxis().SetNdivisions(8);
 
-    hist_obs,hist_exp,hist_1s,hist_2s = make_limit_graph(path+"Cut2020_v4_VBF.txt")
+    hist_obs,hist_exp,hist_1s,hist_2s = make_limit_graph(path+"DNNnop_v6_ggF.txt")
+    hist_obs2,hist_exp2,hist_1s2,hist_2s2 = make_limit_graph(path+"DNN2020_v6_ggF.txt")
+    for i in range(hist_exp.GetN()): 
+	hist_exp.GetY()[i] *= 1./4.52
+	hist_exp2.GetY()[i] *= 1./4.52
+	hist_obs.GetY()[i] *= 1./4.52
+	hist_obs2.GetY()[i] *= 1./4.52
 
     canvas = ROOT.TCanvas("canvas2", " ", 600, 600)
     canvas.SetLogy()
 
+    ##========================= add ratio pad ===========================
+    ratio=0.2
+    if ratio>0:
+      fraction=ratio+0.2
+      Pad1 = TPad("p1","p1",0,fraction*1.0/(fraction+1),1,1,0,0) # x1,y1,x2,y2
+      Pad1.SetMargin(0.15,0.10,0.03,0.05)
+      Pad1.SetLogy()
+      Pad2 = TPad("p2","p2",0,0,1,fraction*1.0/(fraction+1),0,0)
+      Pad2.SetMargin(0.15,0.10,0.15/fraction,0.04)
+      Pad2.SetGrid()
+      Pad1.Draw()
+      Pad2.Draw()
+
+    hist_exp.SetLineWidth(3)
+    hist_exp.SetMarkerStyle(20)
+    hist_exp.SetMarkerSize(0.5)
+    hist_exp.SetLineColor(1)
+    hist_exp.SetLineStyle(1)
+    hist_exp2.SetLineWidth(3)
+    hist_exp2.SetMarkerStyle(20)
+    hist_exp2.SetMarkerSize(0.5)
+    hist_exp2.SetLineColor(2)
+
+    if ratio>0: Pad1.cd()
+    else: canvas.cd()
     dummy.Draw()
-    hist_2s.Draw("3")
-    hist_1s.Draw("3")
-    hist_exp.Draw("L")
-    #hist_obs.Draw("L")
+    hist_exp. Draw("CP")
+    hist_exp2. Draw("CP")
 
-    hist_obs.SetLineWidth(2)
-    hist_obs.SetMarkerStyle(20)
-    hist_obs.SetMarkerSize(0.5)
-    hist_exp.SetLineColor(4)
-    hist_exp.SetLineWidth(2)
-
-    hist_obs.Draw("CP")
-
-    dummy.Draw("AXIS SAME")
-
-    #legend = ROOT.myLegend(0.56, 0.60, 0.83, 0.90)
     legend = ROOT.myLegend(0.56, 0.70, 0.83, 0.90)
-    legend.AddEntry(hist_obs, "Observed #it{CL_{s}} limit", "l")
-    legend.AddEntry(hist_exp, "Expected #it{CL_{s}} limit", "l")
-    legend.AddEntry(hist_1s, "Expected #pm 1 #sigma", "f")
-    legend.AddEntry(hist_2s, "Expected #pm 2 #sigma", "f")
+    legend.AddEntry(hist_exp,  "Fix other POI", "l")
+    legend.AddEntry(hist_exp2, "Float", "l")
     legend.Draw()
 
     lumi = 138.97
@@ -133,12 +153,34 @@ def plot_limit(path, file_name, xslabel, typelabel, minx=200,maxx=2000):
     ROOT.myText(x_off_title, 0.85, 1, "#bf{#it{ATLAS}} Internal")
     ROOT.myText(x_off_title, 0.80, 1, "13 TeV, {:.1f} fb^{{-1}}".format(lumi))
     ROOT.myText(x_off_title, 0.75, 1, typelabel)
+    #dummy.Draw("AXIS SAME")
 
-    #file_name = re.sub("txt","pdf",file_name)
+    if ratio>0: 
+      x1=hist_exp.GetX()
+      y1=hist_exp.GetY()
+      y2=hist_exp2.GetY()
+      hist_ratio2 =  ROOT.TGraph(len(x1))
+      for i in range(len(x1)):
+         hist_ratio2.SetPoint(i, x1[i], y2[i]/y1[i])
+      Pad2.cd()
+      mg = ROOT.TMultiGraph()
+      mg.GetXaxis().SetLimits(minx,maxx)
+      mg.SetMinimum(0.8)
+      mg.SetMaximum(1.2)
+      hist_ratio2.SetMarkerSize(0.5)
+      hist_ratio2.SetLineColor(2)
+      hist_ratio2.SetLineStyle(2)
+      hist_ratio2.SetLineWidth(2)
+      mg.Add(hist_ratio2)
+      mg.Draw("ALP")
+      mg.GetYaxis().SetTitle("Ratio")
+      mg.GetXaxis().SetTitle(x_axis_title)
+
     canvas.SaveAs("Pdf_plots/"+file_name+".pdf")
 
 
 if __name__ == "__main__":
-    path="/afs/cern.ch/work/h/hezhu/public/workplace/H4lAna/CMakeWS/Condor/4l_results/"
-    plot_limit(path,"limits_Cut2020_obs_VBF","VBF","NWA, VBF production")
+    #path="/afs/cern.ch/work/h/hezhu/public/workplace/H4lAna/CMakeWS/Condor/Comb_DNN_ggF/"
+    path="/afs/cern.ch/work/h/hezhu/public/workplace/H4lAna/CMakeWS/Condor/DNN_NWA_ggF/"
+    plot_limit(path,"ratio_4lexp_profilepoi_ggF","ggF","NWA, ggF production")
 

@@ -29,12 +29,14 @@ def get_graph_from_list(mass_list, obs_list, exp_list,
     gr_exp = ROOT.TGraph(len(mass_list), array('f', mass_list), array('f', exp_list))
     gr_1sig = create_TGraphAsymmErrors(mass_list, exp_list, up_1sig_list, down_1sig_list)
     gr_2sig = create_TGraphAsymmErrors(mass_list, exp_list, up_2sig_list, down_2sig_list)
-    gr_obs.SetLineWidth(2)
+    gr_obs.SetLineWidth(3)
     gr_obs.SetLineStyle(1)
     gr_obs.SetMarkerStyle(20)
+    gr_obs.SetMarkerSize(0.6)
 
     gr_exp.SetLineWidth(2)
     gr_exp.SetLineStyle(2)
+    gr_exp.SetMarkerSize(0)
 
     gr_1sig.SetFillStyle(1001)
     gr_1sig.SetFillColor(ROOT.kGreen)
@@ -87,48 +89,61 @@ def make_limit_graph(file1):
                                up_1sig_list, up_2sig_list,
                                down_1sig_list, down_2sig_list)
 
-def plot_limit(path, file_name, xslabel, typelabel, minx=200,maxx=2000):
+def plot_limit(path, file_name, xslabel, typelabel, minx=400,maxx=2000):
 
-    low_y = 0.01
+    low_y = 0.001
     hi_y = 5
     sigma = "#sigma_{"+xslabel+"}"
-    unit = "95% CL limits on "+sigma+" #times BR(S#rightarrow ZZ #rightarrow 4l) [fb]"
+    unit = "95% CL limits on "+sigma+" #times BR(S#rightarrow ZZ) [pb]"
     x_axis_title = "m_{S} [GeV]"
 
     dummy=ROOT.TH2F("dummy",";"+x_axis_title+";"+unit,
                     160, float(minx),float(maxx),3000,low_y,hi_y);
     dummy.GetXaxis().SetNdivisions(8);
 
-    hist_obs,hist_exp,hist_1s,hist_2s = make_limit_graph(path+"Cut2020_v4_VBF.txt")
+    hist_obs,hist_exp,hist_1s,hist_2s = make_limit_graph(path+"4l_LWA_w15.txt")
+    hist_obs2,hist_exp2,hist_1s2,hist_2s2 = make_limit_graph(path+"llvv_LWA_w15.txt")
+    hist_obs3,hist_exp3,hist_1s3,hist_2s3 = make_limit_graph(path+"comb_LWA_w15.txt")
+    #hist_exp.Scale(1./4.52)
+    for i in range(hist_exp.GetN()): 
+	hist_exp.GetY()[i] *= 1./4.52
+	hist_obs.GetY()[i] *= 1./4.52
 
     canvas = ROOT.TCanvas("canvas2", " ", 600, 600)
     canvas.SetLogy()
 
     dummy.Draw()
-    hist_2s.Draw("3")
-    hist_1s.Draw("3")
-    hist_exp.Draw("L")
-    #hist_obs.Draw("L")
-
-    hist_obs.SetLineWidth(2)
-    hist_obs.SetMarkerStyle(20)
-    hist_obs.SetMarkerSize(0.5)
+    #hist_obs.SetLineWidth(3)
+    hist_obs.SetLineColor(4)
+    #hist_obs2.SetLineWidth(3)
+    hist_obs2.SetLineColor(2)
+    #hist_obs3.SetLineWidth(3)
+    hist_obs3.SetLineColor(1)
     hist_exp.SetLineColor(4)
-    hist_exp.SetLineWidth(2)
+    hist_exp2.SetLineColor(2)
+    hist_exp3.SetLineColor(1)
 
-    hist_obs.Draw("CP")
+    hist_2s3.Draw("3")
+    hist_1s3.Draw("3")
+    hist_exp3. Draw("LP")
+    hist_exp. Draw("LP")
+    hist_exp2. Draw("LP")
+    hist_obs3. Draw("CP")
+    #hist_obs. Draw("CP")
+    #hist_obs2. Draw("CP")
 
     dummy.Draw("AXIS SAME")
 
     #legend = ROOT.myLegend(0.56, 0.60, 0.83, 0.90)
-    legend = ROOT.myLegend(0.56, 0.70, 0.83, 0.90)
-    legend.AddEntry(hist_obs, "Observed #it{CL_{s}} limit", "l")
-    legend.AddEntry(hist_exp, "Expected #it{CL_{s}} limit", "l")
+    legend = ROOT.myLegend(0.56, 0.70, 0.83, 0.88)
+    legend.AddEntry(hist_exp,  "llll", "l")
+    legend.AddEntry(hist_exp2, "llvv", "l")
+    legend.AddEntry(hist_exp3, "Combined", "l")
     legend.AddEntry(hist_1s, "Expected #pm 1 #sigma", "f")
     legend.AddEntry(hist_2s, "Expected #pm 2 #sigma", "f")
     legend.Draw()
 
-    lumi = 138.97
+    lumi = 139.0
     x_off_title = 0.20
     ROOT.myText(x_off_title, 0.85, 1, "#bf{#it{ATLAS}} Internal")
     ROOT.myText(x_off_title, 0.80, 1, "13 TeV, {:.1f} fb^{{-1}}".format(lumi))
@@ -139,6 +154,6 @@ def plot_limit(path, file_name, xslabel, typelabel, minx=200,maxx=2000):
 
 
 if __name__ == "__main__":
-    path="/afs/cern.ch/work/h/hezhu/public/workplace/H4lAna/CMakeWS/Condor/4l_results/"
-    plot_limit(path,"limits_Cut2020_obs_VBF","VBF","NWA, VBF production")
+    path="/afs/cern.ch/work/h/hezhu/public/workplace/H4lAna/CMakeWS/Condor/Comb_LWA/"
+    plot_limit(path,"LWA_comb_4l_llvv_w15","ggF","LWA, #Gamma_{S} = 0.15 #times m_{S}")
 
