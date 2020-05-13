@@ -112,32 +112,31 @@ int main(int argc, char** argv)
     // }
 
     // set nuisance and global to be zero
-    /***
-      RooRealVar* tmp_obj;
-      if ( ! ws->loadSnapshot("nominalNuis") ){
+    
+    RooRealVar* tmp_obj;
+    if ( ! ws->loadSnapshot("nominalNuis") ){
       TIter itr_nuis(mc->GetNuisanceParameters()->createIterator());
       while ( (tmp_obj = (RooRealVar*) itr_nuis()) ){
-      TString tmp_str(tmp_obj->GetName());
-      tmp_str.ToLower();
-    // if( tmp_str.Contains("atlas_norm") || tmp_str.Contains("bin") )
-    if( tmp_str.Contains("bin") ){
-    tmp_obj->setVal(1.0);
-    }else {
-    tmp_obj->setVal(0.0);
-    tmp_obj->setError(1.0);
-    }
-    }
+         TString tmp_str(tmp_obj->GetName());
+         tmp_str.ToLower();
+         if( tmp_str.Contains("bin") ){
+            tmp_obj->setVal(1.0);
+         }else {
+            tmp_obj->setVal(0.0);
+            tmp_obj->setError(1.0);
+         }
+      }
     }
     if (! ws->loadSnapshot("nominalGlobs") ){
-    TIter itr_glob(mc->GetGlobalObservables()->createIterator());
-    while ( (tmp_obj = (RooRealVar*) itr_glob()) ){
-    TString tmp_str(tmp_obj->GetName());
-    tmp_str.ToLower();
-    if(tmp_str.Contains("bin")) continue;
-    tmp_obj->setVal(0.0);
+      TIter itr_glob(mc->GetGlobalObservables()->createIterator());
+      while ( (tmp_obj = (RooRealVar*) itr_glob()) ){
+         TString tmp_str(tmp_obj->GetName());
+         tmp_str.ToLower();
+         if(tmp_str.Contains("bin")) continue;
+         tmp_obj->setVal(0.0);
+      }
     }
-    }
-     **/
+    
 
     // setup constants...
     RooStatsHelper::fixVariables(ws, fix_variables, mc);
@@ -151,14 +150,71 @@ int main(int argc, char** argv)
 
     double obs_p0 = -1;
     double exp_p0 = -1;
-
+    
     RooRealVar* mu_ZZ = ws->var("muZZ");
     if (mu_ZZ){
         mu_ZZ->setVal(1.);
         mu_ZZ->setConstant(false);
     }
 
-    if (options == "" || options.find("pvalue") != string::npos)
+    RooRealVar* mu_ZZ1 = ws->var("muZZ_VBF");
+    if (mu_ZZ1){
+        mu_ZZ1->setVal(1.);
+        mu_ZZ1->setConstant(false);
+    }
+
+    RooRealVar* mu_ZZ2 = ws->var("muZZ_ggF");
+    if (mu_ZZ2){
+        mu_ZZ2->setVal(1.);
+        mu_ZZ2->setConstant(false);
+    }
+
+    RooRealVar* mu_ZZ3 = ws->var("muZZ_rest");
+    if (mu_ZZ3){
+        mu_ZZ3->setVal(1.);
+        mu_ZZ3->setConstant(false);
+    }
+   
+    RooRealVar* mu_llll_ZZ = ws->var("mu_llll_ZZ");
+    if (mu_llll_ZZ){
+        mu_llll_ZZ->setVal(1.);
+        mu_llll_ZZ->setConstant(false);
+    }
+
+    RooRealVar* mu_llll_ZZ_VBF = ws->var("mu_llll_ZZ_VBF");
+    if (mu_llll_ZZ_VBF){
+        mu_llll_ZZ_VBF->setVal(1.);
+        mu_llll_ZZ_VBF->setConstant(false);
+    }
+
+    RooRealVar* mu_llll_ZZ_ggF = ws->var("mu_llll_ZZ_ggF");
+    if (mu_llll_ZZ_ggF){
+        mu_llll_ZZ_ggF->setVal(1.);
+        mu_llll_ZZ_ggF->setConstant(false);
+    }
+
+    RooRealVar* mu_llll_ZZ_rest = ws->var("mu_llll_ZZ_rest");
+    if (mu_llll_ZZ_rest){
+        mu_llll_ZZ_rest->setVal(1.);
+        mu_llll_ZZ_rest->setConstant(false);
+    }
+
+    RooRealVar* mu_llvv_ZZ = ws->var("mu_llvv_ZZ");
+    if (mu_llvv_ZZ){
+        mu_llvv_ZZ->setVal(1.);
+        mu_llvv_ZZ->setConstant(false);
+    }
+
+    RooRealVar* XS_ggF = ws->var("XS_ggF");
+    if(XS_ggF) XS_ggF->setMin(-5.);
+    RooRealVar* XS_VBF = ws->var("XS_VBF");
+    if(XS_VBF) XS_VBF->setMin(-5.);
+    RooRealVar* mu_ggF = ws->var("mu_ggF");
+    if(mu_ggF) mu_ggF->setMin(-5.);
+    RooRealVar* mu_VBF = ws->var("mu_VBF");
+    if(mu_VBF) mu_VBF->setMin(-5.);
+
+    if (options == "" || options.find("pvalue") != string::npos) 
     {
         std::cout<<"running pvalue code"<<std::endl;
         if (data_opt == "" || data_opt.find("obs") != string::npos) {
