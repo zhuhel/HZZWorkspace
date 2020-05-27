@@ -199,7 +199,7 @@ void CBGauss::makeCBGParameterization()
         workspace->import(*a0acc);
         workspace->import(*a1acc);
         workspace->import(*a2acc);
-        if (a3acc) workspace->import(*a3acc);
+        workspace->import(*a3acc);
 
         if (addInt){
             // parameters for the amplitude of interference term
@@ -337,7 +337,7 @@ RooAbsPdf* CBGauss::getPDF()
 
         // width
         RooAbsReal* gamma = new RooRealVar("gamma","gamma", 0.004, 200);
-        ((RooRealVar*)gamma)->setVal(75);
+        ((RooRealVar*)gamma)->setVal(7.);
         RooAbsReal* gamma_rel = new RooFormulaVar("gamma_rel","gamma/mH",RooArgList(*gamma,*mH));
         Helper::addPoiName(gamma->GetName());
         RooAbsPdf* truthPdf = NULL;

@@ -78,7 +78,7 @@ namespace IntegralHelper{
             G_zz *= std::pow(x,3) * std::pow((1-std::pow(2*91.2/x,2)),1/2) * (1-std::pow(2*91.2/x,2)+0.75*std::pow(2*91.2/x,4)) * (x>2*91.2);
 
             Double_t result_tmp =  Norm * L_gg(x) * std::pow(x,1) * G_gg * Propag * G_zz ;
-            //	if (i_step%100==0) std::cout<<"i_step = "<<i_step<<", x = "<<x<<", result_tmp = "<<result_tmp<< endl;
+            if (i_step%1000==0) std::cout<<"+++ get_HiggsIntegral: i_step = "<<i_step<<", x = "<<x<<", result_tmp = "<<result_tmp<< endl;
             if (result_tmp>0) result+= result_tmp;
         }
         result*=step/2.;
@@ -98,7 +98,7 @@ namespace IntegralHelper{
 
     //::: Return signal cross section x acceptance
     // Acceptance parameterized as a 2D polynomial as a function of mH
-    Double_t getSignalIntegral(Double_t mH, Double_t width, Double_t acc_0, Double_t acc_1, Double_t acc_2)
+    Double_t getSignalIntegral(Double_t mH, Double_t width, Double_t acc_0, Double_t acc_1, Double_t acc_2, Double_t acc_3)
     {
         Double_t Norm = 6.88734e-08;  // XY to figure out WHY this number is what it is
         // Note to self: it's not G-fermi
@@ -143,10 +143,15 @@ namespace IntegralHelper{
             Double_t G_zz = 1;
             G_zz *= std::pow(x,3) * std::pow((1-std::pow(2*91.2/x,2)),1/2) * (1-std::pow(2*91.2/x,2)+0.75*std::pow(2*91.2/x,4)) * (x>2*91.2);
 
-            Double_t Acc =  acc_0 + acc_1*x + acc_2*x*x ;
+            Double_t Acc =  acc_0 + acc_1*x + acc_2*x*x + acc_3*x*x*x;
 
             Double_t result_tmp =  Norm * L_gg(x) * std::pow(x,1) * G_gg * Propag * G_zz * Acc ;
 
+            if (i_step%1000==0){ 
+		std::cout<<"+++ get_SignalIntegral: i_step = "<<i_step<<", x = "<<x<<", result_tmp = "<<result_tmp<< endl;
+		std::cout<<"\t L_gg="<<L_gg(x)<<", G_gg="<<G_gg<<", Propag="<<Propag<<", G_zz="<<G_zz<<", Acc="<<Acc << endl;
+	        std::cout<<"\t acc_0/1/2/3 = "<<acc_0<<", "<<acc_1<<", "<<acc_2<<", "<<acc_3<<endl;
+	    }
             if (result_tmp>0) result+= result_tmp;
         }
         result*=step;
@@ -174,10 +179,11 @@ namespace IntegralHelper{
         Double_t acc_0 = par[1];
         Double_t acc_1 = par[2];
         Double_t acc_2 = par[3];
-        return getSignalIntegral(mH, width, acc_0, acc_1, acc_2);
+        Double_t acc_3 = par[4];
+        return getSignalIntegral(mH, width, acc_0, acc_1, acc_2, acc_3);
     }
 
-    Double_t getTotalIntegral(Double_t mH, Double_t width, Double_t log10_kappa, Double_t acc_0, Double_t acc_1, Double_t acc_2, Double_t a_0, Double_t a_1, Double_t a_2, Double_t a_3, Double_t a_4, Double_t b_0, Double_t b_1, Double_t b_2, Double_t b_3, Double_t b_4)
+    Double_t getTotalIntegral(Double_t mH, Double_t width, Double_t log10_kappa, Double_t acc_0, Double_t acc_1, Double_t acc_2, Double_t acc_3, Double_t a_0, Double_t a_1, Double_t a_2, Double_t a_3, Double_t a_4, Double_t b_0, Double_t b_1, Double_t b_2, Double_t b_3, Double_t b_4)
     {
         Double_t Norm = 6.88734e-08;
 
@@ -233,7 +239,7 @@ namespace IntegralHelper{
             Double_t G_zz = 1;
             G_zz *= std::pow(x,3) * std::pow((1-std::pow(2*91.2/x,2)),1/2) * (1-std::pow(2*91.2/x,2)+0.75*std::pow(2*91.2/x,4)) * (x>2*91.2);
 
-            Double_t Acc =  acc_0 + acc_1*x + acc_2*x*x ;
+            Double_t Acc =  acc_0 + acc_1*x + acc_2*x*x + acc_3*x*x*x;
 
             Double_t result_tmp =  Norm * L_gg(x) * std::pow(x,1) * G_gg * Propag * G_zz * Acc ;
 
@@ -246,8 +252,16 @@ namespace IntegralHelper{
             Double_t A = a_0 + a_1*x + a_2*TMath::Power(x,2) + a_3*TMath::Power(x,3) + a_4*TMath::Power(x,4);
             Double_t B = b_0 + b_1*x + b_2*TMath::Power(x,2) + b_3*TMath::Power(x,3) + b_4*TMath::Power(x,4);
 
-            result_tmp += 10e+07 * L_gg(x) * C * ( C_a * A + C_b * B ) * log10_kappa ;
+            Double_t result_tmp2 = 10e+07 * L_gg(x) * C * ( C_a * A + C_b * B ) * log10_kappa ;
+	    result_tmp += result_tmp2 ;
 
+            if (i_step%1000==0){
+		std::cout<<"+++ get_TotalIntegral: i_step = "<<i_step<<", x = "<<x<<", result_tmp = "<<result_tmp<<", tmp_int = "<<result_tmp2<< endl;
+		std::cout<<"\t C = "<<C<<", C_a = "<<C_a<<", A = "<<A<<", C_b = "<<C_b<<", B = "<<B<<endl;
+	        std::cout<<"\t Acc = "<<Acc<<", acc_0/1/2/3 = "<<acc_0<<", "<<acc_1<<", "<<acc_2<<", "<<acc_3<<endl;
+	        std::cout<<"\t A = "<<A<<", a_0/1/2/3/4 = "<<a_0<<", "<<a_1<<", "<<a_2<<", "<<a_3<<", "<<a_4<<endl;
+	        std::cout<<"\t B = "<<B<<", b_0/1/2/3/4 = "<<b_0<<", "<<b_1<<", "<<b_2<<", "<<b_3<<", "<<b_4<<endl;
+	    }
             if (result_tmp>0) result+= result_tmp;
         }
         result*=step;
@@ -278,18 +292,20 @@ namespace IntegralHelper{
         Double_t acc_0 = par[1];
         Double_t acc_1 = par[2];
         Double_t acc_2 = par[3];
-        Double_t a_0 = par[4];
-        Double_t a_1 = par[5];
-        Double_t a_2 = par[6];
-        Double_t a_3 = par[7];
-        Double_t a_4 = par[8];
-        Double_t b_0 = par[9];
-        Double_t b_1 = par[10];
-        Double_t b_2 = par[11];
-        Double_t b_3 = par[12];
-        Double_t b_4 = par[13];
+        Double_t acc_3 = par[4];
+        Double_t a_0 = par[5];
+        Double_t a_1 = par[6];
+        Double_t a_2 = par[7];
+        Double_t a_3 = par[8];
+        Double_t a_4 = par[9];
+        Double_t b_0 = par[10];
+        Double_t b_1 = par[11];
+        Double_t b_2 = par[12];
+        Double_t b_3 = par[13];
+        Double_t b_4 = par[14];
 
-        return getTotalIntegral(mH, width, kappa, acc_0, acc_1, acc_2,
+        std::cout << "[getTotalIntegralTF1]: x[1] (kappa) = "<< kappa << endl;
+        return getTotalIntegral(mH, width, kappa, acc_0, acc_1, acc_2, acc_3,
                 a_0, a_1, a_2, a_3, a_4,
                 b_0, b_1, b_2, b_3, b_4);
     }

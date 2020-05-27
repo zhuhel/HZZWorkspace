@@ -703,16 +703,16 @@ RooAbsReal* Coefficient::GetGenericFactorUsingNormDic(const std::string& p, cons
             RooFormulaVar* factor_raw = new RooFormulaVar(Form("%s_%s_raw",p2.Data(),m_channel.c_str()),formula.Data(),vars);
 
             float mH_down = 200.0;
-            float mH_up = 1500.0;
+            float mH_up = 2000.0;
 
             RooRealVar* mH = new RooRealVar("mH", "mH", mH_down, mH_up);
-            mH->setVal(600.);
+            mH->setVal(700.);
 
             // Relative width value for each mass, used for generating a TF1 map for calculating
             // the cross section! Different name w.r.t the one used in the RooRelativeBW.
             // This value is set priori to the fitting. For each benchmark width 1%, 5%, 10% and 15%,
             // before making the workspaces, one needs to change this value, recompile the code.
-            RooAbsReal* gamma_frac = new RooRealVar("gamma_frac","gamma_frac",0.10);
+            RooAbsReal* gamma_frac = new RooRealVar("gamma_frac","gamma_frac",0.15);
 
             TF1* f_HiggsXS = new TF1("SM_xs", IntegralHelper::getHiggsXSTF1, mH_down, mH_up, 1);
             f_HiggsXS->SetNpx(2);
@@ -724,9 +724,9 @@ RooAbsReal* Coefficient::GetGenericFactorUsingNormDic(const std::string& p, cons
             RooRealVar* xs = new RooRealVar("XS_ggF","XS_ggF",1.,0.00000001,100.);
             RooAbsReal* kappa_ggF = new RooFormulaVar("kappa_ggF","TMath::Sqrt(1 / ( @0*(@0>0.00001*@1)/@1+0.00001*(1-(@0>0.00001*@1))))",RooArgList(*xs,*SM_xs));
 
-            TF1* f_SigInt = new TF1(Form("SignalIntegral_%s",m_channel.c_str()), IntegralHelper::getSignalIntegralTF1, 200., 1000., 4);
+            TF1* f_SigInt = new TF1(Form("SignalIntegral_%s",m_channel.c_str()), IntegralHelper::getSignalIntegralTF1, 200., 2000., 5);
             f_SigInt->SetNpx(80);
-            TF2* f_TotInt = new TF2(Form("TotalIntegral_%s",m_channel.c_str()), IntegralHelper::getTotalIntegralTF2, 200., 1000., 0.05, 500., 14);
+            TF2* f_TotInt = new TF2(Form("TotalIntegral_%s",m_channel.c_str()), IntegralHelper::getTotalIntegralTF2, 200., 2000., 0.05, 500., 15);
             f_TotInt->SetNpx(80);
             f_TotInt->SetNpy(800);
             // f_TotInt->SetNpx(2);
@@ -735,6 +735,7 @@ RooAbsReal* Coefficient::GetGenericFactorUsingNormDic(const std::string& p, cons
             RooAbsReal* accp0 = new RooRealVar(Form("ATLAS_Signal_ggF_%s_ACC_p0",m_channel.c_str()),Form("ATLAS_Signal_ggF_%s_ACC_p0",m_channel.c_str()),1.,-10000.,10000.);
             RooAbsReal* accp1 = new RooRealVar(Form("ATLAS_Signal_ggF_%s_ACC_p1",m_channel.c_str()),Form("ATLAS_Signal_ggF_%s_ACC_p1",m_channel.c_str()),1.,-10000.,10000.);
             RooAbsReal* accp2 = new RooRealVar(Form("ATLAS_Signal_ggF_%s_ACC_p2",m_channel.c_str()),Form("ATLAS_Signal_ggF_%s_ACC_p2",m_channel.c_str()),1.,-10000.,10000.);
+            RooAbsReal* accp3 = new RooRealVar(Form("ATLAS_Signal_ggF_%s_ACC_p3",m_channel.c_str()),Form("ATLAS_Signal_ggF_%s_ACC_p3",m_channel.c_str()),1.,-10000.,10000.);
             RooAbsReal* inta0 = new RooRealVar(Form("ATLAS_Signal_ggF_%s_INT_a0",m_channel.c_str()),Form("ATLAS_Signal_ggF_%s_INT_a0",m_channel.c_str()),1.,-10000.,10000.);
             RooAbsReal* inta1 = new RooRealVar(Form("ATLAS_Signal_ggF_%s_INT_a1",m_channel.c_str()),Form("ATLAS_Signal_ggF_%s_INT_a1",m_channel.c_str()),1.,-10000.,10000.);
             RooAbsReal* inta2 = new RooRealVar(Form("ATLAS_Signal_ggF_%s_INT_a2",m_channel.c_str()),Form("ATLAS_Signal_ggF_%s_INT_a2",m_channel.c_str()),1.,-10000.,10000.);
@@ -750,12 +751,14 @@ RooAbsReal* Coefficient::GetGenericFactorUsingNormDic(const std::string& p, cons
             list_sig.add(*accp0);
             list_sig.add(*accp1);
             list_sig.add(*accp2);
+            list_sig.add(*accp3);
             RooArgList list_int("list_int");
             list_int.add(*gamma_frac);
             //	list_int.add(*kappa_ggF);
             list_int.add(*accp0);
             list_int.add(*accp1);
             list_int.add(*accp2);
+            list_int.add(*accp3);
             list_int.add(*inta0);
             list_int.add(*inta1);
             list_int.add(*inta2);
