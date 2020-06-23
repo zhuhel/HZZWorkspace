@@ -712,7 +712,7 @@ RooAbsReal* Coefficient::GetGenericFactorUsingNormDic(const std::string& p, cons
             // the cross section! Different name w.r.t the one used in the RooRelativeBW.
             // This value is set priori to the fitting. For each benchmark width 1%, 5%, 10% and 15%,
             // before making the workspaces, one needs to change this value, recompile the code.
-            RooAbsReal* gamma_frac = new RooRealVar("gamma_frac","gamma_frac",0.15);
+            RooAbsReal* gamma_frac = new RooRealVar("gamma_frac","gamma_frac",0.01);
 
             TF1* f_HiggsXS = new TF1("SM_xs", IntegralHelper::getHiggsXSTF1, mH_down, mH_up, 1);
             f_HiggsXS->SetNpx(2);

@@ -72,6 +72,7 @@ int main(int argc, char** argv)
         }
     }
     opt_id ++;
+    if (fix_variables == "none") { fix_variables = "";}
 
     // summary of options
     cout<<" Input: " << input_name << endl;
@@ -206,13 +207,13 @@ int main(int argc, char** argv)
     }
 
     RooRealVar* XS_ggF = ws->var("XS_ggF");
-    if(XS_ggF) XS_ggF->setMin(-5.);
+    if(XS_ggF) XS_ggF->setMin(0.);
     RooRealVar* XS_VBF = ws->var("XS_VBF");
-    if(XS_VBF) XS_VBF->setMin(-5.);
+    if(XS_VBF) XS_VBF->setMin(0.);
     RooRealVar* mu_ggF = ws->var("mu_ggF");
-    if(mu_ggF) mu_ggF->setMin(-5.);
+    if(mu_ggF) mu_ggF->setMin(0.);
     RooRealVar* mu_VBF = ws->var("mu_VBF");
-    if(mu_VBF) mu_VBF->setMin(-5.);
+    if(mu_VBF) mu_VBF->setMin(0.);
 
     if (options == "" || options.find("pvalue") != string::npos) 
     {
